@@ -1,7 +1,6 @@
 # STEEL SPIRIT
 
-![](#scenes/cover.png)
-
+![steel spirit cover](scenes/cover.png)
 ## A TwinStick,Shmup RPG hybrid    
 
 In progress, lots yet to be done. 
