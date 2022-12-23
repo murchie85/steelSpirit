@@ -52,10 +52,12 @@ STATE 3 - ALERT
 
 
 class scout(parent):
-	def __init__(self,gui,x=None,y=None):
+	def __init__(self,_id,gui,x=None,y=None):
 		super().__init__(gui)
+		self.id             = _id
 		self.name           = 'scout'
 		self.images         = imageAnimateAdvanced(gui.scoutRed,0.2)
+		self.x,self.y       = 500,500
 		if(x!=None): self.x = x
 		if(y!=None): self.y = y
 		self.w              = int(gui.scoutRed[0].get_width())
@@ -64,7 +66,7 @@ class scout(parent):
 
 
 		self.state             = 'patrol'
-		self.patrolLocations   = [(730,110),(1440,110),(1440,540),(730,540)] 
+		self.patrolLocations   = [(self.x,self.y),(self.x+400,self.y),(self.x+400,self.y+200),(self.x,self.y+200)] 
 		self.currentLocIndex   = 0
 
 
@@ -76,6 +78,7 @@ class scout(parent):
 
 	# AI LOGIC
 	def actions(self,gui,game,lv):
+
 
 		if(self.state=='patrol'):
 			self.patrol()
@@ -142,6 +145,8 @@ class scout(parent):
 	def drawSelf(self,gui,game,lv):
 		x,y = self.x - gui.camX,self.y  - gui.camY
 		
-		if(self.alive==True and onScreen(self,gui)):
+		if(self.hit):
+			self.damageAnimation(gui,lv,game)
+		elif(self.alive==True and onScreen(self,gui) ):
 			animate,imageParms = self.images.animate(gui,'scout',[x,y],game,rotation=self.facing-90)
 

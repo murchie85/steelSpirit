@@ -2,6 +2,26 @@
 import pickle 
 import math
 
+"""
+
+- onScreen
+- clamp
+- zero
+- angleToTarget
+- wrapAngle
+- faceTarget
+- getDistance
+- collidesWith
+- collidesWithHitBox
+- killme
+- createFid
+-
+
+
+"""
+
+
+
 
 def onScreen(unit,gui):
 	onScreen = True
@@ -187,54 +207,8 @@ def killme(self,lv,killMesssage=None,printme=False):
 
 
 
-
-# HELICOPTER STYLE CONTROL SYSTEM
-
-def copterControls(self,pressedKeys,lv):
-
-	# ACCELELRATION FLAG
-	vAccell,hAccell = False,False
-	# GET DIRECTION OF ACCELLERATION
-	if('W' in pressedKeys ):
-		self.vSpeed -= 0.4
-		vAccell = True
-	if('S' in pressedKeys):
-		self.vSpeed += 0.4
-		vAccell = True
-	if('D' in pressedKeys):
-		self.hSpeed += 0.4
-		hAccell = True
-	if('A' in pressedKeys):
-		self.hSpeed -= 0.4
-		hAccell = True
-
-	#---------ROTATION
-
-	if('H' in pressedKeys ):
-		self.facing += self.rotationSpeed
-
-
-	if('J' in pressedKeys ):
-		self.facing -= self.rotationSpeed
-
-	# SLOW DOWN IF NOT ACCELLERATING
-	if(hAccell==False): self.hSpeed = zero(self.hSpeed,self.decelleration)
-	if(vAccell==False): self.vSpeed = zero(self.vSpeed,self.decelleration)
-
-
-	# BORDER CLAMP
-
-	if(self.x + self.w > lv.mapw): self.x -= self.maxHSpeed
-	if(self.x < lv.mapx): self.x += self.maxHSpeed
-	if(self.y + self.h > lv.maph): self.y -= self.maxVSpeed
-	if(self.y < lv.mapy): self.y += self.maxVSpeed
-
-	
-	# CLAMP SPEEDS
-	self.hSpeed = clamp(self.hSpeed,self.maxHSpeed)
-	self.vSpeed = clamp(self.vSpeed,self.maxVSpeed)
-
-	# UPDATE POSITION
-	self.x += self.hSpeed
-	self.y += self.vSpeed
+def createFid(self):
+	rfid = max(self.fids,default=0) + 1
+	self.fids.append(rfid)
+	return(rfid)
 

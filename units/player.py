@@ -9,6 +9,7 @@ import random
 class player():
 	def __init__(self,gui):
 		self.id             = 0
+		self.name 			= 'player'
 		self.classification = 'ally'
 		self.alive          = True
 
@@ -27,16 +28,19 @@ class player():
 		self.rotatedH	   = self.h
 		
 		# ATTRIBUTES 
-		self.hp              = 100
-		self.speed           = 0
-		self.maxSpeed        = 8
-		self.maxSpeedDefault = 8
-		self.boostSpeed      = 16
-		self.boosting        = False
-		self.boostTimer      = stopTimer()           # BUFF
-		self.boostCoolDown   = stopTimer()
-		self.boostAvailable  = True
-		self.boostCount      = 0
+		self.hp                = 100
+		self.hit 			   = False
+		self.speed             = 0
+		self.maxSpeed          = 8
+		self.maxSpeedDefault   = 8
+		self.boostSpeed        = 16
+		self.boosting          = False
+		self.boostDuration     = 4
+		self.boostCooldownTime = 1
+		self.boostTimer        = stopTimer()           # BUFF
+		self.boostCoolDown     = stopTimer()
+		self.boostAvailable    = True
+		self.boostCount        = 0
 
 		self.decelleration  = 0.2
 		self.rotationSpeed  = 5
@@ -44,15 +48,20 @@ class player():
 
 
 		# BULLETS 
-
+		self.shotType			= 'pellet'
+		self.availableWeapons   = ['pellet','doublePellet' ,'slitherShot','doubleSlither']
+		self.bulletAttrs        = { 'pellet':{'speed':10,'damage':10}, 'doublePellet':{'speed':10,'damage':10},  'slitherShot':{'speed':3,'damage':20}, 'doubleSlither':{'speed':3,'damage':20} }
 		self.bulletTimer        = stopTimer()           # BUFF
 		self.shootDelay         = 0.1                   # BUFF
 		self.bulletsFired       = 0
 
 
+
 		# DESTROY 
 		self.destructionComplete = False
-
+		self.chosenExplosionImg  = gui.smallYellowExplosion
+		self.explosion           = imageAnimateAdvanced(self.chosenExplosionImg,0.1)
+		self.debris 			 = 0
 
 	
 	# MANAGE ACCELLERATION 
@@ -66,7 +75,7 @@ class player():
 
 		# --------MOVEMENT LOGIC
 
-		self.classicControls(pressedKeys,lv,game)
+		self.classicControls(gui,pressedKeys,lv,game)
 
 
 		# --------CAMERA MOVEMENT
@@ -119,17 +128,43 @@ class player():
 		
 		# IF SHOOT CRITEREA MET,
 		if((shotAvailable)):
-			self.bulletsFired +=1
-			# ADDS BULLET TO BULLET LIST
-			bid = max(([x.id for x in lv.bulletList]),default=0) + 1
-			lv.bulletList.append(bullet(gui,self.blitPos[0]+ gui.camX,self.blitPos[1]+ gui.camY,bid,self.classification, self.facing,'slitherShot', speed=self.maxSpeed + bulletSpeed,colour=bulletColour))
-		
+
+			if(self.shotType=='doublePellet'):
+				self.bulletsFired +=1
+				# ADDS BULLET TO BULLET LIST
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.blitPos['leftTop'][0]+ gui.camX,self.blitPos['leftTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+				
+				# ADDS BULLET TO BULLET LIST
+				self.bulletsFired +=1
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.blitPos['rightTop'][0]+ gui.camX,self.blitPos['rightTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+			elif(self.shotType=='doubleSlither'):
+				self.bulletsFired +=1
+				# ADDS BULLET TO BULLET LIST
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.blitPos['leftTop'][0]+ gui.camX,self.blitPos['leftTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+				
+				# ADDS BULLET TO BULLET LIST
+				self.bulletsFired +=1
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.blitPos['rightTop'][0]+ gui.camX,self.blitPos['rightTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+			else:
+				self.bulletsFired +=1
+				# ADDS BULLET TO BULLET LIST
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+			
 
 
 	def drawSelf(self,gui,game):
 		x,y = self.x - gui.camX,self.y  - gui.camY
-		
-		if(self.alive==True and onScreen(self,gui)):
+
+		if(self.hit):
+			self.damageAnimation(gui,lv,game)
+		elif(self.alive==True and onScreen(self,gui)):
 			
 			self.shadow.animate(gui,'player shadow',[self.shadowPos[0],self.shadowPos[1]],game,rotation=self.facing-90,noseAdjust=True)
 			
@@ -138,11 +173,11 @@ class player():
 			else:
 				animate,imageParms = self.images.animate(gui,'player',[x,y],game,rotation=self.facing-90)
 			
-			self.blitPos   = imageParms['midTop']
+			self.blitPos   = imageParms
 			self.shadowPos = imageParms['behind']
 
 
-	def classicControls(self,pressedKeys,lv,game):
+	def classicControls(self,gui,pressedKeys,lv,game):
 
 		# ACCELELRATION FLAG
 		accell= False
@@ -158,10 +193,14 @@ class player():
 		if('A' in pressedKeys):
 			self.facing += 2
 
+		if(gui.input.returnedKey.upper()=='E'):
+			nextIndex    = (self.availableWeapons.index(self.shotType) + 1) % len(self.availableWeapons)
+			self.shotType = self.availableWeapons[nextIndex]
+
 		# SPEED BOOST
 		if('J' in pressedKeys):
 			
-			boostComplete = self.boostTimer.stopWatch(2,'boost', str(self.boostCount),game,silence=True)
+			boostComplete = self.boostTimer.stopWatch(self.boostDuration,'boost', str(self.boostCount),game,silence=True)
 			
 			if(not boostComplete):
 				self.boosting = True
@@ -173,7 +212,7 @@ class player():
 			self.boosting       = False
 			self.maxSpeed       = self.maxSpeedDefault
 			if(self.boostAvailable == False):
-				self.boostAvailable = self.boostCoolDown.stopWatch(2,'boost cooldown Counter', str(self.boostCount),game,silence=True)
+				self.boostAvailable = self.boostCoolDown.stopWatch(self.boostCooldownTime,'boost cooldown Counter', str(self.boostCount),game,silence=True)
 				if(self.boostAvailable):
 					self.boostCount +=1
 
@@ -214,3 +253,18 @@ class player():
 			self.facing -= self.rotationSpeed
 		"""
 
+
+	def animateDestruction(self,gui,lv,game):
+		x,y = self.x - gui.camX,self.y  - gui.camY
+
+		if(self.destructionComplete==False and self.alive==False):
+			complete,blitPos = self.explosion.animate(gui,str(str(self.name) +' explosion'),[x,y],game)
+			bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+
+
+			if(self.debris<=12):
+				self.debris +=1
+				# ADDS DEBRIS TO TO LIST
+				lv.bulletList.append(bullet(gui,self.x + 0.5* self.chosenExplosionImg[0].get_width(),self.y+ 0.5* self.chosenExplosionImg[0].get_height(),bid,'debris',random.randrange(0,360),'debris',speed=10, w=0.05*self.w,h=0.05*self.h,colour=(192,192,192)))
+			if(complete):
+				self.destructionComplete = True

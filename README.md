@@ -10,8 +10,7 @@ In progress, lots yet to be done.
 ## TODO   
 
 
-- Thinner fire
-- Double fire
+
 - Finish isonscreen function - test using a viewport
 - JINK
 - MISSILE
@@ -22,7 +21,15 @@ In progress, lots yet to be done.
 - ++ VER SPEED
 - ++ CANVAS SPEED
 
+DONE: make and render player DONE: Do a simple map DONE: Navigate with aswd DONE: Camera Nav
+DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion animation, allow player to die, 
+DONE Thinner fire
+DONE Double fire
 
+
+- UPGRADE TREE
+- MAINMENU UNLOCK
+	- LONGER BOOST TIME - Dual fire
 
 # GAME FLOW 
 
@@ -103,7 +110,7 @@ SCENE
 
 FEATURES:
 
-DONE: make and render player DONE: Do a simple map DONE: Navigate with aswd DONE: Camera Nav
+
 
 fire weapon
 

@@ -22,7 +22,7 @@ class levelOne():
 		self.allyList    = []
 		self.enemyList   = []
 		self.deadList    = []
-		self.idList      = [1]
+		self.fids        = [1]
 
 
 		self.log         = []
@@ -44,7 +44,7 @@ class levelOne():
 			# ----PLAYER 
 
 			game.player.drawSelf(gui,game)
-			game.player.actions(gui,game,self)
+			if(game.player.alive): game.player.actions(gui,game,self)
 
 			# ENEMY ACTIONS
 
@@ -103,10 +103,25 @@ class levelOne():
 	def init(self,gui,game):
 
 		#---place enemies on battlefield
-		_scout = scout(gui,x=500,y=100)
-		_scout.id = max(self.idList) +1
+		_scout = scout(createFid(self),gui,x=500,y=100)
+		_scout.patrolLocations   = [(730,110),(1440,110),(1440,540),(730,540)] 
 		self.enemyList.append(_scout)
-		
+
+		# ----scout 2
+		_scout = scout(createFid(self),gui,x=580,y=100)
+		self.enemyList.append(_scout)
+
+
+		_scout = scout(createFid(self),gui,x=630,y=400)
+		self.enemyList.append(_scout)
+
+
+		_scout = scout(createFid(self),gui,x=700,y=400)
+		self.enemyList.append(_scout)
+
+		_scout = scout(createFid(self),gui,x=770,y=400)
+		self.enemyList.append(_scout)
+
 
 		self.allyList.append(game.player)
 		self.state= ' start'

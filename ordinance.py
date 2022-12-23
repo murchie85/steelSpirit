@@ -4,7 +4,7 @@ import pygame
 import math
 
 class bullet():
-	def __init__(self,gui,x,y,bid,classification,facing,bulletType,speed=5,w=3,h=3,colour=(255,177,42),damage=10,_range=1200):
+	def __init__(self,gui,x,y,bid,classification,facing,bulletType,speed=5,w=5,h=5,colour=(255,177,42),damage=10,_range=1200):
 		self.x,self.y       = x,y
 		self.ox,self.oy     = x,y
 		self.id             = bid
@@ -20,7 +20,7 @@ class bullet():
 
 		self.bulletType     = bulletType
 
-		if(self.bulletType=='slitherShot'):
+		if(self.bulletType in ['slitherShot','doubleSlither']):
 			self.bulletImage   = imageAnimateAdvanced(gui.slitherShot,0.1)
 
 
@@ -56,8 +56,10 @@ class bullet():
 	def drawSelf(self,gui,game):
 		x,y = self.x -gui.camX, self.y -gui.camY
 		
-		if(self.bulletType=='slitherShot'):
-			self.bulletImage.animate(gui,'slitherShotBullet',[x-gui.slitherShot[0].get_width(),y],game,rotation=self.facing-90)
+		if(self.bulletType=='doublePellet'):
+			pygame.draw.circle(gui.screen, self.colour, (x,y), self.w, 0)
+		elif(self.bulletType in ['slitherShot','doubleSlither']):
+			self.bulletImage.animate(gui,'slitherShotBullet',[x-0.5*gui.slitherShot[0].get_width(),y],game,rotation=self.facing-90)
 		else:
 			pygame.draw.circle(gui.screen, self.colour, (x,y), self.w, 0)
 
@@ -73,6 +75,7 @@ class bullet():
 			# IF THE TARGET ISN'T INVINCIBLE 
 			if(not target.invincible):
 				target.hp -= self.damage
+				target.hit = True
 				self.killBullet(lv,killBulletsssage='struck enemy')
 
 			# ----KILL THE ENEMY 

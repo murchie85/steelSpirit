@@ -1,5 +1,7 @@
 from utils._utils import stopTimer,loadingBarClass,wrapAngle,imageAnimateAdvanced
+from utils.gameUtils import *
 from ordinance import *
+
 import random
 
 import math
@@ -15,6 +17,12 @@ class parent():
 		self.y               = 730
 		self.facing          = 90
 		self.alive           = True
+
+		# SHOULD BE OVERRIDEN
+
+		self.hitImage         = gui.scoutRedHit
+		self.hitAnimation     = imageAnimateAdvanced(self.hitImage,0.2)
+
 
 		# ATTRIBUTES 
 		self.hp              = 100
@@ -71,7 +79,7 @@ class parent():
 
 		# OVERRIDE
 		self.chosenExplosionImg = gui.smallRedExplosion
-		self.explosion          = imageAnimateAdvanced(gui.smallRedExplosion,0.1)
+		self.explosion          = imageAnimateAdvanced(self.chosenExplosionImg,0.1)
 
 
 
@@ -108,3 +116,12 @@ class parent():
 				lv.bulletList.append(bullet(gui,self.x + 0.5* self.chosenExplosionImg[0].get_width(),self.y+ 0.5* self.chosenExplosionImg[0].get_height(),bid,'debris',random.randrange(0,360),'debris',speed=10, w=0.05*self.w,h=0.05*self.h,colour=(192,192,192)))
 			if(complete):
 				self.destructionComplete = True
+
+	def damageAnimation(self,gui,lv,game):
+		x,y = self.x - gui.camX,self.y  - gui.camY
+		
+		if(self.alive==True and onScreen(self,gui)):
+			complete,imageParms = self.hitAnimation.animate(gui,str(self.name) + ' hit',[x,y],game,rotation=self.facing-90)
+			if(complete):
+				self.hit = False
+

@@ -106,6 +106,7 @@ gui.playerBoost       = loadImageFiles('fighterBoost1.png',IMAGEASSETPATH + 'fig
 gui.playerShadow      = loadImageFiles('shadow1.png',IMAGEASSETPATH + 'fighter/',convert=False)
 
 gui.scoutRed          = loadImageFiles('crabRed1.png',IMAGEASSETPATH + 'enemies/crab/',convert=False)
+gui.scoutRedHit       = loadImageFiles('crabRedhit1.png',IMAGEASSETPATH + 'enemies/crab/',convert=False)
 
 
 # ---------BULLETS AND WEAPONS
