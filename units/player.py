@@ -29,9 +29,9 @@ class player():
 		# ATTRIBUTES 
 		self.hp              = 100
 		self.speed           = 0
-		self.maxSpeed        = 6
-		self.maxSpeedDefault = 6
-		self.boostSpeed      = 12
+		self.maxSpeed        = 8
+		self.maxSpeedDefault = 8
+		self.boostSpeed      = 16
 		self.boosting        = False
 		self.boostTimer      = stopTimer()           # BUFF
 		self.boostCoolDown   = stopTimer()
@@ -56,48 +56,51 @@ class player():
 
 	
 	# MANAGE ACCELLERATION 
+	
 	def actions(self,gui,game,lv):
 		
-		# GET PRESSED KEYS
+		# --------GET PRESSED KEYS
 
 		pressedKeys     = [x.upper() for x in gui.input.pressedKeys]
+
+
+		# --------MOVEMENT LOGIC
 
 		self.classicControls(pressedKeys,lv,game)
 
 
-		#---------CAMERA MOVEMENT
-
-		margins     = [0.9*gui.w,0.1*gui.w,0.85*gui.h,0.15*gui.h]
+		# --------CAMERA MOVEMENT
 		softMargins = [0.7*gui.w,0.3*gui.w, 0.65*gui.h, 0.35*gui.h]
 
+		"""
 
 		# MOVE THE CAMERA SO IT STAYS AHEAD OF  MARGINS
 		if(self.x  > gui.camX + softMargins[0]): 
-			gui.camX += self.maxSpeed
+			gui.camX += 5
 
 		if(self.x  < gui.camX + softMargins[1]): 
-			gui.camX -= self.maxSpeed
+			gui.camX -= 5
 
 		if(self.y  > gui.camY + softMargins[2]): 
-			gui.camY += self.maxSpeed
+			gui.camY += 5
 
 		if(self.y  < gui.camY + softMargins[3]): 
-			gui.camY -= self.maxSpeed
-
-		"""	
-		if(self.x  > gui.camX + margins[0]): 
-			gui.camX += self.maxSpeed
-
-		if(self.x  < gui.camX + margins[1]): 
-			gui.camX -= self.maxSpeed	
-	
-		if(self.y  > gui.camY + margins[2]): 
-			gui.camY += self.maxSpeed
-
-		if(self.y  < gui.camY + margins[3]): 
-			gui.camY -= self.maxSpeed
-
+			gui.camY -= 5
 		"""
+
+		interpolation_factor=0.5
+
+		# Interpolate between current and target camera positions
+		target_camX = self.x - softMargins[0]
+		gui.camX = (1 - interpolation_factor) * gui.camX + interpolation_factor * target_camX
+
+		target_camY = self.y - softMargins[2]
+		gui.camY = (1 - interpolation_factor) * gui.camY + interpolation_factor * target_camY
+
+		# Clamp camera position within the limits of the game world
+		#gui.camX = min(max(0, gui.camX), gui.w)
+		#gui.camY = min(max(0, gui.camY), gui.h)
+
 
 
 		# ---------SHOOT
@@ -119,7 +122,7 @@ class player():
 			self.bulletsFired +=1
 			# ADDS BULLET TO BULLET LIST
 			bid = max(([x.id for x in lv.bulletList]),default=0) + 1
-			lv.bulletList.append(bullet(gui,self.blitPos[0],self.blitPos[1],bid,self.classification, self.facing,'slitherShot', speed=self.maxSpeed + bulletSpeed,colour=bulletColour))
+			lv.bulletList.append(bullet(gui,self.blitPos[0]+ gui.camX,self.blitPos[1]+ gui.camY,bid,self.classification, self.facing,'slitherShot', speed=self.maxSpeed + bulletSpeed,colour=bulletColour))
 		
 
 
@@ -135,26 +138,9 @@ class player():
 			else:
 				animate,imageParms = self.images.animate(gui,'player',[x,y],game,rotation=self.facing-90)
 			
-			self.blitPos = imageParms['midTop']
+			self.blitPos   = imageParms['midTop']
 			self.shadowPos = imageParms['behind']
-			
 
-		else:
-			if(self.destructionComplete==False):
-				"""
-				complete,blitPos,w,h = self.explosion.animate(battleManager.gui,'drone kaboom',[x,y],battleManager.game)
-				bid = max(([x.id for x in battleManager.bulletList]),default=0) + 1
-
-
-				if(self.debris<=5):
-					self.debris +=1
-					# ADDS DEBRIS TO TO LIST
-					battleManager.bulletList.append(bullet(self.x + 0.5* battleManager.gui.droneExplosion[0].get_width(),self.y+ 0.5* battleManager.gui.droneExplosion[0].get_height(),bid,'debris', random.randrange(0,360),w=0.2*self.w,h=0.2*self.h,colour=(192,192,192),speed=2 ))
-					
-				if(complete):
-					self.destructionComplete = True
-
-				"""
 
 	def classicControls(self,pressedKeys,lv,game):
 
@@ -168,9 +154,9 @@ class player():
 			self.speed -= 0.4
 			accell = True
 		if('D' in pressedKeys):
-			self.facing -= 4
+			self.facing -= 2
 		if('A' in pressedKeys):
-			self.facing += 4
+			self.facing += 2
 
 		# SPEED BOOST
 		if('J' in pressedKeys):
@@ -191,11 +177,7 @@ class player():
 				if(self.boostAvailable):
 					self.boostCount +=1
 
-			
 
-		#self.boostTimer      = stopTimer()           # BUFF
-		#self.boostCoolDown   = stopTimer()
-		#self.boostAvailable  = True
 	
 		# WRAP ANGLE
 		self.facing = wrapAngle(self.facing)

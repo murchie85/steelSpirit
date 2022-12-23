@@ -3,7 +3,7 @@ import random
 from utils._utils import stopTimer
 from scenes.title import *
 from scenes.mapMaker import *
-from player import *
+from units.player import *
 from levelOne import *
 
 """

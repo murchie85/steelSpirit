@@ -9,14 +9,89 @@ In progress, lots yet to be done.
 
 ## TODO   
 
-- TOGGLE ABILITIES FOR FLY
-- ROTATE + JINK
+
+- Thinner fire
+- Double fire
+- Finish isonscreen function - test using a viewport
+- JINK
+- MISSILE
+- LOCK ON
+- CHAFF
 - UDLR + ROTATE 
 - ++ HOR SPEED
 - ++ VER SPEED
 - ++ CANVAS SPEED
 
-  
+
+
+# GAME FLOW 
+
+
+## SIMPLIFIED  Game Logic: 
+
+- [MAIN] - [GAME] - [LEVEL] - [PLAYER OBJ, ENEMY OBJ, BULLET OBJ, TILEMAPS]
+
+
+## FULL FLOW 
+
+
+- main 
+	
+	- setup ---- (importing images and setting up the main gui, game and other classes)
+	
+	- Coordinator [GAME CLASS] (managing the main scenes/phease of the game)
+
+		- Intro 
+
+		- Title screen
+
+		- Start Menu
+
+		-  Game Logic [LEVEL CLASS]
+
+			- Two main states: 
+
+				- Init
+					- Setup background, add enemies to the field
+				- Run
+					- Runs the bullets, map, enemies, players functions
+
+		- Map editor ***(Complete)***
+
+			- Create new map
+
+			- Load Map
+
+				- Edit map
+
+		- (settings, profile...)
+
+# SCENES 
+
+**ACCEPTANCE** don't start until DOGFIGHT, CHAFF, 5 ENEMIES, 5 GROUND AA COMPLETE
+
+- Pop up view box (Consider spinning out of power x302s)
+- Meeting an alien skrill for the first time 'your ship is junk'...fight me
+- VR intro scene, 4 different sides... go go go, split up
+
+
+ 
+
+# REFS 
+
+
+https://www.reddit.com/user/KrahsteertS/
+
+https://twitter.com/dantemendes/status/1605888637534707717
+
+shmup maker https://twitter.com/bulostudio/status/1606030117133815808
+
+Gyro Blade
+https://twitter.com/HTProject073/status/1600464060428222464
+
+https://twitter.com/HTProject073/status/1601422278054449153
+
+
 # Notes  
 
 
@@ -67,7 +142,7 @@ mild plot about slipgates
 
 Lock on fights
 
-BIG SCENE 1 - DREADNAUGHT
+## BIG SCENE 1 - DREADNAUGHT
 
 Timer in big, 'x until end of earht, shrinks to top right'
 battlship preview before coming to you

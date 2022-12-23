@@ -1,4 +1,5 @@
-from utils._utils import stopTimer, imageAnimateAdvanced
+from utils._utils import stopTimer, imageAnimateAdvanced,darken
+from utils.gameUtils import killme
 import pygame
 import math
 
@@ -23,7 +24,7 @@ class bullet():
 			self.bulletImage   = imageAnimateAdvanced(gui.slitherShot,0.1)
 
 
-	def move(self,gui,lv):
+	def move(self,gui,lv,game):
 		vel_x = self.speed * math.cos(math.radians(360-self.facing))
 		vel_y = self.speed * math.sin(math.radians(360-self.facing))
 
@@ -34,7 +35,7 @@ class bullet():
 		self.checkBoundary(gui,lv)
 
 		if(self.classification=='debris'):
-			removeMe = self.debrisTimer.stopWatch(self.debrisDelay,'debris', str(self.id) + str(self.classification) + 'debris', gui.game,silence=True)
+			removeMe = self.debrisTimer.stopWatch(self.debrisDelay,'debris', str(self.id) + str(self.classification) + 'debris', game,silence=True)
 			self.colour = darken(self.colour,darkenAmount=1)
 			if(removeMe):
 				self.killBullet(lv,killBulletsssage='debris Fadeout')
@@ -53,7 +54,7 @@ class bullet():
 	# ONLY DRAW IF IN BOUNDARY
 
 	def drawSelf(self,gui,game):
-		x,y = self.x , self.y 
+		x,y = self.x -gui.camX, self.y -gui.camY
 		
 		if(self.bulletType=='slitherShot'):
 			self.bulletImage.animate(gui,'slitherShotBullet',[x-gui.slitherShot[0].get_width(),y],game,rotation=self.facing-90)
@@ -66,16 +67,18 @@ class bullet():
 	# MANAGE BULLET COLLISION WITH SELF 
 
 	def bulletCollides(self,target,gui,lv):
+		# IF BULLET CLASSIFICATION IS NOT THE SAME AS TARGETS 
 		if(self.classification!=target.classification and self.classification!='debris'):
+			
+			# IF THE TARGET ISN'T INVINCIBLE 
 			if(not target.invincible):
 				target.hp -= self.damage
 				self.killBullet(lv,killBulletsssage='struck enemy')
-				target.shieldFlicker = True
 
 			# ----KILL THE ENEMY 
 			if(target.hp<=0):
 				target.alive = False
-				killme(target,gui,killMesssage=' struck by enemy fire.')
+				killme(target,lv,killMesssage=' struck by enemy fire.',printme=True)
 
 	# ENSURE BULLET DIES. 
 

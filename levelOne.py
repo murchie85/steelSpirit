@@ -1,5 +1,7 @@
-from utils._utils import drawImage
+from utils._utils import drawImage,load_pickle
 from utils.gameUtils import *
+from units.scout import *
+
 class levelOne():
 	def __init__(self,gui):
 		self.state = 'init'
@@ -16,28 +18,63 @@ class levelOne():
 
 		# in game objects
 
-		self.bulletList = []
+		self.bulletList  = []
+		self.allyList    = []
+		self.enemyList   = []
+		self.deadList    = []
+		self.idList      = [1]
+
+
+		self.log         = []
 
 
 
 	def run(self,gui,game):
 
 		if(self.state=='init'):
-			self.init()
+			self.init(gui,game)
 		else:
 
 
 			# ------MAIN LOOP 
+
 			self.drawMap(gui)
 			
+
+			# ----PLAYER 
+
 			game.player.drawSelf(gui,game)
 			game.player.actions(gui,game,self)
 
-			# PROJECTILE MANAGER
-			for bullet in self.bulletList:
-				bullet.drawSelf(gui,game)
-				bullet.move(gui,self)
+			# ENEMY ACTIONS
 
+			for enemy in self.enemyList:
+				enemy.drawSelf(gui,game,self)
+				enemy.actions(gui,game,self)
+
+				if(collidesWith(game.player,enemy)):
+					killme(game.player,self,killMesssage=' collided with enemy.',printme=True)
+
+
+			# ------BULLET MANAGER
+
+			for bullet in self.bulletList:
+
+				# check if bullet hits any enemies
+				for enemy in self.enemyList:
+
+					if(collidesWithHitBox(bullet,enemy)):
+						bullet.bulletCollides(enemy,gui,self)
+
+
+				# move bullet
+				bullet.drawSelf(gui,game)
+				bullet.move(gui,self,game)
+
+			#-----Death animations
+			for dead in self.deadList:
+				if(dead.alive==False):
+					dead.animateDestruction(gui,self,game)
 
 
 	def drawMap(self,gui):
@@ -63,6 +100,14 @@ class levelOne():
 			x = 0
 
 
-	def init(self):
-		print('init')
+	def init(self,gui,game):
+
+		#---place enemies on battlefield
+		_scout = scout(gui,x=500,y=100)
+		_scout.id = max(self.idList) +1
+		self.enemyList.append(_scout)
+		
+
+		self.allyList.append(game.player)
+		self.state= ' start'
 

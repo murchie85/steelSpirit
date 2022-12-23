@@ -12,6 +12,7 @@ class introScreen():
 		self.timer      = stopTimer()
 		self.timer2     = stopTimer()
 		self.timer3     = stopTimer()
+		self.timer4     = stopTimer()
 		self.introY     = None
 
 		self.dynamicBorder = dynamicBorder(borderColour=(60,60,200),noShadeShifts=10)
@@ -20,6 +21,13 @@ class introScreen():
 			self.reels.append({'cometReel':imageAnimateAdvanced(gui.blueFire,0.3),'x':random.randrange(0,1500),'y':random.randrange(-500,0),'skip':False} )
 		
 		self.bfReel        = imageAnimateAdvanced(gui.blueFire,0.3)
+
+		# alpha overlay
+		self.alphaI         = 100      # used on fade out (goes up to 255)
+		self.fadeSurface    = pygame.Surface((gui.w,gui.h))
+
+
+
 
 
 		# PROFILE 
@@ -71,24 +79,32 @@ class introScreen():
 			titleFontB     = gui.titleFontB
 			smallTitleFont = gui.smallNokiaFont
 			pygame.draw.rect(gui.screen, (gui.colourA), [0.05*gui.w, 0.05*gui.h,0.9*gui.w ,0.9*gui.h],4)
-			startup = self.timer.stopWatch(1,'intro',self.textState,game)
+			fadeReady    = self.timer4.stopWatch(1,'fade in',self.textState,game)
+			startup      = self.timer.stopWatch(2,'intro',self.textState,game)
+
+			
 			dcy = 0.15*gui.h
 			fsH   = 0.8*gui.h
 			h2022 = 0.85*gui.h
 			
 			# LOGO IMAGE 
-			drawImage(gui.screen,gui.titleLogo,(0.5*(gui.w-gui.titleLogo.get_width()),0.44*(gui.h-gui.titleLogo.get_height())))
-			
+			drawImage(gui.screen,gui.cover1,(0.5*(gui.w-gui.cover1.get_width()),0.44*(gui.h-gui.cover1.get_height())))
 			# 2022
 			drawText(gui,smallTitleFont, '2022',0.9*gui.w,h2022, 0.2*gui.w,colour=(100, 100, 200))
-			if(startup):
-				drawText(gui,titleFontB, 'DRONE COMMANDER',gui.x,dcy, gui.w,colour=(129, 212, 250),center=gui.w,pos=None)
+			
+			if(fadeReady):
+				self.fadeSurface.set_alpha(self.alphaI)
+				self.fadeSurface.fill((0,0,0))
+				gui.screen.blit(self.fadeSurface,(0,0))
+			if(startup):		
+				drawImage(gui.screen,gui.coverLogo,(0.5*(gui.w-gui.coverLogo.get_width()),50))
+				#drawText(gui,titleFontB, 'Steel Spirit',gui.x,dcy, gui.w,colour=(129, 212, 250),center=gui.w,pos=None)
 				subtitle = self.timer2.stopWatch(1,'intro',self.textState,game)
 				if(subtitle):
-					drawText(gui,titleFont, 'FIRST STRIKE',gui.x,fsH, gui.w,colour=gui.white,center=gui.w,pos=None)
+					drawText(gui,titleFont, 'First Strike',gui.x,fsH, gui.w,colour=gui.white,center=gui.w,pos=None)
 					title = self.timer3.stopWatch(1,'intro',self.textState,game)
 					if(title):
-						drawBlinkingText(gui.screen,gui.nokiaFont, 'Press Start',0.44*gui.w,0.65*gui.h, colour=(100, 100, 200))
+						drawBlinkingText(gui.screen,gui.bigNokiaFont, 'Press Start',0.44*gui.w,0.65*gui.h, colour=(255, 255, 30))
 
 			gui.input.processInput()
 			if(gui.input.returnedKey=='ENTER'):
@@ -101,43 +117,8 @@ class introScreen():
 			pygame.draw.rect(gui.screen,(5,9,20),(0.05*gui.w, 0.05*gui.h,0.9*gui.w ,0.9*gui.h))
 			# ANIMATE PLANET 
 
-			drawImage(gui.screen,gui.planet,[0.05*gui.w, 0.3*gui.h],trim=(0*gui.w,0.05*gui.h,gui.w,0.65*gui.h))
+			drawImage(gui.screen,gui.bunnyGirlYCover,[0,0])
 			
-
-
-			# ANIMATE COMMETS 
-
-			for i in range(len(self.reels)):
-				j = self.reels[i]
-				j['x'] -= 5
-				j['y'] += 5
-
-
-
-				# RESET COORDINATES
-				if(j['y']> gui.h and j['x'] < 0 ): j['x'],j['y']= random.randrange(0,gui.w+300),random.randrange(-500,0)
-
-				# CHANGE SLIDES BASED ON POSITION
-				if(j['x'] < 799 and j['cometReel'].imageFrames  != gui.bluefireEntry and j['y'] > 450):
-					j['cometReel'].imageFrames  = gui.bluefireEntry
-					j['cometReel'].currentFrame = 0
-					j['cometReel'].changeCount  = 0
-				if(j['x'] < 500 and j['cometReel'].imageFrames== gui.bluefireEntry and j['cometReel'].currentFrame > len(j['cometReel'].imageFrames)-2 ):
-					j['skip']=True
-
-				elif(j['x'] > 799 and j['cometReel'].imageFrames  != gui.blueFire):
-					j['cometReel'].imageFrames  = gui.blueFire
-					j['cometReel'].currentFrame = 0
-					j['cometReel'].changeCount  = 0
-					j['skip']=False
-
-				
-				# RENDER IMAGE IF IN BOX
-				imgWidth,imageHeight = j['cometReel'].imageFrames[0].get_width(),j['cometReel'].imageFrames[0].get_height()
-				if(j['x']-imgWidth<0.05*gui.w or j['x'] > 0.9*gui.w or j['y'] < 0.05*gui.h or j['y']+imageHeight > 0.9*gui.h or j['skip']):
-					pass
-				else:
-					j['cometReel'].animate(gui,'blueFire',(j['x'],j['y']),game,rotation=0)
 
 
 			# DRAWS BORDER 
@@ -148,15 +129,15 @@ class introScreen():
 			
 			tw,th   = getTextWidth(chosenFont,'A menu item yep sure.'),getTextHeight(chosenFont,'A menu item yep sure.')
 
-			profile,tex,tey     = simpleButton(0.5*(gui.w-tw),0.4*gui.h,'Profile',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+			profile,tex,tey     = simpleButton(0.8*(gui.w-tw),0.3*gui.h,'Profile',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
 
-			startGame,tex,tey    = simpleButton(0.5*(gui.w-tw),tey + 0.8*th,'Start Game',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+			startGame,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Start Game',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
 
-			loadGame,tex,tey    = simpleButton(0.5*(gui.w-tw),tey + 0.8*th,'Load Game',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+			loadGame,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Load Game',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
 
-			mapEditor,tex,tey   = simpleButton(0.5*(gui.w-tw),tey + 0.8*th,'Map Editor',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+			mapEditor,tex,tey   = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Map Editor',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
 
-			settings,tex,tey    = simpleButton(0.5*(gui.w-tw),tey + 0.8*th,'Settings',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+			settings,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Settings',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
 
 
 

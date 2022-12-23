@@ -2,6 +2,7 @@ from pygame.locals import *
 import pygame
 import time
 import pygame
+import pickle 
 import math
 import os
 
@@ -58,6 +59,11 @@ DRAW
 # ------MATH 
 
 - wrapAngle()
+
+# ------STATE 
+
+- save_dict_as_pickle
+- load_picle
 
 
 CLASSES
@@ -1039,7 +1045,7 @@ def drawSelectableImage(image,image2,pos,gui,trim=False):
 
 
 # returns image array iterating last filedigit
-def loadImageFiles(firstFile,path,convert=False):
+def loadImageFiles(firstFile,path,convert=False,log=False):
     imgFiles = []
     prefix = firstFile.split('.')[0][:-1]
     try:
@@ -1052,7 +1058,8 @@ def loadImageFiles(firstFile,path,convert=False):
         tfile = path + cf + affix
         if(os.path.isfile(tfile)):
             if(convert):
-                print('converting ' + str(tfile))
+                if(log):
+                    print('converting ' + str(tfile))
                 img = pygame.image.load(tfile).convert()
             else:
                 img = pygame.image.load(tfile)
@@ -1083,6 +1090,31 @@ def wrapAngle(facing):
     if(facing<0): facing = facing%360
 
     return(facing)
+
+
+
+
+
+
+
+# --------SAVE FILE 
+
+def save_dict_as_pickle(dictionary, file_path):
+  try:
+    with open(file_path, 'wb') as file:
+      pickle.dump(dictionary, file)
+  except Exception as e:
+    print(f'Error saving dictionary to {file_path}: {e}')
+    exit()
+
+# LOAD
+def load_pickle(file_path):
+  try:
+    with open(file_path, 'rb') as file:
+      return pickle.load(file)
+  except Exception as e:
+    print(f'Error loading pickle from {file_path}: {e}')
+    exit()
 
 
 

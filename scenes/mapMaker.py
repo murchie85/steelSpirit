@@ -17,7 +17,12 @@ class mapEditor():
 		self.selectedCoords        = [0,0]
 		self.tileOptions           = list(gui.tileDict.keys())
 		self.tileOptionsIndex      = 0
-		self.tileOptionsSubIndex  = 0
+		self.tileOptionsSubIndex   = 0
+
+		self.timer      			= stopTimer()
+		self.timer      			= stopTimer()
+		self.saving 				= False
+		self.saves 					= 0
 
 	def init(self,gui,game):
 		self.state             = 'options'
@@ -118,6 +123,7 @@ class mapEditor():
 		if(self.state=='loadMap'):
 			loadPath       = 'state/'
 			availableFiles = os.listdir(loadPath)
+			availableFiles = [x for x in availableFiles if x[-4:]=='.pkl']
 			chosenFont = gui.smallFont
 			borderColour=(60,60,200)
 			tw,th   = getTextWidth(chosenFont,'A menu item yep sure.'),getTextHeight(chosenFont,'A menu item yep sure.')
@@ -125,7 +131,10 @@ class mapEditor():
 			buttonY = 300
 			for f in availableFiles:
 				chosenFile,tex,tey  = simpleButton(700,buttonY,f,gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+				hoverered, ttx,tty  = drawText(gui,gui.smallFont, 'Delete',tex+10,buttonY+10, colour=(0, 128, 0),center=False,pos=[gui.mx,gui.my])
+				
 				buttonY += 1.5*th
+				# IF FILE SELECTED LOAD FILE 
 				if(chosenFile):
 					self.gameMap = load_pickle(loadPath + f)
 					self.gameMap['cols'] = int(self.gameMap['width']/self.gameMap['tileDims'])
@@ -133,7 +142,16 @@ class mapEditor():
 					self.state = 'editMap'
 					break
 
+				# IF DELETE
+				if(hoverered and gui.clicked):
+					os.remove(loadPath + f)
 
+			tw,th   = getTextWidth(chosenFont,'A menu item.'),getTextHeight(chosenFont,'A menu item.')
+			back,tex,tey      = simpleButton(100,0.93*gui.h,'Back',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+			if(back):
+				game.state = 'intro'  
+				self.init(gui,game)
+				print('going to intro')
 
 
 		if(self.state=='editMap'):
@@ -196,18 +214,28 @@ class mapEditor():
 			
 			if(save):
 				save_dict_as_pickle(self.gameMap, 'state/' + str(self.gameMap['name']) + '.pkl' )
-			if(back):
-				game.state = 'intro'  
-				self.init(gui,game)
-				print('going to intro')
+				self.saving = True
+			if(self.saving):
+				saveMessageTimeout    = self.timer.stopWatch(2,'SaveMessage',self.saves,game)
+				drawText(gui,gui.bigFont, 'Saved!',650,350,colour=(80, 255, 80))
+				if(saveMessageTimeout):
+					self.saving = False
+					self.saves+=1
 
 			# -----gui text
+
 			setWidth=getTextWidth(gui.font,'A menu item yep sure correct.')
 			sentence = "Map Size: [" + str(self.gameMap['width']) + ':' + str(self.gameMap['height']) +']'
 			drawTextWithBackground(gui.screen,gui.font,sentence,50,20,setWidth=setWidth ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
 			sentence = '(' +str(gui.mx+gui.camX) + ',' + str(gui.my+gui.camY) +')'
 			drawTextWithBackground(gui.screen,gui.font,sentence,50,800,setWidth=setWidth ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
 			
+			#--- always goes at the end
+			
+			if(back):
+				game.state = 'intro'  
+				self.init(gui,game)
+				print('going to intro')
 
 
 
@@ -257,10 +285,10 @@ class mapEditor():
 
 		# GET DIRECTION OF ACCELLERATION
 		if('W' in pressedKeys ):
-			gui.camY -= 7
+			gui.camY -= 20
 		if('S' in pressedKeys):
-			gui.camY += 7
+			gui.camY += 20
 		if('D' in pressedKeys):
-			gui.camX += 7
+			gui.camX += 20
 		if('A' in pressedKeys):
-			gui.camX -= 7
+			gui.camX -= 20

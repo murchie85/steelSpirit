@@ -91,7 +91,12 @@ gui.titleLogo        = pygame.image.load(IMAGEASSETPATH + '/scenes/title/titleLo
 gui.blueFire         = [pygame.image.load(IMAGEASSETPATH + 'scenes/title/bluefire1.png'),pygame.image.load(IMAGEASSETPATH + 'scenes/title/bluefire2.png') ,pygame.image.load(IMAGEASSETPATH + 'scenes/title/bluefire3.png') ,pygame.image.load(IMAGEASSETPATH + 'scenes/title/bluefire4.png')]
 gui.bluefireEntry    = loadImageFiles('blueFireEntry1.png',IMAGEASSETPATH + 'scenes/title/',convert=False)
 gui.planet           = pygame.image.load(IMAGEASSETPATH + 'scenes/title/planet.png')
-
+gui.coverLogo         = pygame.image.load(IMAGEASSETPATH + 'cover/logo.png')
+gui.cover1            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover.png')
+gui.cover2            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover2.png')
+gui.cover3            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover3.png')
+gui.cyborgCover       = pygame.image.load(IMAGEASSETPATH + 'cover/cyborgGirl.png')
+gui.bunnyGirlYCover   = pygame.image.load(IMAGEASSETPATH + 'cover/bunnyGirlYellowCover.png')
 
 
 # ----- UNITS AND PLAYER 
@@ -100,6 +105,7 @@ gui.player            = loadImageFiles('fighter1.png',IMAGEASSETPATH + 'fighter/
 gui.playerBoost       = loadImageFiles('fighterBoost1.png',IMAGEASSETPATH + 'fighter/',convert=False)
 gui.playerShadow      = loadImageFiles('shadow1.png',IMAGEASSETPATH + 'fighter/',convert=False)
 
+gui.scoutRed          = loadImageFiles('crabRed1.png',IMAGEASSETPATH + 'enemies/crab/',convert=False)
 
 
 # ---------BULLETS AND WEAPONS
@@ -120,7 +126,8 @@ gui.tileDict           = {'Grass': gui.grassTiles,
 						  }
 
 
-
+gui.smallRedExplosion      = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'explosions/smallExplosion/')
+gui.smallYellowExplosion   = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'explosions/explosionParticle/')
 
 # ------ CLASS ATTRS
 
