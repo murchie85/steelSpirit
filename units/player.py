@@ -21,13 +21,17 @@ class player():
 		self.images         = imageAnimateAdvanced(gui.player,0.2)
 		self.boostImage     = imageAnimateAdvanced(gui.playerBoost,0.2)
 		self.shadow         = imageAnimateAdvanced(gui.playerShadow,0.2)
+		self.lockOnImage    = imageAnimateAdvanced(gui.lockOn,0.15)
 		self.w              = int(gui.player[0].get_width())
 		self.h              = int(gui.player[0].get_height())
-		self.blitPos       = [self.x,self.y]
-		self.shadowPos     = [self.x,self.y]
-		self.rotatedW	   = self.w
-		self.rotatedH	   = self.h
-		
+		self.blitPos         = [self.x,self.y]
+		self.shadowPos       = [self.x,self.y]
+		self.rotatedW	     = self.w
+		self.rotatedH	     = self.h
+		self.cone_points     = None 	
+		self.lockedOn        = False
+		self.lockonIndex     = 1
+
 		# ATTRIBUTES 
 		self.hp                = 100
 		self.hit 			   = False
@@ -43,8 +47,9 @@ class player():
 		self.boostAvailable    = True
 		self.boostCount        = 0
 
-		self.decelleration  = 0.2
-		self.rotationSpeed  = 5
+		self.decelleration     = 0.2
+		self.rotationSpeed     = 5
+
 
 
 
@@ -78,25 +83,16 @@ class player():
 
 		self.classicControls(gui,pressedKeys,lv,game)
 
+		# --------BUILD DETECTION CONE
+
+		self.cone_points = detectionCone(self.x,self.y,gui,-self.facing,cone_length=400,cone_angle=100)
+
+		enemies = self.detectEnemies(lv,self.cone_points)
+		self.lockOn(gui,enemies,game)
 
 		# --------CAMERA MOVEMENT
 		softMargins = [0.7*gui.w,0.3*gui.w, 0.65*gui.h, 0.35*gui.h]
 
-		"""
-
-		# MOVE THE CAMERA SO IT STAYS AHEAD OF  MARGINS
-		if(self.x  > gui.camX + softMargins[0]): 
-			gui.camX += 5
-
-		if(self.x  < gui.camX + softMargins[1]): 
-			gui.camX -= 5
-
-		if(self.y  > gui.camY + softMargins[2]): 
-			gui.camY += 5
-
-		if(self.y  < gui.camY + softMargins[3]): 
-			gui.camY -= 5
-		"""
 
 		interpolation_factor=0.5
 
@@ -117,6 +113,54 @@ class player():
 
 		if('H' in pressedKeys):
 			self.shoot(game,lv,gui)
+
+	def detectEnemies(self,lv,cone_points):
+
+		# Create a Rect object for the cone of vision
+		cone_rect = pygame.Rect(min([p[0] for p in cone_points]), min([p[1] for p in cone_points]), max([p[0] for p in cone_points]) - min([p[0] for p in cone_points]), max([p[1] for p in cone_points]) - min([p[1] for p in cone_points]))
+
+		detectEnemies = []
+		for enemy in lv.enemyList:
+			if cone_rect.collidepoint((enemy.x, enemy.y)):
+				distance = getDistance(self.x,self.y,enemy.x,enemy.y)
+				detectEnemies.append((enemy,distance))
+
+		sorted_list  = sorted(detectEnemies, key=lambda x: x[1])
+		enemies      = [tuple[0] for tuple in sorted_list]
+
+		return(enemies)
+
+	def lockOn(self,gui,enemies,game):
+		
+		# INCREMENT LOCKON STATE 
+		if(gui.input.returnedKey.upper()=='L'):
+			self.lockonIndex+=1
+		
+		# DONT LET LOCKON VAL GO BEYOND LEN ENEMIES
+		if(self.lockonIndex>len(enemies)):
+			self.lockonIndex=0
+
+		# ANIMATE LOCKON
+		if(self.lockonIndex>=1):
+
+			if(len(enemies)>0):
+				ex,ey = enemies[self.lockonIndex-1].x -gui.camX, enemies[self.lockonIndex-1].y-gui.camY
+				ew,eh = enemies[self.lockonIndex-1].w , enemies[self.lockonIndex-1].h
+				if(self.lockedOn==True):
+					repeat = False
+				else:
+					repeat = True
+				complete,blitPos = self.lockOnImage.animate(gui,str(enemies[0].id) + str(self.lockedOn),[ex+0.5*(ew-gui.lockOn[0].get_width()),ey+0.5*(eh-gui.lockOn[0].get_height())],game,repeat=repeat)
+				self.lockedOn = True
+				return()
+
+		self.lockOnImage.currentFrame = 0
+		self.lockedOn                 = False
+		self.lockonIndex 			  =1
+
+
+
+
 
 
 
@@ -179,35 +223,16 @@ class player():
 			self.blitPos   = imageParms
 			self.shadowPos = imageParms['behind']
 
-
-
-		facing   = -(self.facing* math.pi / 180)
-		self.draw_cone(x,y,gui, -self.facing,lv)
+		# DRAW DETECTION CONE
+		#if(self.cone_points!=None): self.draw_cone(x,y,gui, self.cone_points,lv)
 
 	
-	def draw_cone(self,x,y,gui,facing,lv):
+	def draw_cone(self,x,y,gui,cone_points,lv):
 
-		# Define the cone of vision properties
-		cone_length = 400
-		cone_angle = 100
-
-		# Calculate the radius of the cone at the base
-		cone_radius = math.sqrt(cone_length**2 / 4 + cone_length**2 * math.tan(math.radians(cone_angle/2))**2)
-
-		# Calculate the x and y coordinates of the end of the cone
-		end_x = x + cone_length * math.cos(math.radians(facing))
-		end_y = y + cone_length * math.sin(math.radians(facing))
-
-		# Create a list of points to define the shape of the cone
-		cone_points  = [(x, y)]
-		cone_points += [(x + cone_radius * math.cos(math.radians(angle)), y + cone_radius * math.sin(math.radians(angle))) for angle in range(round(facing - cone_angle/2), round(facing + cone_angle/2 + 1))]
-		
+		cone_points = detectionCone(self.x-gui.camX,self.y-gui.camY,gui,-self.facing,cone_length=200,cone_angle=100)
 		# Draw the cone of vision using the polygon() function
-		pygame.draw.polygon(gui.screen, (255, 255, 255), cone_points)
+		pygame.draw.polygon(gui.screen, (255, 255, 255), cone_points,3)
 
-		for enemy in lv.enemyList:
-		    if math.point_in_polygon((enemy.x, enemy.y), cone_points):
-		    	print("enemy in cone")
 
 
 	def classicControls(self,gui,pressedKeys,lv,game):

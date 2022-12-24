@@ -113,6 +113,8 @@ gui.scoutRedHit       = loadImageFiles('crabRedhit1.png',IMAGEASSETPATH + 'enemi
 
 gui.slitherShot            = loadImageFiles('slither1.png',IMAGEASSETPATH + 'ordinance/',convert=False)
 
+gui.lockOn                 = loadImageFiles('lockon1.png',IMAGEASSETPATH + 'gui/',convert=False)
+
 # ---------TILE SETS
 gui.grassTiles         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/grassV1/',convert=True)
 gui.concreteTiles      = loadImageFiles('concrete1.png',IMAGEASSETPATH + 'tilesets/concrete/',convert=True)

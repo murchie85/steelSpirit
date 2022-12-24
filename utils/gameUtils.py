@@ -15,7 +15,7 @@ import math
 - collidesWithHitBox
 - killme
 - createFid
--
+- Detection Cone 
 
 
 """
@@ -212,3 +212,25 @@ def createFid(self):
 	self.fids.append(rfid)
 	return(rfid)
 
+
+
+
+
+def detectionCone(x,y,gui,facing,cone_length=200,cone_angle=100):
+		
+		# Define the cone of vision properties
+		cone_length = cone_length
+		cone_angle = cone_angle
+
+		# Calculate the radius of the cone at the base
+		cone_radius = math.sqrt(cone_length**2 / 4 + cone_length**2 * math.tan(math.radians(cone_angle/2))**2)
+
+		# Calculate the x and y coordinates of the end of the cone
+		end_x = x + cone_length * math.cos(math.radians(facing))
+		end_y = y + cone_length * math.sin(math.radians(facing))
+
+		# Create a list of points to define the shape of the cone
+		cone_points  = [(x, y)]
+		cone_points += [(x + cone_radius * math.cos(math.radians(angle)), y + cone_radius * math.sin(math.radians(angle))) for angle in range(round(facing - cone_angle/2), round(facing + cone_angle/2 + 1))]
+		return(cone_points)
+		

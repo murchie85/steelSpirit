@@ -13,18 +13,13 @@ In progress, lots yet to be done.
 
 - Finish isonscreen function - test using a viewport
 - JINK
+- Ground units
 - MISSILE
-- LOCK ON
 - CHAFF
-- UDLR + ROTATE 
-- ++ HOR SPEED
-- ++ VER SPEED
 - ++ CANVAS SPEED
 
 DONE: make and render player DONE: Do a simple map DONE: Navigate with aswd DONE: Camera Nav
-DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion animation, allow player to die, 
-DONE Thinner fire
-DONE Double fire
+DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion animation, allow player to die, Thinner fire, Double fire, radar cone, LOCK ON
 
 
 - UPGRADE TREE
@@ -77,6 +72,7 @@ DONE Double fire
 
 **ACCEPTANCE** don't start until DOGFIGHT, CHAFF, 5 ENEMIES, 5 GROUND AA COMPLETE
 
+- BREAK RIGHT
 - Pop up view box (Consider spinning out of power x302s)
 - Meeting an alien skrill for the first time 'your ship is junk'...fight me
 - VR intro scene, 4 different sides... go go go, split up
