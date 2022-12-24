@@ -1,30 +1,40 @@
 # STEEL SPIRIT
 
-![steel spirit cover](scenes/cover.png)
-## A TwinStick,Shmup RPG hybrid    
+![steel spirit cover](scenes/cover.png)  
+
+# A TwinStick,Shmup RPG hybrid    
 
 In progress, lots yet to be done. 
 
 
 
-## TODO   
+# FEATURES
 
+## PRIMARY 
 
-
-- Finish isonscreen function - test using a viewport
+- LOCKON TOGGLE
+- FACE ENEMY DURING LOCKON
+- PIVOT DURING LOCKON
 - JINK
+- Finish isonscreen function - test using a viewport
 - Ground units
 - MISSILE
 - CHAFF
 - ++ CANVAS SPEED
 
+
+## SECONDARHY 
+
+- UPGRADE TREE
+	- MAINMENU UNLOCK
+	- LONGER BOOST TIME - Dual fire
+- Boss target-points flash/Highlight
+
+
 DONE: make and render player DONE: Do a simple map DONE: Navigate with aswd DONE: Camera Nav
 DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion animation, allow player to die, Thinner fire, Double fire, radar cone, LOCK ON
 
 
-- UPGRADE TREE
-- MAINMENU UNLOCK
-	- LONGER BOOST TIME - Dual fire
 
 # GAME FLOW 
 
@@ -68,14 +78,7 @@ DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion an
 
 		- (settings, profile...)
 
-# SCENES 
 
-**ACCEPTANCE** don't start until DOGFIGHT, CHAFF, 5 ENEMIES, 5 GROUND AA COMPLETE
-
-- BREAK RIGHT
-- Pop up view box (Consider spinning out of power x302s)
-- Meeting an alien skrill for the first time 'your ship is junk'...fight me
-- VR intro scene, 4 different sides... go go go, split up
 
 
  
@@ -95,6 +98,90 @@ https://twitter.com/HTProject073/status/1600464060428222464
 https://twitter.com/HTProject073/status/1601422278054449153
 
 
+
+
+
+================================
+| 							   |
+| 							   |
+|       CHECKPOINT 			   |
+| 							   |
+| 		**DO NOT PASS**		   |
+| 							   |
+| 							   |
+| 							   |
+================================
+
+
+**ACCEPTANCE** don't start until DOGFIGHT, CHAFF, 5 ENEMIES, 5 GROUND AA COMPLETE
+
+
+
+# SCENE MECHANISMS 
+
+
+
+## BIG SCENES
+
+
+## 0 - INTRO
+
+BUNNIES, FOX, CATS on Mars, Venus and outposts
+Parallel world where we gen altered ourselves. Solar system has 40 billion peeps
+
+
+## 1 - TRAINING VR / THE BIG FURBALL
+
+---CHATER 0 THE BIG FURBALL---
+
+'Takes the keys', your GROUNDED, BACK TO VR
+- Team break! (Ling ling, Raj, Simon...) 
+- Race them to clearing objective points
+- Chase each other with Lockon fights
+
+
+
+
+## 2 - DREADNOUGHT
+
+## MECHANISM: 
+
+battlship preview before coming to you
+Dreadaught restrict sections and slow scroll speed
+Dreadnaught regens...hence timed to take out at mars
+Boss target points flash
+
+
+# STORY 
+
+Timer in big, 'x until end of Earth...or the sun, **shrinks to top right**'
+MASSIVE EXPLOSIONS, AIM BIGGER THAN THE REST
+Beat the ship, then give a triumphant intro..Adam proudly presents etc
+Use UDM names, Turov etc, make a big tutorial
+go here shoot this use chaff repeat
+
+
+
+## OTHER 
+
+- mild plot about slipgates
+- BREAK RIGHT
+- Pop up view box (Consider spinning out of power x302s)
+- Meeting an alien skrill for the first time 'your ship is junk'...fight me
+- VR intro scene, 4 different sides... go go go, split up
+
+
+
+# Music Notes
+
+Snippets: https://youtu.be/H6kvP0h0g9M?t=5
+
+
+
+
+
+
+
 # Notes  
 
 
@@ -107,24 +194,11 @@ SCENE
 FEATURES:
 
 
+## DONE: 
 
-fire weapon
+fire weapon make enemy make enemy simple logic make enemy fire destroy enemy scene
 
-make enemy
-
-make enemy simple logic
-
-make enemy fire
-
-destroy enemy scene
-
-Deduct Health
-
-Helicopter mode in atmo
-
-MUST HAVE: After burners
-
-MUST HAVE: Jink DODGE
+Deduct Health MUST HAVE: After burners 
 
 Shmup into open world
 
@@ -134,26 +208,4 @@ Camera shake
 
 later
 Team ally players
-BIG SCENE 0 - FURBALL
 
-Training/competition scene
-
-cats, dogs, apes
-They have sleek fast ships, chase em to locations and clean up before them
-
-mild plot about slipgates
-
-Lock on fights
-
-## BIG SCENE 1 - DREADNAUGHT
-
-Timer in big, 'x until end of earht, shrinks to top right'
-battlship preview before coming to you
-MASSIVE EXPLOSIONS, AIM BIGGER THAN THE REST
-Beat the ship, then give a triumphant intro..Adam proudly presents etc
-Use UDM names, Turov etc
-make a big tutorial
-go here
-shoot this
-use chaff
-repeat

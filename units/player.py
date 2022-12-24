@@ -91,7 +91,7 @@ class player():
 		self.lockOn(gui,enemies,game)
 
 		# --------CAMERA MOVEMENT
-		softMargins = [0.7*gui.w,0.3*gui.w, 0.65*gui.h, 0.35*gui.h]
+		softMargins = [0.7*gui.w,0.3*gui.w, 0.6*gui.h, 0.3*gui.h]
 
 
 		interpolation_factor=0.5
@@ -154,9 +154,10 @@ class player():
 				self.lockedOn = True
 				return()
 
-		self.lockOnImage.currentFrame = 0
-		self.lockedOn                 = False
-		self.lockonIndex 			  =1
+		if(len(enemies)<1):
+			self.lockOnImage.currentFrame = 0
+			self.lockedOn                 = False
+			self.lockonIndex 			  = 1
 
 
 
@@ -237,25 +238,36 @@ class player():
 
 	def classicControls(self,gui,pressedKeys,lv,game):
 
-		# ACCELELRATION FLAG
-		accell= False
-		# GET DIRECTION OF ACCELLERATION
-		if('W' in pressedKeys ):
-			self.speed += 0.4
-			accell = True
-		if('S' in pressedKeys):
-			self.speed -= 0.4
-			accell = True
-		if('D' in pressedKeys):
-			self.facing -= 2
-		if('A' in pressedKeys):
-			self.facing += 2
+
+		# ------MOVEMENT
+		JINK = 0
+		accell= False # ACCELELRATION FLAG
+		if('K' in pressedKeys):
+			if('D' in pressedKeys):
+				JINK = self.maxSpeed
+			if('A' in pressedKeys):
+				JINK = -self.maxSpeed
+		else:
+			# GET DIRECTION OF ACCELLERATION
+			if('W' in pressedKeys ):
+				self.speed += 0.4
+				accell = True
+			if('S' in pressedKeys):
+				self.speed -= 0.4
+				accell = True
+			if('D' in pressedKeys):
+				self.facing -= 2
+			if('A' in pressedKeys):
+				self.facing += 2
+
+
+		# ------INCREMENT SHOT TYPE 
 
 		if(gui.input.returnedKey.upper()=='E'):
 			nextIndex    = (self.availableWeapons.index(self.shotType) + 1) % len(self.availableWeapons)
 			self.shotType = self.availableWeapons[nextIndex]
 
-		# SPEED BOOST
+		# -------SPEED BOOST
 		if('J' in pressedKeys):
 			
 			boostComplete = self.boostTimer.stopWatch(self.boostDuration,'boost', str(self.boostCount),game,silence=True)
@@ -283,7 +295,7 @@ class player():
 		self.speed = clamp(self.speed,self.maxSpeed)
 
 		# APPLY SPEED COMPONENT
-		vel_x = self.speed * math.cos(math.radians(360-self.facing))
+		vel_x = self.speed * math.cos(math.radians(360-self.facing)) + JINK
 		vel_y = self.speed * math.sin(math.radians(360-self.facing))
 
 		# UPDATE POSITION
