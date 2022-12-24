@@ -3,6 +3,7 @@ from utils.gameUtils import *
 from utils._utils import stopTimer
 from ordinance import *
 import time
+import numpy
 import random
 
 # CAMERA IS ALL MANAGED BY PLAYER 
@@ -159,8 +160,10 @@ class player():
 			
 
 
-	def drawSelf(self,gui,game):
+	def drawSelf(self,gui,game,lv):
 		x,y = self.x - gui.camX,self.y  - gui.camY
+
+
 
 		if(self.hit):
 			self.damageAnimation(gui,lv,game)
@@ -175,6 +178,36 @@ class player():
 			
 			self.blitPos   = imageParms
 			self.shadowPos = imageParms['behind']
+
+
+
+		facing   = -(self.facing* math.pi / 180)
+		self.draw_cone(x,y,gui, -self.facing,lv)
+
+	
+	def draw_cone(self,x,y,gui,facing,lv):
+
+		# Define the cone of vision properties
+		cone_length = 400
+		cone_angle = 100
+
+		# Calculate the radius of the cone at the base
+		cone_radius = math.sqrt(cone_length**2 / 4 + cone_length**2 * math.tan(math.radians(cone_angle/2))**2)
+
+		# Calculate the x and y coordinates of the end of the cone
+		end_x = x + cone_length * math.cos(math.radians(facing))
+		end_y = y + cone_length * math.sin(math.radians(facing))
+
+		# Create a list of points to define the shape of the cone
+		cone_points  = [(x, y)]
+		cone_points += [(x + cone_radius * math.cos(math.radians(angle)), y + cone_radius * math.sin(math.radians(angle))) for angle in range(round(facing - cone_angle/2), round(facing + cone_angle/2 + 1))]
+		
+		# Draw the cone of vision using the polygon() function
+		pygame.draw.polygon(gui.screen, (255, 255, 255), cone_points)
+
+		for enemy in lv.enemyList:
+		    if math.point_in_polygon((enemy.x, enemy.y), cone_points):
+		    	print("enemy in cone")
 
 
 	def classicControls(self,gui,pressedKeys,lv,game):

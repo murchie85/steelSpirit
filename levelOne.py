@@ -43,7 +43,7 @@ class levelOne():
 
 			# ----PLAYER 
 
-			game.player.drawSelf(gui,game)
+			game.player.drawSelf(gui,game,self)
 			if(game.player.alive): game.player.actions(gui,game,self)
 
 			# ENEMY ACTIONS
