@@ -47,13 +47,30 @@ class player():
 		self.maxSpeed          = 8
 		self.maxSpeedDefault   = 8
 		self.boostSpeed        = 16
+		
+
+		# BOOSTING 
+
 		self.boosting          = False
 		self.boostDuration     = 4
-		self.boostCooldownTime = 1
+		self.boostCooldownTime = 6
 		self.boostTimer        = stopTimer()           # BUFF
 		self.boostCoolDown     = stopTimer()
 		self.boostAvailable    = True
 		self.boostCount        = 0
+
+		# JINKING
+		self.jinking           = False
+		self.jinkDuration      = 4
+		self.jinkCooldownTime  = 6
+		self.jinkTimer         = stopTimer()           # BUFF
+		self.jinkCoolDown      = stopTimer()
+		self.jinkAvailable     = True
+		self.jinkCount         = 0
+
+
+
+
 
 		self.decelleration     = 0.2
 		self.rotationSpeed     = 5
@@ -98,27 +115,17 @@ class player():
 
 		# --------BUILD DETECTION CONE
 
-		self.cone_points = detectionCone(self.x,self.y,gui,-self.facing,cone_length=400,cone_angle=100)
+		self.cone_points = detectionCone(self.x,self.y,gui,-self.facing,cone_length=400,cone_angle=120)
+
+		# -------LOCK ON
 
 		enemies = self.detectEnemies(lv,self.cone_points)
 		self.lockOn(gui,enemies,game,pressedKeys)
 
-		# --------CAMERA MOVEMENT
-		softMargins = [0.7*gui.w,0.3*gui.w, 0.6*gui.h, 0.3*gui.h]
 
+		# ---------MANAGE CAMERA 
 
-		interpolation_factor=0.5
-
-		# Interpolate between current and target camera positions
-		target_camX = self.x - softMargins[0]
-		gui.camX = (1 - interpolation_factor) * gui.camX + interpolation_factor * target_camX
-
-		target_camY = self.y - softMargins[2]
-		gui.camY = (1 - interpolation_factor) * gui.camY + interpolation_factor * target_camY
-
-		# Clamp camera position within the limits of the game world
-		#gui.camX = min(max(0, gui.camX), gui.w)
-		#gui.camY = min(max(0, gui.camY), gui.h)
+		self.camera(gui)
 
 
 
@@ -266,16 +273,37 @@ class player():
 
 	def classicControls(self,gui,pressedKeys,lv,game):
 
+		BOOST_BUTTON = 'K' 
+		JINK_BUTTON  = 'J'
 
 		# ------MOVEMENT
 		JINK = 0
 		accell= False # ACCELELRATION FLAG
-		if('K' in pressedKeys):
-			if('D' in pressedKeys):
-				JINK = self.maxSpeed
-			if('A' in pressedKeys):
-				JINK = -self.maxSpeed
-		else:
+		noJink = False
+		if(JINK_BUTTON in pressedKeys):
+			
+			# JINK PHASE 1: JINKING
+			jinkComplete = self.jinkTimer.stopWatch(self.jinkDuration,'jinking', str(self.jinkCount),game,silence=True)
+			if(not jinkComplete):
+				self.jinking = True
+				vel_x = self.maxSpeed * math.cos(math.radians(360-self.facing-90))
+				vel_y = self.maxSpeed * math.sin(math.radians(360-self.facing-90))
+				if('D' in pressedKeys):
+					self.x -= vel_x
+					self.y -= vel_y
+				if('A' in pressedKeys):
+					self.x += vel_x
+					self.y += vel_y
+				if('W' in pressedKeys ):
+					self.speed += 0.7
+					accell = True
+				if('S' in pressedKeys):
+					self.speed -= 0.7
+					accell = True
+			if(jinkComplete==True):
+				noJink = True
+				self.jinkAvailable = False
+		if(JINK_BUTTON not in pressedKeys or noJink):
 			# GET DIRECTION OF ACCELLERATION
 			if('W' in pressedKeys ):
 				self.speed += 0.4
@@ -288,6 +316,16 @@ class player():
 			if('A' in pressedKeys):
 				self.facing += 2
 
+		# -------JINK PHASE 2: COOLDOWN
+
+		if((JINK_BUTTON not in pressedKeys) or self.jinkAvailable == False):
+			self.jinking       = False
+			if(self.jinkAvailable == False):
+				self.jinkAvailable = self.jinkCoolDown.stopWatch(self.jinkCooldownTime,'jink cooldown Counter', str(self.jinkCount),game,silence=True)
+				if(self.jinkAvailable):
+					self.jinkCount +=1
+
+
 
 		# ------INCREMENT SHOT TYPE 
 
@@ -295,8 +333,9 @@ class player():
 			nextIndex    = (self.availableWeapons.index(self.shotType) + 1) % len(self.availableWeapons)
 			self.shotType = self.availableWeapons[nextIndex]
 
-		# -------SPEED BOOST
-		if('J' in pressedKeys):
+		# -------SPEED BOOST PHASE 1
+		
+		if(BOOST_BUTTON in pressedKeys):
 			
 			boostComplete = self.boostTimer.stopWatch(self.boostDuration,'boost', str(self.boostCount),game,silence=True)
 			
@@ -305,8 +344,10 @@ class player():
 				self.maxSpeed = self.boostSpeed
 			if(boostComplete==True):
 				self.boostAvailable = False
-			
-		if(('J' not in pressedKeys) or self.boostAvailable == False):
+		
+		# -------SPEED BOOST PHASE COOLDOWN
+
+		if((BOOST_BUTTON not in pressedKeys) or self.boostAvailable == False):
 			self.boosting       = False
 			self.maxSpeed       = self.maxSpeedDefault
 			if(self.boostAvailable == False):
@@ -324,7 +365,7 @@ class player():
 
 		# APPLY SPEED COMPONENT
 		vel_x = self.speed * math.cos(math.radians(360-self.facing)) + JINK
-		vel_y = self.speed * math.sin(math.radians(360-self.facing))
+		vel_y = self.speed * math.sin(math.radians(360-self.facing)) 
 
 		# UPDATE POSITION
 		self.x += int(vel_x )
@@ -340,6 +381,22 @@ class player():
 		if(self.x < lv.mapx): self.x += self.maxSpeed
 		if(self.y + self.h > lv.maph): self.y -= self.maxSpeed
 		if(self.y < lv.mapy): self.y += self.maxSpeed
+
+
+
+	def camera(self,gui):
+		# --------CAMERA MOVEMENT
+		#margins = [0.7*gui.w,0.3*gui.w, 0.6*gui.h, 0.3*gui.h]
+		margins = [0.5*gui.w,0.5*gui.h]
+
+		interpolation_factor=0.7
+
+		# Interpolate between current and target camera positions
+		target_camX = self.x - margins[0]
+		gui.camX = (1 - interpolation_factor) * gui.camX + interpolation_factor * target_camX
+
+		target_camY = self.y - margins[1]
+		gui.camY = (1 - interpolation_factor) * gui.camY + interpolation_factor * target_camY
 
 
 
@@ -364,7 +421,7 @@ class player():
 			self.shadowPos = imageParms['behind']
 
 		# DRAW DETECTION CONE
-		if(self.cone_points!=None): self.draw_cone(x,y,gui, self.cone_points,lv)
+		#if(self.cone_points!=None): self.draw_cone(x,y,gui, self.cone_points,lv)
 
 	
 	def draw_cone(self,x,y,gui,cone_points,lv):

@@ -1,6 +1,7 @@
 from utils._utils import drawImage,load_pickle
 from utils.gameUtils import *
 from units.scout import *
+from units.player import *
 
 class levelOne():
 	def __init__(self,gui):
@@ -9,10 +10,14 @@ class levelOne():
 		self.mapx  = 0
 		self.mapy  = 0
 
+		
+		self.player    = player(gui)
 
-		self.gameMap = load_pickle('state/' + 'lv1.pkl')
-		self.mapw  = self.gameMap['width']
-		self.maph  = self.gameMap['height']
+		# ----map 
+		
+		self.gameMap   = load_pickle('state/' + 'lv1.pkl')
+		self.mapw      = self.gameMap['width']
+		self.maph      = self.gameMap['height']
 
 
 
@@ -50,7 +55,12 @@ class levelOne():
 
 					if(collidesWithHitBox(bullet,enemy)):
 						bullet.bulletCollides(enemy,gui,self)
+				
+				# check if bullet hits any enemies
+				for ally in self.allyList:
 
+					if(collidesWithHitBox(bullet,ally)):
+						bullet.bulletCollides(ally,gui,self)
 
 				# move bullet
 				bullet.drawSelf(gui,game)
@@ -59,8 +69,8 @@ class levelOne():
 
 			# ----PLAYER 
 
-			game.player.drawSelf(gui,game,self)
-			if(game.player.alive): game.player.actions(gui,game,self)
+			self.player.drawSelf(gui,game,self)
+			if(self.player.alive): self.player.actions(gui,game,self)
 
 			# ENEMY ACTIONS
 
@@ -68,15 +78,15 @@ class levelOne():
 				enemy.drawSelf(gui,game,self)
 				enemy.actions(gui,game,self)
 
-				if(collidesWith(game.player,enemy) and game.player.invincible==False):
-					game.player.hp         -= int(0.1*game.player.defaultHp)
-					game.player.hit        = True
-					game.player.invincible = True
+				if(collidesWith(self.player,enemy) and self.player.invincible==False):
+					self.player.hp         -= int(0.1*self.player.defaultHp)
+					self.player.hit        = True
+					self.player.invincible = True
 
-					dx = 0.5*gui.w - game.player.x
-					dy = 0.5*gui.h - game.player.y
-					game.player.x += dx
-					game.player.y += dy
+					dx = 0.5*gui.w - self.player.x
+					dy = 0.5*gui.h - self.player.y
+					self.player.x += dx
+					self.player.y += dy
 
 
 
@@ -133,6 +143,50 @@ class levelOne():
 		self.enemyList.append(_scout)
 
 
-		self.allyList.append(game.player)
+
+
+
+		_scout = scout(createFid(self),gui,x=2000,y=2000)
+		self.enemyList.append(_scout)
+
+		_scout = scout(createFid(self),gui,x=2100,y=2000)
+		self.enemyList.append(_scout)
+
+		_scout = scout(createFid(self),gui,x=2200,y=2000)
+		self.enemyList.append(_scout)
+
+
+		_scout = scout(createFid(self),gui,x=1500,y=3000)
+		self.enemyList.append(_scout)
+
+		_scout = scout(createFid(self),gui,x=1600,y=3000)
+		self.enemyList.append(_scout)
+
+		_scout = scout(createFid(self),gui,x=1700,y=3000)
+		self.enemyList.append(_scout)
+
+
+
+		_scout = scout(createFid(self),gui,x=1500,y=4000)
+		self.enemyList.append(_scout)
+
+		_scout = scout(createFid(self),gui,x=1600,y=4000)
+		self.enemyList.append(_scout)
+
+		_scout = scout(createFid(self),gui,x=1700,y=4000)
+		self.enemyList.append(_scout)
+
+
+		_scout = scout(createFid(self),gui,x=2000,y=3500)
+		self.enemyList.append(_scout)
+
+		_scout = scout(createFid(self),gui,x=2100,y=3600)
+		self.enemyList.append(_scout)
+
+		_scout = scout(createFid(self),gui,x=2200,y=3700)
+		self.enemyList.append(_scout)
+
+
+		self.allyList.append(self.player)
 		self.state= ' start'
 

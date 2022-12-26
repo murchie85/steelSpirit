@@ -13,11 +13,13 @@ class mapEditor():
 		self.gameMap           = None
 
 		# TILE SELECTION 
-		self.tileSelected          = False
-		self.selectedCoords        = [0,0]
+		self.editingTile          = False
 		self.tileOptions           = list(gui.tileDict.keys())
 		self.tileOptionsIndex      = 0
 		self.tileOptionsSubIndex   = 0
+		self.tileSelecting         = False
+		self.tileSelectionList     = []
+		self.tileHovered 		   = False
 
 		self.timer      			= stopTimer()
 		self.timer      			= stopTimer()
@@ -33,11 +35,14 @@ class mapEditor():
 		self.gameMap           = None
 
 		# TILE SELECTION 
-		self.tileSelected          = False
-		self.selectedCoords        = [0,0]
+		self.editingTile          = False
 		self.tileOptions           = list(gui.tileDict.keys())
 		self.tileOptionsIndex      = 0
-		self.tileOptionsSubIndex  = 0
+		self.tileOptionsSubIndex   =  0
+		self.tileSelecting         = False
+		self.tileSelectionList     = []
+		self.tileHovered 		   = False
+
 
 	def run(self,gui,game):
 
@@ -161,25 +166,46 @@ class mapEditor():
 			x = 0
 			y = 0
 			# USES THE type and index as keys to gui.tileDict
+			
+			if(gui.clicked and self.tileHovered):
+				if(self.tileSelecting==False and self.editingTile==False):
+					self.tileSelecting = True
+					gui.clicked        = False
+				elif(self.tileSelecting==True and self.editingTile==False):
+					self.editingTile = True
+					self.tileSelecting = False
+					gui.clicked = False
+				
+
+
+			self.tileHovered = False
 			for r in range(len(mapTiles)):
 				row = mapTiles[r]
 				
 				for c in range(len(row)):
 					col = row[c]
+
 					if(col['animated']==False ):
 						image = gui.tileDict[col['type']][col['index']]
 
-						# IF SELECTED, SHOW THE CURRENT BROWSED IMAGE
-						if(r == self.selectedCoords[0] and c == self.selectedCoords[1] and self.tileSelected):
-							drawImage(gui.screen,gui.tileDict[self.tileOptions[self.tileOptionsIndex]][self.tileOptionsSubIndex],(x-gui.camX,y-gui.camY))
-					
+
 						# IF HOVERED, CHANGE TILE TO SELECT ME 
-						elif(gui.mouseCollides(x-gui.camX,y-gui.camY,image.get_width(),image.get_height()) and self.tileSelected==False):
-							drawImage(gui.screen,gui.tileDict['base'][1],(x-gui.camX,y-gui.camY))
-							if(gui.clicked):
-								gui.clicked = False
-								self.tileSelected = True
-								self.selectedCoords = [r,c]
+						if(gui.mouseCollides(x-gui.camX,y-gui.camY,image.get_width(),image.get_height())):
+							self.tileHovered = True
+							if(self.tileSelecting):
+								# ADD TO EDIT LIST
+								selectedCoords = [r,c]
+								if(selectedCoords not in self.tileSelectionList): 
+									self.tileSelectionList.append(selectedCoords)
+
+						# IF SELECTED, SHOW THE CURRENT BROWSED IMAGE
+						if([r,c] in self.tileSelectionList and self.tileSelecting):
+							drawImage(gui.screen,gui.base100[2],(x-gui.camX,y-gui.camY))
+					
+						# IF SELECTED, SHOW THE CURRENT BROWSED IMAGE
+						elif([r,c] in self.tileSelectionList and self.editingTile):
+							drawImage(gui.screen, gui.tileDict[self.tileOptions[self.tileOptionsIndex]][self.tileOptionsSubIndex],(x-gui.camX,y-gui.camY))
+
 
 						# DRAW THE CURRENT TILE
 						else:
@@ -194,11 +220,14 @@ class mapEditor():
 				y+= image.get_height()
 				x = 0
 
-			
+
+
+
+
 
 			# SELECT TILES OR NAVIGATE MODE 
 
-			if(self.tileSelected):
+			if(self.editingTile):
 				self.selectTile(gui)
 			else:
 				self.nav(gui)
@@ -255,6 +284,7 @@ class mapEditor():
 			self.tileOptionsIndex -= 1
 			self.tileOptionsSubIndex =0 
 		
+		# TOP LEVEL SELECTION
 		if(self.tileOptionsIndex<0):self.tileOptionsIndex = len(self.tileOptions)-1
 		if(self.tileOptionsIndex>len(self.tileOptions)-1):self.tileOptionsIndex = 0
 
@@ -265,12 +295,20 @@ class mapEditor():
 		if(self.tileOptionsSubIndex > len(gui.tileDict[self.tileOptions[self.tileOptionsIndex]])-1): self.tileOptionsSubIndex = 0
 		if(self.tileOptionsSubIndex<0):self.tileOptionsSubIndex = len(gui.tileDict[self.tileOptions[self.tileOptionsIndex]])-1
 
+
+		if(gui.rightClicked):
+			self.editingTile        = False
+			self.tileSelectionList   = []
+			gui.clicked              = False
+			self.tileSelecting       = False
+
 		if(gui.input.returnedKey.upper()=='RETURN' or gui.clicked):
-			self.gameMap['metaTiles'][self.selectedCoords[0]][self.selectedCoords[1]] = {'placed': True, 'animated':False,'type':self.tileOptions[self.tileOptionsIndex],'index':self.tileOptionsSubIndex}
-			self.tileSelected        = False
-			self.selectedCoords      = [0,0]
-			#self.tileOptionsIndex    = 0
-			#self.tileOptionsSubIndex = 0
+			for tile in self.tileSelectionList:
+				self.gameMap['metaTiles'][tile[0]][tile[1]] = {'placed': True, 'animated':False,'type':self.tileOptions[self.tileOptionsIndex],'index':self.tileOptionsSubIndex}
+				self.editingTile        = False
+				self.tileSelectionList   = []
+				gui.clicked              = False
+				self.tileSelecting       = False
 
 
 

@@ -37,7 +37,6 @@ class gameObject():
         self.levelOne             = levelOne(gui)
 
 
-        self.player               = player(gui)
 
         #------------SCENES
         self.introScene           = introScreen(gui)

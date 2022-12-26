@@ -12,20 +12,23 @@ In progress, lots yet to be done.
 
 ## PRIMARY 
 
-DONE: Finish isonscreen function - test using a viewport
-DONE: TRISHOT - Like in Underdefeat
 
+- GROUND UNIT
+- Want to be able to dodge enemy in shmup style, lockon camera centering clamp may be needed
+	- this makes jink manual
 - LOCKON TOGGLE (left/right to scroll)
 - LOCKON LIMIT 3
 - FACE ENEMY DURING LOCKON
 - PIVOT CLOCKWISE DURING LOCKON
-- JINK IF NOT IN PIVOT
 - ANIMATED TILES
 - Ground units
 - MISSILE
 - CHAFF
-- ++ CANVAS SPEED
+- Enemy placer
 - Next objective arrow to speed to objective
+- Canvas second layer
+- canvas transparent
+- ++ CANVAS SPEED
 - ADD ALLY
 - ADD ALLY LOGIC
 - ALLY COMMAND
@@ -49,6 +52,9 @@ SHIPS IN PORTS
 - Shmup maybe not needed not for a long time anyway
 - GUI LAYOUT: HEALTH, INFO PANEL like DC
 - GUI LAYOUT: RIGHT VIDEO SCREEN FOR FAST, INGAME POPUP SCREEN FOR BLUR
+- release with twitter acc, automate reshares..adds, get list of shmups
+- load assets by lv
+
 
 ## UNDER CONSIDERATOIN
 
@@ -59,6 +65,8 @@ SHIPS IN PORTS
 
 DONE: make and render player DONE: Do a simple map DONE: Navigate with aswd DONE: Camera Nav
 DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion animation, allow player to die, Thinner fire, Double fire, radar cone, LOCK ON
+DONE: Finish isonscreen function - test using a viewport, TRISHOT - Like in Underdefeat, Multi-tile edit
+DONE: - JINK IF NOT IN PIVOT
 
 # ACCEPTANCE CRITERIA GLOBAL
 

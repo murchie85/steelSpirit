@@ -122,12 +122,12 @@ gui.grassTiles         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/
 gui.concreteTiles      = loadImageFiles('concrete1.png',IMAGEASSETPATH + 'tilesets/concrete/',convert=True)
 gui.sandTiles          = loadImageFiles('sand1.png',IMAGEASSETPATH + 'tilesets/sandv1/',convert=True)
 gui.base100            = loadImageFiles('base100_1.png',IMAGEASSETPATH + 'tilesets/template/',convert=True)
-gui.water              = pygame.image.load(IMAGEASSETPATH + 'tilesets/water/water.png')
+gui.water              = loadImageFiles('water1.png',IMAGEASSETPATH + 'tilesets/water/',convert=True)
 gui.tileDict           = {'Grass': gui.grassTiles,
 						  'Concrete': gui.concreteTiles,
 						  'sand': gui.sandTiles,
 						  'base': gui.base100,
-						  'water': [gui.water]
+						  'water': gui.water
 						  }
 
 
