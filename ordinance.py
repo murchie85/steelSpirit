@@ -1,5 +1,5 @@
 from utils._utils import stopTimer, imageAnimateAdvanced,darken
-from utils.gameUtils import killme
+from utils.gameUtils import killme,onScreen
 import pygame
 import math
 
@@ -22,6 +22,8 @@ class bullet():
 
 		if(self.bulletType in ['slitherShot','doubleSlither']):
 			self.bulletImage   = imageAnimateAdvanced(gui.slitherShot,0.1)
+		if(self.bulletType in ['triBlast']):
+			self.bulletImage   = imageAnimateAdvanced(gui.triBlast,0.1)
 
 
 	def move(self,gui,lv,game):
@@ -33,6 +35,9 @@ class bullet():
 
 
 		self.checkBoundary(gui,lv)
+
+		if(not onScreen(self.x,self.y,self.w,self.h,gui)):
+			self.killBullet(lv,killBulletsssage='bullet out of screen')
 
 		if(self.classification=='debris'):
 			removeMe = self.debrisTimer.stopWatch(self.debrisDelay,'debris', str(self.id) + str(self.classification) + 'debris', game,silence=True)
@@ -60,6 +65,8 @@ class bullet():
 			pygame.draw.circle(gui.screen, self.colour, (x,y), self.w, 0)
 		elif(self.bulletType in ['slitherShot','doubleSlither']):
 			self.bulletImage.animate(gui,'slitherShotBullet',[x-0.5*gui.slitherShot[0].get_width(),y],game,rotation=self.facing-90)
+		elif(self.bulletType in ['triBlast']):
+			self.bulletImage.animate(gui,'triBlast',[x-0.5*gui.triBlast[0].get_width(),y-0.5*gui.triBlast[0].get_height()],game,rotation=self.facing-90)
 		else:
 			pygame.draw.circle(gui.screen, self.colour, (x,y), self.w, 0)
 

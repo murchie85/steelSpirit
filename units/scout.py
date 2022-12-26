@@ -71,7 +71,7 @@ class scout(parent):
 
 
 		# CLASS OVERRIDES
-		self.defaultSpeed    = 4
+		self.defaultSpeed    = 2
 		
 
 
@@ -97,8 +97,8 @@ class scout(parent):
 		currentCoords = self.patrolLocations[self.currentLocIndex]
 		angleDifference,distance,targetAngle = angleToTarget(self,self.x,self.y, currentCoords[0],currentCoords[1])
 
-		faceTarget(self,angleDifference, turnIcrement=8)
-		self.speed = 3
+		faceTarget(self,angleDifference, turnIcrement=5)
+		self.speed = self.defaultSpeed
 		self.moveForwards()
 
 		if(distance< self.w): self.currentLocIndex+=1
@@ -147,6 +147,6 @@ class scout(parent):
 		
 		if(self.hit):
 			self.damageAnimation(gui,lv,game)
-		elif(self.alive==True and onScreen(self,gui) ):
+		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) ):
 			animate,imageParms = self.images.animate(gui,'scout',[x,y],game,rotation=self.facing-90)
 

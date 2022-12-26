@@ -21,20 +21,28 @@ class player():
 		self.images         = imageAnimateAdvanced(gui.player,0.2)
 		self.boostImage     = imageAnimateAdvanced(gui.playerBoost,0.2)
 		self.shadow         = imageAnimateAdvanced(gui.playerShadow,0.2)
-		self.lockOnImage    = imageAnimateAdvanced(gui.lockOn,0.15)
+		self.lockOnImage    = imageAnimateAdvanced(gui.lockOn,0.05)
 		self.w              = int(gui.player[0].get_width())
 		self.h              = int(gui.player[0].get_height())
-		self.blitPos         = [self.x,self.y]
+		self.blitPos         = None
 		self.shadowPos       = [self.x,self.y]
 		self.rotatedW	     = self.w
 		self.rotatedH	     = self.h
 		self.cone_points     = None 	
+		self.lockonActive    = False
 		self.lockedOn        = False
 		self.lockonIndex     = 1
 
+		# SHOULD BE OVERRIDEN
+
+		self.hitImage         = gui.playerHit
+		self.hitAnimation     = imageAnimateAdvanced(self.hitImage,0.2)
+
+
+
 		# ATTRIBUTES 
-		self.hp                = 100
-		self.hit 			   = False
+		self.defaultHp         = 100
+		self.hp                = self.defaultHp
 		self.speed             = 0
 		self.maxSpeed          = 8
 		self.maxSpeedDefault   = 8
@@ -51,12 +59,17 @@ class player():
 		self.rotationSpeed     = 5
 
 
-
+		# DAMAGE AND INVINCIBLE  
+		self.hit 			     = False
+		self.invincible          = False               # BUFF
+		self.invincibleDelay     = 0.05                # BUFF
+		self.invincibleTimer     = stopTimer()
+		self.invincibleCount     = 0
 
 		# BULLETS 
 		self.shotType			= 'pellet'
-		self.availableWeapons   = ['pellet','doublePellet' ,'slitherShot','doubleSlither']
-		self.bulletAttrs        = { 'pellet':{'speed':10,'damage':10}, 'doublePellet':{'speed':10,'damage':10},  'slitherShot':{'speed':3,'damage':20}, 'doubleSlither':{'speed':3,'damage':20} }
+		self.availableWeapons   = ['pellet','doublePellet' ,'slitherShot','doubleSlither','triBlast']
+		self.bulletAttrs        = { 'pellet':{'speed':10,'damage':10}, 'doublePellet':{'speed':10,'damage':10},  'slitherShot':{'speed':3,'damage':20}, 'doubleSlither':{'speed':3,'damage':20} , 'triBlast':{'speed':12,'damage':30} }
 		self.bulletTimer        = stopTimer()           # BUFF
 		self.shootDelay         = 0.1                   # BUFF
 		self.bulletsFired       = 0
@@ -88,7 +101,7 @@ class player():
 		self.cone_points = detectionCone(self.x,self.y,gui,-self.facing,cone_length=400,cone_angle=100)
 
 		enemies = self.detectEnemies(lv,self.cone_points)
-		self.lockOn(gui,enemies,game)
+		self.lockOn(gui,enemies,game,pressedKeys)
 
 		# --------CAMERA MOVEMENT
 		softMargins = [0.7*gui.w,0.3*gui.w, 0.6*gui.h, 0.3*gui.h]
@@ -106,6 +119,17 @@ class player():
 		# Clamp camera position within the limits of the game world
 		#gui.camX = min(max(0, gui.camX), gui.w)
 		#gui.camY = min(max(0, gui.camY), gui.h)
+
+
+
+		# ------MANAGE INVINCIBILITY DURATION
+
+		self.setInvincible(game)
+
+		# ------KILL ME
+		
+		if(self.hp<1):
+			killme(self,lv,killMesssage=' collided with enemy.',printme=True)
 
 
 
@@ -127,36 +151,58 @@ class player():
 
 		sorted_list  = sorted(detectEnemies, key=lambda x: x[1])
 		enemies      = [tuple[0] for tuple in sorted_list]
+		enemies      = enemies[:4]
 
 		return(enemies)
 
-	def lockOn(self,gui,enemies,game):
+	def lockOn(self,gui,enemies,game,pressedKeys):
 		
 		# INCREMENT LOCKON STATE 
 		if(gui.input.returnedKey.upper()=='L'):
-			self.lockonIndex+=1
+			self.lockonActive = not self.lockonActive
 		
+		if('L' in pressedKeys):
+			if(self.lockonActive):
+				if(gui.input.returnedKey.upper() == 'D'):
+					self.lockonIndex+=1
+				if(gui.input.returnedKey.upper() == 'A'):
+					self.lockonIndex-=1
+			
 		# DONT LET LOCKON VAL GO BEYOND LEN ENEMIES
-		if(self.lockonIndex>len(enemies)):
+		if(self.lockonIndex>len(enemies) or self.lockonIndex<0):
 			self.lockonIndex=0
 
 		# ANIMATE LOCKON
-		if(self.lockonIndex>=1):
+		if(self.lockonActive):
+			if(self.lockonIndex>=1):
 
-			if(len(enemies)>0):
-				ex,ey = enemies[self.lockonIndex-1].x -gui.camX, enemies[self.lockonIndex-1].y-gui.camY
-				ew,eh = enemies[self.lockonIndex-1].w , enemies[self.lockonIndex-1].h
-				if(self.lockedOn==True):
-					repeat = False
-				else:
-					repeat = True
-				complete,blitPos = self.lockOnImage.animate(gui,str(enemies[0].id) + str(self.lockedOn),[ex+0.5*(ew-gui.lockOn[0].get_width()),ey+0.5*(eh-gui.lockOn[0].get_height())],game,repeat=repeat)
-				self.lockedOn = True
-				return()
+				if(len(enemies)>0):
+
+					ex,ey = enemies[self.lockonIndex-1].x -gui.camX, enemies[self.lockonIndex-1].y-gui.camY
+					ew,eh = enemies[self.lockonIndex-1].w , enemies[self.lockonIndex-1].h
+					if(self.lockedOn==True):
+						repeat = False
+					else:
+						repeat = True
+
+					lx,ly = ex+0.5*(ew-gui.lockOn[0].get_width()),ey+0.5*(eh-gui.lockOn[0].get_height())
+					if(onScreen(lx,ly,gui.lockOn[0].get_width(),gui.lockOn[0].get_height(),gui)):
+						complete,blitPos = self.lockOnImage.animate(gui,str(enemies[0].id) + str(self.lockedOn),[lx,ly],game,repeat=repeat)
+						# FACE ENEMY 
+						#angleDifference,distance,targetAngle = angleToTarget(self,self.x,self.y, ex,ey)
+						#faceTarget(self,angleDifference, turnIcrement=5)
+
+
+
+
+					self.lockedOn = True
+					return()
+
 
 		if(len(enemies)<1):
 			self.lockOnImage.currentFrame = 0
 			self.lockedOn                 = False
+			self.lockonActive			  = False
 			self.lockonIndex 			  = 1
 
 
@@ -173,7 +219,7 @@ class player():
 		shotAvailable = self.bulletTimer.stopWatch(self.shootDelay,'player shoot', str(self.id + self.bulletsFired), game,silence=True)
 		
 		# IF SHOOT CRITEREA MET,
-		if((shotAvailable)):
+		if((shotAvailable and self.blitPos!=None)):
 
 			if(self.shotType=='doublePellet'):
 				self.bulletsFired +=1
@@ -197,6 +243,11 @@ class player():
 				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
 				lv.bulletList.append(bullet(gui,self.blitPos['rightTop'][0]+ gui.camX,self.blitPos['rightTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
 
+			elif(self.shotType=='triBlast'):
+				self.bulletsFired +=1
+				# ADDS BULLET TO BULLET LIST
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.blitPos['midTop'][0]+ gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
 			else:
 				self.bulletsFired +=1
 				# ADDS BULLET TO BULLET LIST
@@ -204,36 +255,13 @@ class player():
 				lv.bulletList.append(bullet(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
 			
 
-
-	def drawSelf(self,gui,game,lv):
-		x,y = self.x - gui.camX,self.y  - gui.camY
-
-
-
-		if(self.hit):
-			self.damageAnimation(gui,lv,game)
-		elif(self.alive==True and onScreen(self,gui)):
-			
-			self.shadow.animate(gui,'player shadow',[self.shadowPos[0],self.shadowPos[1]],game,rotation=self.facing-90,noseAdjust=True)
-			
-			if(self.boosting):
-				animate,imageParms = self.boostImage.animate(gui,'playerBoosting',[x,y],game,rotation=self.facing-90)
-			else:
-				animate,imageParms = self.images.animate(gui,'player',[x,y],game,rotation=self.facing-90)
-			
-			self.blitPos   = imageParms
-			self.shadowPos = imageParms['behind']
-
-		# DRAW DETECTION CONE
-		#if(self.cone_points!=None): self.draw_cone(x,y,gui, self.cone_points,lv)
-
-	
-	def draw_cone(self,x,y,gui,cone_points,lv):
-
-		cone_points = detectionCone(self.x-gui.camX,self.y-gui.camY,gui,-self.facing,cone_length=200,cone_angle=100)
-		# Draw the cone of vision using the polygon() function
-		pygame.draw.polygon(gui.screen, (255, 255, 255), cone_points,3)
-
+	def setInvincible(self,game):
+		
+		if(self.invincible):
+			invincibleTimer = self.invincibleTimer.stopWatch(self.invincibleDelay,str(self.id + self.hp),self,game,silence=True)
+			if(invincibleTimer):
+				print('setting false')
+				self.invincible = False
 
 
 	def classicControls(self,gui,pressedKeys,lv,game):
@@ -313,15 +341,38 @@ class player():
 		if(self.y + self.h > lv.maph): self.y -= self.maxSpeed
 		if(self.y < lv.mapy): self.y += self.maxSpeed
 
-		#---------JINK
-		"""
-		if('H' in pressedKeys ):
-			self.facing += self.rotationSpeed
 
 
-		if('J' in pressedKeys ):
-			self.facing -= self.rotationSpeed
-		"""
+
+	def drawSelf(self,gui,game,lv):
+		x,y = self.x - gui.camX,self.y  - gui.camY
+
+
+
+		if(self.hit):
+			self.damageAnimation(gui,lv,game)
+		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui)):
+			
+			self.shadow.animate(gui,'player shadow',[self.shadowPos[0],self.shadowPos[1]],game,rotation=self.facing-90,noseAdjust=True)
+			
+			if(self.boosting):
+				animate,imageParms = self.boostImage.animate(gui,'playerBoosting',[x,y],game,rotation=self.facing-90)
+			else:
+				animate,imageParms = self.images.animate(gui,'player',[x,y],game,rotation=self.facing-90)
+			
+			self.blitPos   = imageParms
+			self.shadowPos = imageParms['behind']
+
+		# DRAW DETECTION CONE
+		if(self.cone_points!=None): self.draw_cone(x,y,gui, self.cone_points,lv)
+
+	
+	def draw_cone(self,x,y,gui,cone_points,lv):
+
+		cone_points = detectionCone(self.x-gui.camX,self.y-gui.camY,gui,-self.facing,cone_length=400,cone_angle=100)
+		# Draw the cone of vision using the polygon() function
+		pygame.draw.polygon(gui.screen, (255, 255, 255), cone_points,3)
+
 
 
 	def animateDestruction(self,gui,lv,game):
@@ -338,3 +389,12 @@ class player():
 				lv.bulletList.append(bullet(gui,self.x + 0.5* self.chosenExplosionImg[0].get_width(),self.y+ 0.5* self.chosenExplosionImg[0].get_height(),bid,'debris',random.randrange(0,360),'debris',speed=10, w=0.05*self.w,h=0.05*self.h,colour=(192,192,192)))
 			if(complete):
 				self.destructionComplete = True
+
+	def damageAnimation(self,gui,lv,game):
+		x,y = self.x - gui.camX,self.y  - gui.camY
+		
+		if(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui)):
+			complete,imageParms = self.hitAnimation.animate(gui,str(self.name) + ' hit',[x,y],game,rotation=self.facing-90)
+			if(complete):
+				self.hit = False
+

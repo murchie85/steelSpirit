@@ -255,15 +255,15 @@ class mapEditor():
 			self.tileOptionsIndex -= 1
 			self.tileOptionsSubIndex =0 
 		
-		if(self.tileOptionsIndex<0):self.tileOptionsIndex = 0
-		if(self.tileOptionsIndex>len(self.tileOptions)-1):self.tileOptionsIndex = len(self.tileOptions)-1
+		if(self.tileOptionsIndex<0):self.tileOptionsIndex = len(self.tileOptions)-1
+		if(self.tileOptionsIndex>len(self.tileOptions)-1):self.tileOptionsIndex = 0
 
 		# increment minor index (map variation)
 		if(gui.input.returnedKey.upper()=='S'): self.tileOptionsSubIndex += 1
 		if(gui.input.returnedKey.upper()=='W'): self.tileOptionsSubIndex -= 1
 		
-		if(self.tileOptionsSubIndex > len(gui.tileDict[self.tileOptions[self.tileOptionsIndex]])-1): self.tileOptionsSubIndex = len(gui.tileDict[self.tileOptions[self.tileOptionsIndex]])-1
-		if(self.tileOptionsSubIndex<0):self.tileOptionsSubIndex = 0
+		if(self.tileOptionsSubIndex > len(gui.tileDict[self.tileOptions[self.tileOptionsIndex]])-1): self.tileOptionsSubIndex = 0
+		if(self.tileOptionsSubIndex<0):self.tileOptionsSubIndex = len(gui.tileDict[self.tileOptions[self.tileOptionsIndex]])-1
 
 		if(gui.input.returnedKey.upper()=='RETURN' or gui.clicked):
 			self.gameMap['metaTiles'][self.selectedCoords[0]][self.selectedCoords[1]] = {'placed': True, 'animated':False,'type':self.tileOptions[self.tileOptionsIndex],'index':self.tileOptionsSubIndex}

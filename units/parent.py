@@ -105,6 +105,8 @@ class parent():
 	def animateDestruction(self,gui,lv,game):
 		x,y = self.x - gui.camX,self.y  - gui.camY
 
+		# *******BE CAREFUL ABOUNT ON SCREEN
+
 		if(self.destructionComplete==False and self.alive==False):
 			complete,blitPos = self.explosion.animate(gui,str(str(self.name) +' explosion'),[x,y],game)
 			bid = max(([x.id for x in lv.bulletList]),default=0) + 1
@@ -120,7 +122,7 @@ class parent():
 	def damageAnimation(self,gui,lv,game):
 		x,y = self.x - gui.camX,self.y  - gui.camY
 		
-		if(self.alive==True and onScreen(self,gui)):
+		if(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui)):
 			complete,imageParms = self.hitAnimation.animate(gui,str(self.name) + ' hit',[x,y],game,rotation=self.facing-90)
 			if(complete):
 				self.hit = False

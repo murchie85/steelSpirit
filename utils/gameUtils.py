@@ -22,9 +22,14 @@ import math
 
 
 
-
-def onScreen(unit,gui):
-	onScreen = True
+"""
+DEFINE VIEPORT HERE (JUST DO OVERLAY, NOT RESTRICT)
+"""
+def onScreen(xOrign,yOrign,w,h,gui):
+	onScreen = False
+	if((xOrign+w > gui.camX) and (xOrign<gui.camX+gui.camW)):
+		if((yOrign+h > gui.camY) and (yOrign<gui.camY+gui.camH)):
+			onScreen = True
 
 	# NEED TO CHECK CAMERA
 
@@ -76,12 +81,12 @@ def angleToTarget(self,selfX,selfY, targetObjectX,targetObjectY):
 	targetAngle   = 360-(targetAngleR) 
 	
 	# WRAP ANGLE
-	if(targetAngle>360):
-		targetAngle = targetAngle%360
+	targetAngle = wrapAngle(targetAngle)
 
 
 	# CALCULATE ANGLE DIFF
 	angleDifference = (self.facing - targetAngle + 180 + 360) % 360 - 180
+	angleDifference = wrapAngle(angleDifference)
 	
 
 	distance = math.sqrt((xDelta)**2+(yDelta)**2)

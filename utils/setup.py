@@ -104,6 +104,7 @@ gui.bunnyGirlYCover   = pygame.image.load(IMAGEASSETPATH + 'cover/bunnyGirlYello
 gui.player            = loadImageFiles('fighter1.png',IMAGEASSETPATH + 'fighter/',convert=False)
 gui.playerBoost       = loadImageFiles('fighterBoost1.png',IMAGEASSETPATH + 'fighter/',convert=False)
 gui.playerShadow      = loadImageFiles('shadow1.png',IMAGEASSETPATH + 'fighter/',convert=False)
+gui.playerHit         = loadImageFiles('playerHit1.png',IMAGEASSETPATH + 'fighter/',convert=False)
 
 gui.scoutRed          = loadImageFiles('crabRed1.png',IMAGEASSETPATH + 'enemies/crab/',convert=False)
 gui.scoutRedHit       = loadImageFiles('crabRedhit1.png',IMAGEASSETPATH + 'enemies/crab/',convert=False)
@@ -112,6 +113,7 @@ gui.scoutRedHit       = loadImageFiles('crabRedhit1.png',IMAGEASSETPATH + 'enemi
 # ---------BULLETS AND WEAPONS
 
 gui.slitherShot            = loadImageFiles('slither1.png',IMAGEASSETPATH + 'ordinance/',convert=False)
+gui.triBlast               = loadImageFiles('triBlast1.png',IMAGEASSETPATH + 'ordinance/',convert=False)
 
 gui.lockOn                 = loadImageFiles('lockon1.png',IMAGEASSETPATH + 'gui/',convert=False)
 

@@ -41,21 +41,6 @@ class levelOne():
 			self.drawMap(gui)
 			
 
-			# ----PLAYER 
-
-			game.player.drawSelf(gui,game,self)
-			if(game.player.alive): game.player.actions(gui,game,self)
-
-			# ENEMY ACTIONS
-
-			for enemy in self.enemyList:
-				enemy.drawSelf(gui,game,self)
-				enemy.actions(gui,game,self)
-
-				if(collidesWith(game.player,enemy)):
-					killme(game.player,self,killMesssage=' collided with enemy.',printme=True)
-
-
 			# ------BULLET MANAGER
 
 			for bullet in self.bulletList:
@@ -70,6 +55,30 @@ class levelOne():
 				# move bullet
 				bullet.drawSelf(gui,game)
 				bullet.move(gui,self,game)
+
+
+			# ----PLAYER 
+
+			game.player.drawSelf(gui,game,self)
+			if(game.player.alive): game.player.actions(gui,game,self)
+
+			# ENEMY ACTIONS
+
+			for enemy in self.enemyList:
+				enemy.drawSelf(gui,game,self)
+				enemy.actions(gui,game,self)
+
+				if(collidesWith(game.player,enemy) and game.player.invincible==False):
+					game.player.hp         -= int(0.1*game.player.defaultHp)
+					game.player.hit        = True
+					game.player.invincible = True
+
+					dx = 0.5*gui.w - game.player.x
+					dy = 0.5*gui.h - game.player.y
+					game.player.x += dx
+					game.player.y += dy
+
+
 
 			#-----Death animations
 			for dead in self.deadList:
@@ -92,7 +101,8 @@ class levelOne():
 				if(c['animated']==False ):
 					image = gui.tileDict[c['type']][c['index']]
 					#image.set_alpha(200)
-					drawImage(gui.screen,image,(x- gui.camX,y-gui.camY))
+					if(onScreen(x,y,image.get_width(),image.get_height(),gui)):
+						drawImage(gui.screen,image,(x- gui.camX,y-gui.camY))
 				
 
 				x += image.get_width()

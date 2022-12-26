@@ -12,28 +12,58 @@ In progress, lots yet to be done.
 
 ## PRIMARY 
 
-- LOCKON TOGGLE
+DONE: Finish isonscreen function - test using a viewport
+DONE: TRISHOT - Like in Underdefeat
+
+- LOCKON TOGGLE (left/right to scroll)
+- LOCKON LIMIT 3
 - FACE ENEMY DURING LOCKON
-- PIVOT DURING LOCKON
-- JINK
-- Finish isonscreen function - test using a viewport
+- PIVOT CLOCKWISE DURING LOCKON
+- JINK IF NOT IN PIVOT
+- ANIMATED TILES
 - Ground units
 - MISSILE
 - CHAFF
 - ++ CANVAS SPEED
+- Next objective arrow to speed to objective
+- ADD ALLY
+- ADD ALLY LOGIC
+- ALLY COMMAND
+- INCINERY FLARE EXPLOSIONS https://youtu.be/zXjBS382P2k?t=224
+
+ENEMIES: 
+
+GIGA TANK - COME FROM UNDER GROUND
+GIGA TURRET / CANNON 
+SHIPS IN PORTS
 
 
-## SECONDARHY 
+## SECONDARY 
 
+- Check Godzilla for human type ideas
+- Redo title text explaination with ai art gen - move to after game
 - UPGRADE TREE
 	- MAINMENU UNLOCK
 	- LONGER BOOST TIME - Dual fire
 - Boss target-points flash/Highlight
+- Shmup maybe not needed not for a long time anyway
+- GUI LAYOUT: HEALTH, INFO PANEL like DC
+- GUI LAYOUT: RIGHT VIDEO SCREEN FOR FAST, INGAME POPUP SCREEN FOR BLUR
 
+## UNDER CONSIDERATOIN
+
+[`JOINT SPECIAL ATTACK`, `Shmup intro`, `slow Underdefeat shmup levels`,   ]
+
+
+## DONE 
 
 DONE: make and render player DONE: Do a simple map DONE: Navigate with aswd DONE: Camera Nav
 DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion animation, allow player to die, Thinner fire, Double fire, radar cone, LOCK ON
 
+# ACCEPTANCE CRITERIA GLOBAL
+
+- Lots of variety on screen, AA, planes, ATB, etc
+- Good Map Detail 
 
 
 # GAME FLOW 
@@ -119,7 +149,8 @@ https://twitter.com/HTProject073/status/1601422278054449153
 
 # SCENE MECHANISMS 
 
-
+- Scene accepance criteria.. slow blur then pop up or in game side bar scene
+- Both.. side/bott/top for fast alert slow blur for story scene
 
 ## BIG SCENES
 
@@ -137,6 +168,7 @@ Parallel world where we gen altered ourselves. Solar system has 40 billion peeps
 'Takes the keys', your GROUNDED, BACK TO VR
 - Team break! (Ling ling, Raj, Simon...) 
 - Race them to clearing objective points
+- Roxy goes - 'YESSSSS!' in quick pop up once she takes out sth
 - Chase each other with Lockon fights
 
 
