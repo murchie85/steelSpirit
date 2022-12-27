@@ -83,11 +83,18 @@ class levelOne():
 					self.player.hit        = True
 					self.player.invincible = True
 
-					dx = 0.5*gui.w - self.player.x
-					dy = 0.5*gui.h - self.player.y
-					self.player.x += dx
-					self.player.y += dy
-
+					if self.player.x < enemy.x:
+					    # Player is to the left of enemy, move player to the right
+					    player.x = enemy.x - self.player.w
+					elif self.player.x > enemy.x:
+					    # Player is to the right of enemy, move player to the left
+					    self.player.x = enemy.x + enemy.w
+					elif self.player.y < enemy.y:
+					    # Player is above enemy, move player down
+					    self.player.y = enemy.y - self.player.h
+					elif self.player.y > enemy.y:
+					    # Player is below enemy, move player up
+					    self.player.y = enemy.y + enemy.h
 
 
 			#-----Death animations

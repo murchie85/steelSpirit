@@ -116,6 +116,7 @@ gui.slitherShot            = loadImageFiles('slither1.png',IMAGEASSETPATH + 'ord
 gui.triBlast               = loadImageFiles('triBlast1.png',IMAGEASSETPATH + 'ordinance/',convert=False)
 
 gui.lockOn                 = loadImageFiles('lockon1.png',IMAGEASSETPATH + 'gui/',convert=False)
+gui.lockOnStill            = pygame.image.load(IMAGEASSETPATH + '/gui/stillLockedOn.png')
 
 # ---------TILE SETS
 gui.grassTiles         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/grassV1/',convert=True)

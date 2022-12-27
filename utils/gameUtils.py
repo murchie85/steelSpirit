@@ -86,7 +86,8 @@ def angleToTarget(self,selfX,selfY, targetObjectX,targetObjectY):
 
 	# CALCULATE ANGLE DIFF
 	angleDifference = (self.facing - targetAngle + 180 + 360) % 360 - 180
-	angleDifference = wrapAngle(angleDifference)
+	
+	#angleDifference = wrapAngle(angleDifference)
 	
 
 	distance = math.sqrt((xDelta)**2+(yDelta)**2)

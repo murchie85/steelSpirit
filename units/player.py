@@ -28,10 +28,18 @@ class player():
 		self.shadowPos       = [self.x,self.y]
 		self.rotatedW	     = self.w
 		self.rotatedH	     = self.h
+		
+
+		# ---LOCKON 
+
 		self.cone_points     = None 	
-		self.lockonActive    = False
+		self.lockonActive    = True
 		self.lockedOn        = False
-		self.lockonIndex     = 1
+		self.lockOnAvailable = False
+		self.lockedEnemy     = None
+		self.lockonIndex     = 0
+		self.cone_length     = 800
+		self.cone_angle      = 120
 
 		# SHOULD BE OVERRIDEN
 
@@ -45,6 +53,7 @@ class player():
 		self.hp                = self.defaultHp
 		self.speed             = 0
 		self.maxSpeed          = 8
+		self.lockTurnSpeed     = 4
 		self.maxSpeedDefault   = 8
 		self.boostSpeed        = 16
 		
@@ -115,7 +124,7 @@ class player():
 
 		# --------BUILD DETECTION CONE
 
-		self.cone_points = detectionCone(self.x,self.y,gui,-self.facing,cone_length=400,cone_angle=120)
+		self.cone_points = detectionCone(self.x,self.y,gui,-self.facing,cone_length=self.cone_length,cone_angle=self.cone_angle)
 
 		# -------LOCK ON
 
@@ -154,63 +163,104 @@ class player():
 		for enemy in lv.enemyList:
 			if cone_rect.collidepoint((enemy.x, enemy.y)):
 				distance = getDistance(self.x,self.y,enemy.x,enemy.y)
-				detectEnemies.append((enemy,distance))
+				detectEnemies.append((enemy,int(distance)))
 
+		# RETURN ENEMY LIST IN ORDER OF NEAREST
 		sorted_list  = sorted(detectEnemies, key=lambda x: x[1])
 		enemies      = [tuple[0] for tuple in sorted_list]
-		enemies      = enemies[:4]
 
 		return(enemies)
 
 	def lockOn(self,gui,enemies,game,pressedKeys):
+
 		
 		# INCREMENT LOCKON STATE 
-		if(gui.input.returnedKey.upper()=='L'):
-			self.lockonActive = not self.lockonActive
 		
-		if('L' in pressedKeys):
-			if(self.lockonActive):
-				if(gui.input.returnedKey.upper() == 'D'):
-					self.lockonIndex+=1
-				if(gui.input.returnedKey.upper() == 'A'):
-					self.lockonIndex-=1
-			
-		# DONT LET LOCKON VAL GO BEYOND LEN ENEMIES
-		if(self.lockonIndex>len(enemies) or self.lockonIndex<0):
-			self.lockonIndex=0
+		if(gui.input.returnedKey.upper()=='U'):
+			self.lockonActive = not self.lockonActive
+			if(self.lockonActive==False):
+				self.lockedOn = False
+		
 
-		# ANIMATE LOCKON
+		# IF LOCKON FUNCTION AVAILABLE
 		if(self.lockonActive):
-			if(self.lockonIndex>=1):
 
-				if(len(enemies)>0):
+			# IF LEN ENEMIES GREATER THAN 0
 
-					ex,ey = enemies[self.lockonIndex-1].x -gui.camX, enemies[self.lockonIndex-1].y-gui.camY
-					ew,eh = enemies[self.lockonIndex-1].w , enemies[self.lockonIndex-1].h
-					if(self.lockedOn==True):
-						repeat = False
+			if(len(enemies)>0):
+
+				# ------GET THE FIRST ENEMY COORDS
+				
+				ex,ey                = enemies[self.lockonIndex].x , enemies[self.lockonIndex].y
+				exAdjusted,eyAdjusted = ex-gui.camX, ey-gui.camY
+				ew,eh = enemies[self.lockonIndex].w , enemies[self.lockonIndex].h
+				
+				# ------GET ADJUSTED LOCKON ANIMATION X Y COORDS
+				
+				lx,ly = exAdjusted+0.5*(ew-gui.lockOn[0].get_width()),eyAdjusted+0.5*(eh-gui.lockOn[0].get_height())
+				
+				
+				# ------IF THE ENEMY IS ON SCREEN TO REGISTER
+				
+				if(onScreen(ex,ey,gui.lockOn[0].get_width(),gui.lockOn[0].get_height(),gui)):
+					
+					# IS NOT ALREADY CHOSEN
+					if(self.lockedEnemy==None):
+
+						# ------RENDER LOCKON AROUND POTENTIAL ENEMY
+
+						complete,blitPos = self.lockOnImage.animate(gui,str(enemies[0].id) + str(self.lockedOn),[lx,ly],game,repeat=False)
+
+						# ------ IF YOU CHOSE TO LOCKON TO THIS ENEMY
+
+						if(gui.input.returnedKey.upper()=='L'):
+							self.lockedOn     = True
+							self.lockedEnemy  = enemies[self.lockonIndex]
+					
+					# USER SWITCHES LOCKON TO NEXT ENEMY
 					else:
-						repeat = True
-
-					lx,ly = ex+0.5*(ew-gui.lockOn[0].get_width()),ey+0.5*(eh-gui.lockOn[0].get_height())
-					if(onScreen(lx,ly,gui.lockOn[0].get_width(),gui.lockOn[0].get_height(),gui)):
-						complete,blitPos = self.lockOnImage.animate(gui,str(enemies[0].id) + str(self.lockedOn),[lx,ly],game,repeat=repeat)
-						# FACE ENEMY 
-						#angleDifference,distance,targetAngle = angleToTarget(self,self.x,self.y, ex,ey)
-						#faceTarget(self,angleDifference, turnIcrement=5)
-
+						if(gui.input.returnedKey.upper()=='L'):
+							if(self.lockonIndex+1 <len(enemies)):
+								self.lockonIndex += 1
+								self.lockedEnemy  = enemies[self.lockonIndex]
+							else:
+								self.lockonIndex = 0
+								self.lockedEnemy  = enemies[self.lockonIndex]
 
 
 
-					self.lockedOn = True
-					return()
+
+				else:
+					
+					# ------RESET IF THERE ARE NO ENEMIES ON SCREEN
+					
+					self.lockedOn = False
+					self.lockonIndex = 0
+
+			# IF LOCKED ON TO CHOSEN ENEMY
+			if(self.lockedOn and self.lockedEnemy!=None):
+				
+				# RENDER GREEN LOCKON AROUND TARGET
+				drawImage(gui.screen,gui.lockOnStill,(self.lockedEnemy.x-gui.camX,self.lockedEnemy.y-gui.camY))
+				
+				# FACE ENEMY 
+				angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, self.lockedEnemy.x , self.lockedEnemy.y)
+				faceTarget(self,angleDiffToEnemy, turnIcrement=5)
+
+			# ENEMY IS DEAD, GET ANOTHER
+			if(self.lockedEnemy!=None):
+				if(self.lockedEnemy.alive==False):
+					self.lockedOn    = False
+					self.lockedEnemy = None
+
+			if(self.lockedOn==False):
+				self.lockedEnemy = None
+				self.lockonIndex = 0
 
 
 		if(len(enemies)<1):
 			self.lockOnImage.currentFrame = 0
 			self.lockedOn                 = False
-			self.lockonActive			  = False
-			self.lockonIndex 			  = 1
 
 
 
@@ -274,12 +324,14 @@ class player():
 	def classicControls(self,gui,pressedKeys,lv,game):
 
 		BOOST_BUTTON = 'K' 
-		JINK_BUTTON  = 'J'
+		JINK_BUTTON  = 'J' 
 
 		# ------MOVEMENT
 		JINK = 0
 		accell= False # ACCELELRATION FLAG
 		noJink = False
+		# -------JINK MOVEMENT
+
 		if(JINK_BUTTON in pressedKeys):
 			
 			# JINK PHASE 1: JINKING
@@ -303,7 +355,27 @@ class player():
 			if(jinkComplete==True):
 				noJink = True
 				self.jinkAvailable = False
-		if(JINK_BUTTON not in pressedKeys or noJink):
+		
+		# -------LOCKED ON MOVEMENT
+		if(self.lockedOn):
+			self.jinking = True
+			vel_x = self.lockTurnSpeed * math.cos(math.radians(360-self.facing-90))
+			vel_y = self.lockTurnSpeed * math.sin(math.radians(360-self.facing-90))
+			if('D' in pressedKeys):
+				self.x -= vel_x
+				self.y -= vel_y
+			if('A' in pressedKeys):
+				self.x += vel_x
+				self.y += vel_y
+			if('W' in pressedKeys ):
+				self.speed += 0.25
+				accell = True
+			if('S' in pressedKeys):
+				self.speed -= 0.6
+				accell = True
+
+		# -------STANDARD MOVEMENT
+		if((JINK_BUTTON not in pressedKeys or noJink) and not self.lockedOn):
 			# GET DIRECTION OF ACCELLERATION
 			if('W' in pressedKeys ):
 				self.speed += 0.4
@@ -426,7 +498,7 @@ class player():
 	
 	def draw_cone(self,x,y,gui,cone_points,lv):
 
-		cone_points = detectionCone(self.x-gui.camX,self.y-gui.camY,gui,-self.facing,cone_length=400,cone_angle=100)
+		cone_points = detectionCone(self.x-gui.camX,self.y-gui.camY,gui,-self.facing,cone_length=self.cone_length,cone_angle=self.cone_angle)
 		# Draw the cone of vision using the polygon() function
 		pygame.draw.polygon(gui.screen, (255, 255, 255), cone_points,3)
 

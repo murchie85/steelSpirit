@@ -215,5 +215,5 @@ class scout(parent):
 		if(self.hit):
 			self.damageAnimation(gui,lv,game)
 		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) ):
-			animate,self.blitPos  = self.images.animate(gui,'scout',[x,y],game,rotation=self.facing-90)
+			animate,self.blitPos  = self.images.animate(gui,'scout' + str(self.id),[x,y],game,rotation=self.facing-90)
 
