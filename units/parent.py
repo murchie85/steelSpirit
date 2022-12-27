@@ -33,7 +33,6 @@ class parent():
 		self.slowDown        = False
 
 		self.decelleration  = 0.2
-		self.rotationSpeed  = 5
 
 
 

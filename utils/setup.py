@@ -109,6 +109,12 @@ gui.playerHit         = loadImageFiles('playerHit1.png',IMAGEASSETPATH + 'fighte
 gui.scoutRed          = loadImageFiles('crabRed1.png',IMAGEASSETPATH + 'enemies/crab/',convert=False)
 gui.scoutRedHit       = loadImageFiles('crabRedhit1.png',IMAGEASSETPATH + 'enemies/crab/',convert=False)
 
+gui.tank              = loadImageFiles('sandTank1.png',IMAGEASSETPATH + 'enemies/tank/',convert=False)
+gui.tankHit           = loadImageFiles('sandTankHit1.png',IMAGEASSETPATH + 'enemies/tank/',convert=False)
+gui.turret            = [pygame.image.load(IMAGEASSETPATH + 'enemies/tank/turret.png')]
+
+
+
 
 # ---------BULLETS AND WEAPONS
 

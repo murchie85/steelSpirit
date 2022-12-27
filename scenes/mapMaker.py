@@ -10,11 +10,14 @@ class mapEditor():
 		self.answerList        = []
 		self.questionsComplete = False
 		self.buttonIndex       = 0
+		self.buttonsHovered    = False
 
 		self.gameMap           = None
 
 		# TILE SELECTION 
-		self.editingTile          = False
+		self.tileModes             = ['layer1','Enemies']
+		self.tileMode              = 'layer1'
+		self.editingTile           = False
 		self.tileOptions           = list(gui.tileDict.keys())
 		self.tileOptionsIndex      = 0
 		self.tileOptionsSubIndex   = 0
@@ -33,11 +36,14 @@ class mapEditor():
 		self.answerList        = []
 		self.questionsComplete = False
 		self.buttonIndex       = 0
+		self.buttonsHovered    = False
 
 		self.gameMap           = None
 
 		# TILE SELECTION 
-		self.editingTile          = False
+		self.tileModes             = ['layer1','Enemies']
+		self.tileMode              = 'layer1'
+		self.editingTile           = False
 		self.tileOptions           = list(gui.tileDict.keys())
 		self.tileOptionsIndex      = 0
 		self.tileOptionsSubIndex   =  0
@@ -179,14 +185,16 @@ class mapEditor():
 
 
 		if(self.state=='editMap'):
+
+			# GET MAPTILE LIST
 			mapTiles = self.gameMap['metaTiles']
-			
+
 
 			x = 0
 			y = 0
 			# USES THE type and index as keys to gui.tileDict
 			
-			if(gui.clicked and self.tileHovered):
+			if(gui.clicked and self.tileHovered and self.buttonsHovered!=True):
 				if(self.tileSelecting==False and self.editingTile==False):
 					self.tileSelecting = True
 					gui.clicked        = False
@@ -251,15 +259,20 @@ class mapEditor():
 			else:
 				self.nav(gui)
 
+
 			# SAVE OR GO BACK
 
 			chosenFont = gui.largeFont
 			borderColour=(60,60,200)
 			
-			tw,th   = getTextWidth(chosenFont,'A menu item.'),getTextHeight(chosenFont,'A menu item yep sure.')
-			save,tex,tey      = simpleButton(1100,0.93*gui.h,'Save',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
-			back,tex,tey      = simpleButton(tex + 0.1*tw,0.93*gui.h,'Back',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
-			
+			tw,th                          = getTextWidth(chosenFont,'A menu item.'),getTextHeight(chosenFont,'A menu item yep sure.')
+			save,tex,tey,saveHovered       = simpleButtonHovered(1100,0.93*gui.h,'Save',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+			back,ttx,tty,backHovered       = simpleButtonHovered(tex + 0.1*tw,0.93*gui.h,'Back',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+			tileMode,tex,tey,tileHovered   = simpleButtonHovered(tex + 0.1*tw,0.05*gui.h,self.tileMode,gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=(10,170,80), textColour=(255,255,255))
+			self.buttonsHovered            = saveHovered or backHovered or tileHovered
+
+
+
 			if(save):
 				save_dict_as_pickle(self.gameMap, 'state/' + str(self.gameMap['name']) + '.pkl' )
 				self.saving = True
@@ -269,8 +282,11 @@ class mapEditor():
 				if(saveMessageTimeout):
 					self.saving = False
 					self.saves+=1
+			if(tileMode):
+				self.tileMode = self.tileModes[(self.tileModes.index(self.tileMode) + 1) %len(self.tileModes)]
 
-			# -----gui text
+
+			# -----PRINT OUT TEXT INFORMATION SUCH AS MAP SIZE
 
 			setWidth=getTextWidth(gui.font,'A menu item yep sure correct.')
 			sentence = "Map Size: [" + str(self.gameMap['width']) + ':' + str(self.gameMap['height']) +']'

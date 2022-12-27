@@ -3,27 +3,42 @@ from utils.gameUtils import *
 from utils._utils import imageAnimateAdvanced,loadingBarClass
 import pygame
 
-class scout(parent):
+
+
+class tank(parent):
 	def __init__(self,_id,gui,x=None,y=None):
 		super().__init__(gui)
+		# MAIN OVERRIDES 
 		self.id             = _id
-		self.name           = 'scout'
-		self.images         = imageAnimateAdvanced(gui.scoutRed,0.2)
+		self.name           = 'tank'
+		self.images         = imageAnimateAdvanced(gui.tank,0.2)
+		self.turretImage    = imageAnimateAdvanced(gui.turret,0.2)
 		self.x,self.y       = 500,500
 		if(x!=None): self.x = x
 		if(y!=None): self.y = y
-		self.w              = int(gui.scoutRed[0].get_width())
-		self.h              = int(gui.scoutRed[0].get_height())
+		self.w              = int(gui.tank[0].get_width())
+		self.h              = int(gui.tank[0].get_height())
+		self.turretFacing   = self.facing
+		
+		# HIT IMAGE
+		self.hitImage         = gui.tankHit
+		self.hitAnimation     = imageAnimateAdvanced(self.hitImage,0.2)
+
+		# HEALTHBAR 
 		self.healthBar      = loadingBarClass(self.w,0.2*self.h,(80,220,80),(220,220,220),(0,0,200))
 		self.blitPos        = None
+		self.turretPos      = None
 
 		self.state             = 'patrol'
-		self.patrolLocations   = [(self.x,self.y),(self.x+400,self.y),(self.x+400,self.y+200),(self.x,self.y+200)] 
+		self.patrolLocations   = [(self.x,self.y),(self.x+700,self.y),(self.x+700,self.y+200),(self.x,self.y+200)] 
 		self.currentLocIndex   = 0
 
 
 		# CLASS OVERRIDES
-		self.defaultSpeed    = 2
+		self.hp              = 200
+		self.defaultSpeed    = 1
+		self.maxSpeed        = 1
+		self.maxSpeedDefault = 1
 
 		# ENEMY COORDS 
 
@@ -32,9 +47,9 @@ class scout(parent):
 		self.enemyTargetAngle = 0
 		self.defenceSector    = self.patrolLocations[0]
 
-		# SHOOTT 
+		# SHOOT 
 		self.bulletTimer        = stopTimer()           # BUFF
-		self.shootDelay         = 0.5                   # BUFF
+		self.shootDelay         = 0.3                   # BUFF
 		self.bulletsFired       = 0
 
 	# AI LOGIC
@@ -44,12 +59,10 @@ class scout(parent):
 		if(self.state=='patrol'):
 			self.patrol(gui,lv)
 
-		
+
 		if(self.state=='attackPursue'):
 			self.atackPursue(gui,lv,game)
 
-		if(self.state=='alert'):
-			self.alert(gui,lv)
 
 
 
@@ -78,7 +91,9 @@ class scout(parent):
 
 		# -----------GET DISTANCE TO ENEMY
 		angleDiffToEnemy, DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, lv.player.x,lv.player.y)
-		if(DistanceToEnemy<0.4*gui.h):
+		
+		self.turretFacing = self.facing
+		if(DistanceToEnemy<0.7*gui.h):
 			self.state = 'attackPursue'
 			
 			# WORK OUT WHICH SECTOR IS NEAREST
@@ -86,56 +101,24 @@ class scout(parent):
 			self.defenceSector = currentDestination
 
 
-		"""
-		[0,0], [400,0], [400,400], [0,400]
-
-		
-		what destination am i going to at this moment
-		
-		moveToDestinationFunction()
-			
-			what is the target coordinates
-			what is the target coordinates relative to my position
-			from my position, where am i facing
-			from my facing and position, how much do i need to turn, to face the destination
-
-			ajdust facing position, so always facing target
-
-
-			move forward
-
-
-		"""
 
 
 
 
 	def atackPursue(self,gui,lv,game):
+		# RECALCULATE RELATIVE POS TO ENEMY
+		angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = turretAngleToTarget(self,self.x,self.y,lv.player.x,lv.player.y)
+
+		# -----------FACE TOWARDS DESTINATION
 		
-		# DISTANCE THE ENEMY IS FROM ROUTE COORD
-		angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = angleToTarget(self,lv.player.x,lv.player.y,self.defenceSector[0],self.defenceSector[1])
-		
-		if(DistanceToEnemy<0.8*gui.h):
-
-			# RECALCULATE RELATIVE POS TO ENEMY
-			angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y,lv.player.x,lv.player.y)
-
-			# -----------FACE TOWARDS DESTINATION
-			
-			faceTarget(self,angleDiffToEnemy, turnIcrement=5)
-			
-			# -----------MOVE TOWARDS DESTINATION
-			
-			self.speed = self.defaultSpeed
-			self.moveForwards()
+		turretFaceTarget(self,angleDiffToEnemy, turnIcrement=5)
 
 
-			# -------SHOOT
-			if DistanceToEnemy<0.4*gui.h:
-				self.shoot(gui,lv,game)
+		# -------SHOOT
+		if DistanceToEnemy<0.7*gui.h:
+			self.shoot(gui,lv,game)
 
-		else:
-			self.state = 'patrol'
+		#if(DistanceToEnemy>0.7*gui.h): self.state = 'patrol'
 
 
 
@@ -157,7 +140,7 @@ class scout(parent):
 				self.bulletsFired +=1
 				# ADDS BULLET TO BULLET LIST
 				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
-				lv.bulletList.append(bullet(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, self.facing,'slitherShot', speed=self.maxSpeed + 1,damage=2,colour=[150,150,20]))
+				lv.bulletList.append(bullet(gui,self.turretPos['midTop'][0] + gui.camX,self.turretPos['midTop'][1]+ gui.camY,bid,self.classification, self.turretFacing,'tankShell', speed=7,damage=2,colour=[200,80,20],w=10,h=10 ))
 			
 
 
@@ -165,7 +148,17 @@ class scout(parent):
 		x,y = self.x - gui.camX,self.y  - gui.camY
 		
 		if(self.hit):
-			self.damageAnimation(gui,lv,game)
+
+			x,y = self.x - gui.camX,self.y  - gui.camY
+			
+			if(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui)):
+				complete,imageParms = self.hitAnimation.animate(gui,str(self.id) + ' hit',[x,y],game,rotation=self.facing-90)
+				if(complete):
+					self.hit = False
+
+
+
 		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) ):
-			animate,self.blitPos  = self.images.animate(gui,'scout' + str(self.id),[x,y],game,rotation=self.facing-90)
+			animate,self.blitPos     = self.images.animate(gui,'tank' + str(self.id),[x,y],game,rotation=self.facing-90)
+			turretAnimage,self.turretPos  = self.turretImage.animate(gui,'turret' + str(self.id),[x,y],game,rotation=self.turretFacing-90)
 

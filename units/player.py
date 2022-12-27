@@ -317,7 +317,6 @@ class player():
 		if(self.invincible):
 			invincibleTimer = self.invincibleTimer.stopWatch(self.invincibleDelay,str(self.id + self.hp),self,game,silence=True)
 			if(invincibleTimer):
-				print('setting false')
 				self.invincible = False
 
 
@@ -361,12 +360,16 @@ class player():
 			self.jinking = True
 			vel_x = self.lockTurnSpeed * math.cos(math.radians(360-self.facing-90))
 			vel_y = self.lockTurnSpeed * math.sin(math.radians(360-self.facing-90))
+			
+			
 			if('D' in pressedKeys):
 				self.x -= vel_x
 				self.y -= vel_y
 			if('A' in pressedKeys):
 				self.x += vel_x
 				self.y += vel_y
+			
+
 			if('W' in pressedKeys ):
 				self.speed += 0.25
 				accell = True

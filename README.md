@@ -13,15 +13,9 @@ In progress, lots yet to be done.
 ## PRIMARY 
 
 
-- GROUND UNIT
-- Want to be able to dodge enemy in shmup style, lockon camera centering clamp may be needed
-	- this makes jink manual
-- LOCKON TOGGLE (left/right to scroll)
-- LOCKON LIMIT 3
-- FACE ENEMY DURING LOCKON
-- PIVOT CLOCKWISE DURING LOCKON
+
+- Consider holding down lockon, when you let go, you are just in jink mode
 - ANIMATED TILES
-- Ground units
 - MISSILE
 - CHAFF
 - Enemy placer
@@ -29,10 +23,14 @@ In progress, lots yet to be done.
 - Canvas second layer
 - canvas transparent
 - ++ CANVAS SPEED
+- Camera shake
 - ADD ALLY
 - ADD ALLY LOGIC
 - ALLY COMMAND
 - INCINERY FLARE EXPLOSIONS https://youtu.be/zXjBS382P2k?t=224
+- Want to be able to dodge enemy in shmup style, lockon camera centering clamp may be needed
+	- this makes jink manual
+	- more thinking required, because to get that flow, its hard if there are enemies in front and beside
 
 ENEMIES: 
 
@@ -43,7 +41,10 @@ SHIPS IN PORTS
 
 ## SECONDARY 
 
+- Fine control, so rotation is inversed if facing down, (but only if r,l isn't already pressed)
 - Check Godzilla for human type ideas
+- Shmup into open world
+- Redo omega storm including canvas
 - Redo title text explaination with ai art gen - move to after game
 - UPGRADE TREE
 	- MAINMENU UNLOCK
@@ -66,55 +67,12 @@ SHIPS IN PORTS
 DONE: make and render player DONE: Do a simple map DONE: Navigate with aswd DONE: Camera Nav
 DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion animation, allow player to die, Thinner fire, Double fire, radar cone, LOCK ON
 DONE: Finish isonscreen function - test using a viewport, TRISHOT - Like in Underdefeat, Multi-tile edit
-DONE: - JINK IF NOT IN PIVOT
+DONE: - JINK IF NOT IN PIVOT, LOCKON TOGGLE (left/right to scroll), LOCKON LIMIT 3, FACE ENEMY DURING LOCKON, PIVOT CLOCKWISE DURING LOCKON GROUND UNIT
 
 # ACCEPTANCE CRITERIA GLOBAL
 
 - Lots of variety on screen, AA, planes, ATB, etc
 - Good Map Detail 
-
-
-# GAME FLOW 
-
-
-## SIMPLIFIED  Game Logic: 
-
-- [MAIN] - [GAME] - [LEVEL] - [PLAYER OBJ, ENEMY OBJ, BULLET OBJ, TILEMAPS]
-
-
-## FULL FLOW 
-
-
-- main 
-	
-	- setup ---- (importing images and setting up the main gui, game and other classes)
-	
-	- Coordinator [GAME CLASS] (managing the main scenes/phease of the game)
-
-		- Intro 
-
-		- Title screen
-
-		- Start Menu
-
-		-  Game Logic [LEVEL CLASS]
-
-			- Two main states: 
-
-				- Init
-					- Setup background, add enemies to the field
-				- Run
-					- Runs the bullets, map, enemies, players functions
-
-		- Map editor ***(Complete)***
-
-			- Create new map
-
-			- Load Map
-
-				- Edit map
-
-		- (settings, profile...)
 
 
 
@@ -225,27 +183,77 @@ Snippets: https://youtu.be/H6kvP0h0g9M?t=5
 # Notes  
 
 
-DRAW MORE UNITS
-
-GOAL: NO STORY until game is playable and fun GOAL: Do 2 way pivot, shmup to open
-
-SCENE
-
-FEATURES:
 
 
-## DONE: 
 
-fire weapon make enemy make enemy simple logic make enemy fire destroy enemy scene
+# GAME FLOW 
 
-Deduct Health MUST HAVE: After burners 
 
-Shmup into open world
+## SIMPLIFIED  Game Logic: 
 
-Redo omega storm including canvas
+- [MAIN] - [GAME] - [LEVEL] - [PLAYER OBJ, ENEMY OBJ, BULLET OBJ, TILEMAPS]
 
-Camera shake
 
-later
-Team ally players
+## FULL FLOW 
+
+
+- main 
+	
+	- setup ---- (importing images and setting up the main gui, game and other classes)
+	
+	- Coordinator [GAME CLASS] (managing the main scenes/phease of the game)
+
+		- Intro 
+
+		- Title screen
+
+		- Start Menu
+
+		-  Game Logic [LEVEL CLASS]
+
+			- Two main states: 
+
+				- Init
+					- Setup background, add enemies to the field
+				- Run
+					- Runs the bullets, map, enemies, players functions
+
+		- Map editor ***(Complete)***
+
+			- Create new map
+
+			- Load Map
+
+				- Edit map
+
+		- (settings, profile...)
+
+
+
+## STORY BOARDING
+
+
+- EARTH HAS COME A LONG WAY SINCE THE FORMATION OF A WEIGHED FEDERATED ALLIANCE
+  (SPACE SHIPS, MANS SHAKING HANDS)
+
+- EARTH EXPANDED OUT FURTHER INTO THE HEAVENS 
+	 - PICTURES OF SHIPS BUILDING HABBITATES
+
+- FINALLY THE GREATEST BREAKTHROUGH CAME AT OUR FEET AND NOT IN THE STARS
+	- GENETIC ENGINEEERING , BABY HYBRIDS
+
+- NEW VARIATIONS TOOK OFF IN THE NEW PLANETS, 
+	- MARTIAN FOX LIKE CREATIONS
+	- VENUSIAN RABBIT GIRLS
+	- TITAN CAT GIRLS etc
+
+- The population of the solar system grew to 50 billion 
+
+- New racial tensions soon fueled civil wars
+
+- Nation leaders nearly brought us to the brink until the 'veterans' stood in and brought about the peace
+
+- Now we stand at a new dawn, the veterans have retired, with a gap for the new breed
+
+
 

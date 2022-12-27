@@ -86,7 +86,7 @@ def angleToTarget(self,selfX,selfY, targetObjectX,targetObjectY):
 
 	# CALCULATE ANGLE DIFF
 	angleDifference = (self.facing - targetAngle + 180 + 360) % 360 - 180
-	
+
 	#angleDifference = wrapAngle(angleDifference)
 	
 
@@ -131,6 +131,61 @@ def faceTarget(self,angleDifference, turnIcrement=3):
 		return(True)
 	else:
 		return(False)
+
+
+
+# RETURNS ANGLE AND DISTANCE TO TARGET 
+def turretAngleToTarget(self,selfX,selfY, targetObjectX,targetObjectY):
+	# GET VECTOR DIST
+	xDelta        =  targetObjectX - selfX
+	yDelta        =  targetObjectY - selfY
+	# GET ANGLE FROM 
+	targetAngleR  =  math.atan2(yDelta,xDelta) * 180/math.pi
+	targetAngle   = 360-(targetAngleR) 
+	
+	# WRAP ANGLE
+	targetAngle = wrapAngle(targetAngle)
+
+
+	# CALCULATE ANGLE DIFF
+	angleDifference = (self.turretFacing - targetAngle + 180 + 360) % 360 - 180
+
+	#angleDifference = wrapAngle(angleDifference)
+	
+
+	distance = math.sqrt((xDelta)**2+(yDelta)**2)
+	return(int(angleDifference),distance,targetAngle)
+
+
+# UPDATES SELF.turretFacing CLASS 
+def turretFaceTarget(self,angleDifference, turnIcrement=3):
+
+	# WRAP turretFacing ANGLE
+
+	#  IF ITS WITHIN 1
+	if(abs(angleDifference)<=1):
+		self.turretFacing = wrapAngle(self.turretFacing)
+	elif(abs(angleDifference)<turnIcrement):
+		if(angleDifference<0): 
+			self.turretFacing += abs(angleDifference)
+		# IF ITS LEFT OF
+		elif(angleDifference>0): 
+			self.turretFacing -= abs(angleDifference)
+
+	# IF RIGHT OF
+	elif(angleDifference<0): 
+		self.turretFacing += turnIcrement
+	# IF ITS LEFT OF
+	elif(angleDifference>0): 
+		self.turretFacing -= turnIcrement
+	
+	self.turretFacing = wrapAngle(self.turretFacing)
+
+	if(abs(angleDifference)<=turnIcrement+1):
+		return(True)
+	else:
+		return(False)
+
 
 
 

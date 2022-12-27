@@ -944,6 +944,55 @@ def simpleButton(x,y,text,gui,font,setTw=False,backColour=(0,0,0),borderColour=(
     return(selected,x+w,y+h)
 
 
+"""
+simple button
+"""
+def simpleButtonHovered(x,y,text,gui,font,setTw=False,backColour=(0,0,0),borderColour=(255,255,255), textColour=(255,255,255)):
+    
+    # ------overridable----
+    
+    pad  = 20
+
+    # --------------RENDER TEXT TO SET WIDTH
+    
+    selected = False 
+
+    ts     = font.render(text, True, textColour)
+    th     = ts.get_rect().height
+    tw     = ts.get_rect().width
+    if(setTw==False): setTw    = 1.1*tw
+    # ------Set full width,height, text x,y poos
+
+    w,h    = setTw,th+pad
+    tx     = x + 0.5*(w-tw)
+    ty     = y + 0.5*(h-th)
+
+    # -----------draw box
+    if(backColour!=None):
+        pygame.draw.rect(gui.screen, (backColour), [x,y,w,h]) # background colour
+    if(borderColour!=None):
+        pygame.draw.rect(gui.screen, (borderColour), [x,y,w,h],2)               # border colour
+    
+    hovered = False
+    if(gui.mouseCollides(x,y,(w),(h))): 
+        hovered = True
+        if(borderColour!=None):
+            pygame.draw.rect(gui.screen, (borderColour), [x,y,w,h])             # highlighted colour
+        ts     = font.render(text, True, lighten(textColour,50))
+        
+        if(gui.clicked): 
+            selected =True
+            gui.clicked= False
+            gui.pressed = False
+    
+    # ---- write text
+    gui.screen.blit(ts,(tx,ty))
+
+
+    return(selected,x+w,y+h,hovered)
+
+
+
 
 
 ####################################################################################################
@@ -1799,7 +1848,7 @@ class imageAnimateAdvanced():
         #pygame.draw.circle(gui.screen, (220,100,100), (behindX,behindY), 10, 0)
 
 
-        return(self.reelComplete,{'midTop':(midTopX,midTopY),'leftTop':(leftTopX, leftTopY),'rightTop':(rightTopX, rightTopY),'behind':(behindX,behindY) , 'rotatedDims': (rotatedWidth,rotatedHeight)})
+        return(self.reelComplete,{'center':(centerX,centerY ), 'midTop':(midTopX,midTopY),'leftTop':(leftTopX, leftTopY),'rightTop':(rightTopX, rightTopY),'behind':(behindX,behindY) , 'rotatedDims': (rotatedWidth,rotatedHeight)})
 
 
 

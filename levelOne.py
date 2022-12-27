@@ -1,6 +1,8 @@
 from utils._utils import drawImage,load_pickle
 from utils.gameUtils import *
 from units.scout import *
+from units.tank import *
+
 from units.player import *
 
 class levelOne():
@@ -131,7 +133,7 @@ class levelOne():
 
 		#---place enemies on battlefield
 		_scout = scout(createFid(self),gui,x=500,y=100)
-		_scout.patrolLocations   = [(730,110),(1440,110),(1440,540),(730,540)] 
+		#_scout.patrolLocations   = [(730,110),(1440,110),(1440,540),(730,540)] 
 		self.enemyList.append(_scout)
 
 		# ----scout 2
@@ -149,6 +151,19 @@ class levelOne():
 		_scout = scout(createFid(self),gui,x=770,y=400)
 		self.enemyList.append(_scout)
 
+
+
+		_tank = tank(createFid(self),gui,x=1200,y=400)
+		self.enemyList.append(_tank)
+
+		_tank = tank(createFid(self),gui,x=1300,y=400)
+		self.enemyList.append(_tank)
+
+		_tank = tank(createFid(self),gui,x=1200,y=600)
+		self.enemyList.append(_tank)
+
+		_tank = tank(createFid(self),gui,x=1300,y=600)
+		self.enemyList.append(_tank)
 
 
 
