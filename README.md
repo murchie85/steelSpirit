@@ -12,9 +12,18 @@ In progress, lots yet to be done.
 
 ## PRIMARY 
 
+- MOVEMENT EXPERIMENT
+ 	- LOCKON SHOULDN'T FACE TARGET, cus you plough into it, should put you into jink mode, which you can swivel holding jink button
+	- Maybe just slow down when enemies are in range (unless you boost)
+	- Consider shooting puts you in Jink mode to strafe like under defeat
+	- Consider holding down lockon, when you let go, you are just in jink mode
+	- Make dodging a big element too zipping past until you get to a good part
+	- Jinkshoot spray and pray by slowing forward motion is a must.. to make chaff dodge work it should be in non shooting mode..you can lob missiles maybe
 
+- GROUND AA with bullets
+- GROUND AA With missiles
+- GROUND damagable structures
 
-- Consider holding down lockon, when you let go, you are just in jink mode
 - ANIMATED TILES
 - MISSILE
 - CHAFF
@@ -31,6 +40,7 @@ In progress, lots yet to be done.
 - Want to be able to dodge enemy in shmup style, lockon camera centering clamp may be needed
 	- this makes jink manual
 	- more thinking required, because to get that flow, its hard if there are enemies in front and beside
+- dont allow multiple selects of enemy on one tile
 
 ENEMIES: 
 
@@ -55,6 +65,7 @@ SHIPS IN PORTS
 - GUI LAYOUT: RIGHT VIDEO SCREEN FOR FAST, INGAME POPUP SCREEN FOR BLUR
 - release with twitter acc, automate reshares..adds, get list of shmups
 - load assets by lv
+- clean map editor, so it always checks number of rows, cols match actual in metaTiles 
 
 
 ## UNDER CONSIDERATOIN

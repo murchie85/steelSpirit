@@ -3,8 +3,6 @@ from utils.gameUtils import *
 from utils._utils import imageAnimateAdvanced,loadingBarClass
 import pygame
 
-
-
 class tank(parent):
 	def __init__(self,_id,gui,x=None,y=None):
 		super().__init__(gui)
@@ -55,6 +53,9 @@ class tank(parent):
 	# AI LOGIC
 	def actions(self,gui,game,lv):
 
+		# ENSURE VECHICLE DOESN'T EXCEED BOUNDARIES
+		self.stayOnField(lv)
+
 
 		if(self.state=='patrol'):
 			self.patrol(gui,lv)
@@ -74,9 +75,10 @@ class tank(parent):
 		angleDifference,distance,targetAngle = angleToTarget(self,self.x,self.y, currentDestination[0],currentDestination[1])
 
 
+
 		# -----------FACE TOWARDS DESTINATION
 		
-		faceTarget(self,angleDifference, turnIcrement=5)
+		faceTarget(self,angleDifference, turnIcrement=2)
 		
 		# -----------MOVE TOWARDS DESTINATION
 		
@@ -85,7 +87,7 @@ class tank(parent):
 
 		# -----------IF DESTINATION REACHED, MOVE TO NEXT 
 
-		if(distance< self.w): self.currentLocIndex+=1
+		if(distance< 0.3*self.w): self.currentLocIndex+=1
 		if(self.currentLocIndex>=len(self.patrolLocations)):
 			self.currentLocIndex = 0
 
@@ -93,7 +95,7 @@ class tank(parent):
 		angleDiffToEnemy, DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, lv.player.x,lv.player.y)
 		
 		self.turretFacing = self.facing
-		if(DistanceToEnemy<0.7*gui.h):
+		if(DistanceToEnemy<0.5*gui.h):
 			self.state = 'attackPursue'
 			
 			# WORK OUT WHICH SECTOR IS NEAREST
@@ -115,8 +117,10 @@ class tank(parent):
 
 
 		# -------SHOOT
-		if DistanceToEnemy<0.7*gui.h:
+		if DistanceToEnemy<0.5*gui.h:
 			self.shoot(gui,lv,game)
+		else:
+			self.state = 'patrol'
 
 		#if(DistanceToEnemy>0.7*gui.h): self.state = 'patrol'
 
@@ -161,4 +165,6 @@ class tank(parent):
 		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) ):
 			animate,self.blitPos     = self.images.animate(gui,'tank' + str(self.id),[x,y],game,rotation=self.facing-90)
 			turretAnimage,self.turretPos  = self.turretImage.animate(gui,'turret' + str(self.id),[x,y],game,rotation=self.turretFacing-90)
+
+			#pygame.draw.circle(gui.screen, (244,0,0), (self.patrolLocations[self.currentLocIndex][0]- gui.camX ,self.patrolLocations[self.currentLocIndex][1]- gui.camY) , 15, 0)
 

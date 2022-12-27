@@ -101,6 +101,14 @@ class parent():
 				self.speed =0
 				self.slowDown = False
 		
+	
+	def stayOnField(self,lv):
+		# BORDER CLAMP
+		if(self.x + self.w > lv.mapw): self.x -= self.maxSpeed + 3
+		if(self.x < lv.mapx): self.x += self.maxSpeed+ 3
+		if(self.y + self.h > lv.maph): self.y -= self.maxSpeed+ 3
+		if(self.y < lv.mapy): self.y += self.maxSpeed+ 3
+
 	def animateDestruction(self,gui,lv,game):
 		x,y = self.x - gui.camX,self.y  - gui.camY
 

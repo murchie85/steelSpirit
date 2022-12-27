@@ -95,6 +95,10 @@ gui.coverLogo         = pygame.image.load(IMAGEASSETPATH + 'cover/logo.png')
 gui.cover1            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover.png')
 gui.cover2            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover2.png')
 gui.cover3            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover3.png')
+gui.kira              = pygame.image.load(IMAGEASSETPATH + 'cover/kira.png')
+gui.madge             = pygame.image.load(IMAGEASSETPATH + 'cover/madge.png')
+gui.cherry            = pygame.image.load(IMAGEASSETPATH + 'cover/cherry.png')
+gui.apacheJack        = pygame.image.load(IMAGEASSETPATH + 'cover/apacheJack.png')
 gui.cyborgCover       = pygame.image.load(IMAGEASSETPATH + 'cover/cyborgGirl.png')
 gui.bunnyGirlYCover   = pygame.image.load(IMAGEASSETPATH + 'cover/bunnyGirlYellowCover.png')
 
@@ -112,6 +116,7 @@ gui.scoutRedHit       = loadImageFiles('crabRedhit1.png',IMAGEASSETPATH + 'enemi
 gui.tank              = loadImageFiles('sandTank1.png',IMAGEASSETPATH + 'enemies/tank/',convert=False)
 gui.tankHit           = loadImageFiles('sandTankHit1.png',IMAGEASSETPATH + 'enemies/tank/',convert=False)
 gui.turret            = [pygame.image.load(IMAGEASSETPATH + 'enemies/tank/turret.png')]
+gui.tankStatic        = pygame.image.load(IMAGEASSETPATH + 'enemies/tank/sandTankStatic.png')
 
 
 
@@ -136,6 +141,12 @@ gui.tileDict           = {'Grass': gui.grassTiles,
 						  'base': gui.base100,
 						  'water': gui.water
 						  }
+
+gui.enemyDict          = {'scout':{'special':['command1','command2'],'image': gui.scoutRed[0]}, 
+						  'tank':{'special':['command1','command2'],'image': gui.tankStatic}, 
+
+							}
+
 
 
 gui.smallRedExplosion      = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'explosions/smallExplosion/')

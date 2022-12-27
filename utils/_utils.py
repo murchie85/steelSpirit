@@ -901,7 +901,7 @@ def fittedSentenceBox(gui,game,x,y,w,h,textBlob,leftoverWordIndex,font,textColou
 """
 simple button
 """
-def simpleButton(x,y,text,gui,font,setTw=False,backColour=(0,0,0),borderColour=(255,255,255), textColour=(255,255,255)):
+def simpleButton(x,y,text,gui,font,setTw=False,backColour=(0,0,0),borderColour=(255,255,255), textColour=(255,255,255),hoveredColour=None):
     
     # ------overridable----
     
@@ -929,7 +929,11 @@ def simpleButton(x,y,text,gui,font,setTw=False,backColour=(0,0,0),borderColour=(
     
     if(gui.mouseCollides(x,y,(w),(h))): 
         if(borderColour!=None):
-            pygame.draw.rect(gui.screen, (borderColour), [x,y,w,h])             # highlighted colour
+            highlighedColour = borderColour
+            if(hoveredColour!=None): 
+                highlighedColour = hoveredColour
+
+            pygame.draw.rect(gui.screen, (highlighedColour), [x,y,w,h])             # highlighted colour
         ts     = font.render(text, True, lighten(textColour,50))
         
         if(gui.clicked): 

@@ -51,6 +51,9 @@ class scout(parent):
 		if(self.state=='alert'):
 			self.alert(gui,lv)
 
+		# ENSURE VECHICLE DOESN'T EXCEED BOUNDARIES
+		self.stayOnField(lv)
+
 
 
 	def patrol(self,gui,lv):
@@ -78,34 +81,12 @@ class scout(parent):
 
 		# -----------GET DISTANCE TO ENEMY
 		angleDiffToEnemy, DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, lv.player.x,lv.player.y)
-		if(DistanceToEnemy<0.4*gui.h):
+		if(DistanceToEnemy<0.65*gui.h):
 			self.state = 'attackPursue'
 			
 			# WORK OUT WHICH SECTOR IS NEAREST
 
 			self.defenceSector = currentDestination
-
-
-		"""
-		[0,0], [400,0], [400,400], [0,400]
-
-		
-		what destination am i going to at this moment
-		
-		moveToDestinationFunction()
-			
-			what is the target coordinates
-			what is the target coordinates relative to my position
-			from my position, where am i facing
-			from my facing and position, how much do i need to turn, to face the destination
-
-			ajdust facing position, so always facing target
-
-
-			move forward
-
-
-		"""
 
 
 
@@ -131,7 +112,7 @@ class scout(parent):
 
 
 			# -------SHOOT
-			if DistanceToEnemy<0.4*gui.h:
+			if DistanceToEnemy<0.65*gui.h:
 				self.shoot(gui,lv,game)
 
 		else:

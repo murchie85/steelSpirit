@@ -61,8 +61,8 @@ class player():
 		# BOOSTING 
 
 		self.boosting          = False
-		self.boostDuration     = 4
-		self.boostCooldownTime = 6
+		self.boostDuration     = 5
+		self.boostCooldownTime = 3
 		self.boostTimer        = stopTimer()           # BUFF
 		self.boostCoolDown     = stopTimer()
 		self.boostAvailable    = True
@@ -70,8 +70,8 @@ class player():
 
 		# JINKING
 		self.jinking           = False
-		self.jinkDuration      = 4
-		self.jinkCooldownTime  = 6
+		self.jinkDuration      = 6
+		self.jinkCooldownTime  = 3
 		self.jinkTimer         = stopTimer()           # BUFF
 		self.jinkCoolDown      = stopTimer()
 		self.jinkAvailable     = True
@@ -243,9 +243,6 @@ class player():
 				# RENDER GREEN LOCKON AROUND TARGET
 				drawImage(gui.screen,gui.lockOnStill,(self.lockedEnemy.x-gui.camX,self.lockedEnemy.y-gui.camY))
 				
-				# FACE ENEMY 
-				angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, self.lockedEnemy.x , self.lockedEnemy.y)
-				faceTarget(self,angleDiffToEnemy, turnIcrement=5)
 
 			# ENEMY IS DEAD, GET ANOTHER
 			if(self.lockedEnemy!=None):
@@ -331,12 +328,12 @@ class player():
 		noJink = False
 		# -------JINK MOVEMENT
 
-		if(JINK_BUTTON in pressedKeys):
+		if(JINK_BUTTON in pressedKeys and not self.lockedOn):
 			
 			# JINK PHASE 1: JINKING
 			jinkComplete = self.jinkTimer.stopWatch(self.jinkDuration,'jinking', str(self.jinkCount),game,silence=True)
 			if(not jinkComplete):
-				self.jinking = True
+				self.maxSpeed = 5
 				vel_x = self.maxSpeed * math.cos(math.radians(360-self.facing-90))
 				vel_y = self.maxSpeed * math.sin(math.radians(360-self.facing-90))
 				if('D' in pressedKeys):
@@ -357,28 +354,37 @@ class player():
 		
 		# -------LOCKED ON MOVEMENT
 		if(self.lockedOn):
-			self.jinking = True
-			vel_x = self.lockTurnSpeed * math.cos(math.radians(360-self.facing-90))
-			vel_y = self.lockTurnSpeed * math.sin(math.radians(360-self.facing-90))
+
+			self.maxSpeed = 5
+			vel_x = self.maxSpeed * math.cos(math.radians(360-self.facing-90))
+			vel_y = self.maxSpeed * math.sin(math.radians(360-self.facing-90))
 			
-			
+			# TURN IF JINK BUTTON HELD
+			if('D' in pressedKeys and JINK_BUTTON in pressedKeys):
+				self.facing -= 2
+			# OTHER WISE MOVE IN JINK FASHION
 			if('D' in pressedKeys):
 				self.x -= vel_x
 				self.y -= vel_y
+			# TURN IF JINK BUTTON HELD
+			if('A' in pressedKeys and JINK_BUTTON in pressedKeys):
+				self.facing += 2
+			# OTHER WISE MOVE IN JINK FASHION
 			if('A' in pressedKeys):
 				self.x += vel_x
 				self.y += vel_y
-			
 
 			if('W' in pressedKeys ):
-				self.speed += 0.25
+				self.speed += 0.7
 				accell = True
 			if('S' in pressedKeys):
-				self.speed -= 0.6
+				self.speed -= 0.7
 				accell = True
 
 		# -------STANDARD MOVEMENT
+
 		if((JINK_BUTTON not in pressedKeys or noJink) and not self.lockedOn):
+			self.maxSpeed = self.maxSpeedDefault
 			# GET DIRECTION OF ACCELLERATION
 			if('W' in pressedKeys ):
 				self.speed += 0.4
@@ -394,7 +400,6 @@ class player():
 		# -------JINK PHASE 2: COOLDOWN
 
 		if((JINK_BUTTON not in pressedKeys) or self.jinkAvailable == False):
-			self.jinking       = False
 			if(self.jinkAvailable == False):
 				self.jinkAvailable = self.jinkCoolDown.stopWatch(self.jinkCooldownTime,'jink cooldown Counter', str(self.jinkCount),game,silence=True)
 				if(self.jinkAvailable):
@@ -449,7 +454,6 @@ class player():
 		# SLOWDOWN WHEN NOT ACCELLERATING
 		if(accell==False):
 			self.speed = zero(self.speed,self.decelleration)
-
 
 		# BORDER CLAMP
 		if(self.x + self.w > lv.mapw): self.x -= self.maxSpeed

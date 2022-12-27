@@ -5,19 +5,15 @@ from units.tank import *
 
 from units.player import *
 
-class levelOne():
-	def __init__(self,gui):
+class levelTwo():
+	def __init__(self,gui,game):
 		self.state = 'init'
-		self.grass = [gui.grassTiles[0] for x in range(800)]
 		self.mapx  = 0
 		self.mapy  = 0
 
 		
 		self.player    = player(gui)
-
-		# ----map 
-		
-		self.gameMap   = load_pickle('state/' + 'lv1.pkl')
+		self.gameMap   = load_pickle('state/' + 'lv2.pkl')
 		self.mapw      = self.gameMap['width']
 		self.maph      = self.gameMap['height']
 
@@ -131,84 +127,43 @@ class levelOne():
 
 	def init(self,gui,game):
 
-		#---place enemies on battlefield
-		_scout = scout(createFid(self),gui,x=500,y=100)
-		#_scout.patrolLocations   = [(730,110),(1440,110),(1440,540),(730,540)] 
-		self.enemyList.append(_scout)
-
-		# ----scout 2
-		_scout = scout(createFid(self),gui,x=580,y=100)
-		self.enemyList.append(_scout)
 
 
-		_scout = scout(createFid(self),gui,x=630,y=400)
-		self.enemyList.append(_scout)
+		mapTiles = self.gameMap['metaTiles']
+		enemies  = self.gameMap['enemyList']
+		#--------------ADD ENEMIES
+		x,y = 0,0
+		# USES THE type and index as keys to gui.tileDict
+		for r in range(len(mapTiles)):
+			row = mapTiles[r]
+			for c in range(len(row)):
+				col = row[c]
+				# needed to increment x,y values respectively
+				image = gui.tileDict[col['type']][col['index']]
+				
+				# ADD ENEMY IF AT THIS R,C LEVEL
+				for enemy in self.gameMap['enemyList']:
+					if(r == enemy['row'] and c== enemy['col']):
+						self.addEnemy(x,y,enemy,gui)
 
+				x += image.get_width()
+			y+= image.get_height()
+			x = 0
 
-		_scout = scout(createFid(self),gui,x=700,y=400)
-		self.enemyList.append(_scout)
-
-		_scout = scout(createFid(self),gui,x=770,y=400)
-		self.enemyList.append(_scout)
-
-
-
-		_tank = tank(createFid(self),gui,x=1200,y=400)
-		self.enemyList.append(_tank)
-
-		_tank = tank(createFid(self),gui,x=1300,y=400)
-		self.enemyList.append(_tank)
-
-		_tank = tank(createFid(self),gui,x=1200,y=600)
-		self.enemyList.append(_tank)
-
-		_tank = tank(createFid(self),gui,x=1300,y=600)
-		self.enemyList.append(_tank)
-
-
-
-
-		_scout = scout(createFid(self),gui,x=2000,y=2000)
-		self.enemyList.append(_scout)
-
-		_scout = scout(createFid(self),gui,x=2100,y=2000)
-		self.enemyList.append(_scout)
-
-		_scout = scout(createFid(self),gui,x=2200,y=2000)
-		self.enemyList.append(_scout)
-
-
-		_scout = scout(createFid(self),gui,x=1500,y=3000)
-		self.enemyList.append(_scout)
-
-		_scout = scout(createFid(self),gui,x=1600,y=3000)
-		self.enemyList.append(_scout)
-
-		_scout = scout(createFid(self),gui,x=1700,y=3000)
-		self.enemyList.append(_scout)
-
-
-
-		_scout = scout(createFid(self),gui,x=1500,y=4000)
-		self.enemyList.append(_scout)
-
-		_scout = scout(createFid(self),gui,x=1600,y=4000)
-		self.enemyList.append(_scout)
-
-		_scout = scout(createFid(self),gui,x=1700,y=4000)
-		self.enemyList.append(_scout)
-
-
-		_scout = scout(createFid(self),gui,x=2000,y=3500)
-		self.enemyList.append(_scout)
-
-		_scout = scout(createFid(self),gui,x=2100,y=3600)
-		self.enemyList.append(_scout)
-
-		_scout = scout(createFid(self),gui,x=2200,y=3700)
-		self.enemyList.append(_scout)
 
 
 		self.allyList.append(self.player)
+		self.player.x = 0.5*self.mapw
+		self.player.y = 0.5*self.maph
 		self.state= ' start'
+	
+	def addEnemy(self,x,y,enemy,gui):
+		if(enemy['kind']=='scout'):
+			_scout = scout(createFid(self),gui,x=x,y=y)
+			_scout.patrolLocations = [x['coords'] for x in enemy['patrolCoords']]
+			self.enemyList.append(_scout)
+		if(enemy['kind']=='tank'):
+			_tank = tank(createFid(self),gui,x=x,y=y)
+			_tank.patrolLocations = [x['coords'] for x in enemy['patrolCoords']]
+			self.enemyList.append(_tank)
 

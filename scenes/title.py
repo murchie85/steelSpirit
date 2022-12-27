@@ -144,15 +144,15 @@ class introScreen():
 
 
 
-			profile,tex,tey     = simpleButton(0.8*(gui.w-tw),0.3*gui.h,'Profile',gui,chosenFont,setTw=tw,backColour=backColour[0],borderColour=borderColour, textColour=(255,255,255))
+			profile,tex,tey      = simpleButton(0.8*(gui.w-tw),0.3*gui.h,'Profile',gui,chosenFont,setTw=tw,backColour=backColour[0],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
-			startGame,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Start Game',gui,chosenFont,setTw=tw,backColour=backColour[1],borderColour=borderColour, textColour=(255,255,255))
+			startGame,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Start Game',gui,chosenFont,setTw=tw,backColour=backColour[1],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
-			loadGame,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Load Game',gui,chosenFont,setTw=tw,backColour=backColour[2],borderColour=borderColour, textColour=(255,255,255))
+			loadGame,tex,tey     = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Load Game',gui,chosenFont,setTw=tw,backColour=backColour[2],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
-			mapEditor,tex,tey   = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Map Editor',gui,chosenFont,setTw=tw,backColour=backColour[3],borderColour=borderColour, textColour=(255,255,255))
+			mapEditor,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Map Editor',gui,chosenFont,setTw=tw,backColour=backColour[3],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
-			settings,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Settings',gui,chosenFont,setTw=tw,backColour=backColour[4],borderColour=borderColour, textColour=(255,255,255))
+			settings,tex,tey     = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Settings',gui,chosenFont,setTw=tw,backColour=backColour[4],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
 			
 			# IF ENTER PRESSED - SELECT THE CHOSEN BUTTON
