@@ -1106,7 +1106,7 @@ def loadImageFiles(firstFile,path,convert=False,log=False):
     except:
         print('*Error* image file does not end with a numer' + str(firstFile))
     affix  = '.' + firstFile.split('.')[-1]
-    for i in range(index,index+40):
+    for i in range(index,index+80):
         cf = prefix + str(index)
         tfile = path + cf + affix
         if(os.path.isfile(tfile)):
@@ -1806,6 +1806,7 @@ class imageAnimateAdvanced():
     def animate(self,gui,trackedName,blitPos,game,rotation=None,centerOfRotation=(0.5,0.5),repeat=True, noseAdjust=False):
         # TIMER THAT ITERATES THROUGH A FRAME EACH GIVEN INTERVAL
         changeFrame = self.frameTimer.stopWatch(self.changeDuration,trackedName, str(self.changeCount) + trackedName, game,silence=True)
+        
         if(changeFrame):
             self.changeCount +=1
             self.currentFrame +=1
@@ -1815,8 +1816,11 @@ class imageAnimateAdvanced():
                 else:
                     self.currentFrame = 0
                 self.reelComplete = True
+            else:
+                # LATE ADDITION MIGHT NEED ROLLED BACK
+                self.reelComplete = False
 
-        if(rotation==None): rotation = 90
+        if(rotation==None): rotation = 0
         rotation = wrapAngle(rotation)
 
         # GET ORIGINAL AND ROTATED LEN AND WIDTH
@@ -1847,12 +1851,47 @@ class imageAnimateAdvanced():
 
         centerX,centerY   = (blitPos[0]+0.5*imgW + rotatedWidth*0.01*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH -rotatedHeight*0.01*math.sin(wrapAngle(rotation+90)*math.pi/180))
 
+        smallOx,smallOy = 20 * math.cos(math.radians(360-rotation)), 20 * math.sin(math.radians(360-rotation))
+        centerRx,CenterRy = centerX + smallOx, centerY + smallOy
+        centerLx,CenterLy = centerX - smallOx, centerY - smallOy
+
         behindX,behindY   = (blitPos[0]+0.5*imgW - imgW*1.3*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH +imgH*1.3*math.sin(wrapAngle(rotation+90)*math.pi/180))
         
+
         #pygame.draw.circle(gui.screen, (220,100,100), (behindX,behindY), 10, 0)
 
 
-        return(self.reelComplete,{'center':(centerX,centerY ), 'midTop':(midTopX,midTopY),'leftTop':(leftTopX, leftTopY),'rightTop':(rightTopX, rightTopY),'behind':(behindX,behindY) , 'rotatedDims': (rotatedWidth,rotatedHeight)})
+        return(self.reelComplete,{'center':(centerX,centerY ), 'centerL':(centerLx,CenterLy ),'centerR':(centerRx,CenterRy ), 'midTop':(midTopX,midTopY),'leftTop':(leftTopX, leftTopY),'rightTop':(rightTopX, rightTopY),'behind':(behindX,behindY) , 'rotatedDims': (rotatedWidth,rotatedHeight)})
+
+
+
+    def animateNoRotation(self,gui,trackedName,blitPos,game,repeat=True):
+        # TIMER THAT ITERATES THROUGH A FRAME EACH GIVEN INTERVAL
+        changeFrame = self.frameTimer.stopWatch(self.changeDuration,trackedName, str(self.changeCount) + trackedName, game,silence=True)
+        
+        if(changeFrame):
+            self.changeCount +=1
+            self.currentFrame +=1
+            if(self.currentFrame>=len(self.imageFrames)):
+                if(repeat==False):
+                    self.currentFrame = len(self.imageFrames)-1
+                else:
+                    self.currentFrame = 0
+                self.reelComplete = True
+            else:
+                # LATE ADDITION MIGHT NEED ROLLED BACK
+                self.reelComplete = False
+
+
+        # GET ORIGINAL AND ROTATED LEN AND WIDTH
+        imgW,imgH = self.imageFrames[self.currentFrame].get_width(), self.imageFrames[self.currentFrame].get_height()
+        gui.screen.blit(self.imageFrames[self.currentFrame], (blitPos[0],blitPos[1]))
+
+        return(self.reelComplete)
+
+
+
+
 
 
 
@@ -1966,6 +2005,34 @@ class countDownTimer():
 
         return(False,self.counter)
 
+
+
+class countUpTimer():
+    def __init__(self):
+        self.counter   = 0
+        self.alarmTime = None
+    
+    def reset(self,alarmTime):
+        self.alarmTime = alarmTime
+        self.counter   = 0
+    
+    def countRealSeconds(self,alarmTime,game):
+        # INIT
+        if(self.alarmTime==None): 
+            self.alarmTime = alarmTime
+
+        try:
+            self.counter+=game.dt/1000
+        except:
+            print("Failed to add to counter in countUpTimer, likely you didn't reset it ")
+            exit()
+        
+        # RESET COUNTER, RETURN TRUE
+        if(self.counter>self.alarmTime):
+            self.counter= None
+            return(True,self.counter)
+
+        return(False,self.counter)
 
 
 

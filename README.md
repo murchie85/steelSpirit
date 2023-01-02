@@ -2,70 +2,148 @@
 
 ![steel spirit cover](scenes/cover.png)  
 
-# A TwinStick,Shmup RPG hybrid    
 
-In progress, lots yet to be done. 
-
+# TRAILER RELEASE WHEN..
+SHOW
+- More colourful weapons (missiles,shields), dodge move
+- A boss to show, objectives, allies, levels, and GUI scenes
+- Tech Tree, flirt scene, weapons loadout
 
 
 # FEATURES
 
 ## PRIMARY 
 
-- MOVEMENT EXPERIMENT
- 	- LOCKON SHOULDN'T FACE TARGET, cus you plough into it, should put you into jink mode, which you can swivel holding jink button
-	- Maybe just slow down when enemies are in range (unless you boost)
-	- Consider shooting puts you in Jink mode to strafe like under defeat
-	- Consider holding down lockon, when you let go, you are just in jink mode
-	- Make dodging a big element too zipping past until you get to a good part
-	- Jinkshoot spray and pray by slowing forward motion is a must.. to make chaff dodge work it should be in non shooting mode..you can lob missiles maybe
 
-- GROUND AA with bullets
-- GROUND AA With missiles
-- GROUND damagable structures
+Main focus
+----
 
+
+
+
+## ART ADDITION
+
+- Draw a bunch of stuff (Candc3 sprites long laser sect)
+- INCINERY FLARE EXPLOSIONS https://youtu.be/zXjBS382P2k?t=224
+- Special, Nuke Mussile
+
+## CODE CHANGES
+
+- Enemy Respawn
+- Facing south when shooting inverts u/d
+- Third layer with paralax canv Speed (possibly cloud cover) - canvas transparent. MOD to pick layer size
+- Probably want lockon/lockoff buttons all to be the same - controll still feels offf, storyboard
+- PROPER SCREEN PANNING so north,south gets more coverage in facing dir
 - ANIMATED TILES
-- MISSILE
-- CHAFF
-- Enemy placer
-- Next objective arrow to speed to objective
-- Canvas second layer
-- canvas transparent
-- ++ CANVAS SPEED
-- Camera shake
+H - shoot in lockon J - strafe mode JJ - clockwise mode  J hold - break off K - missile
+
+## FEATURES 
+
+- RADAR
+- GROUND AA LASER CANNON builds up
+- Next ENEMY Arrow/s (red) this will help when vision is down..make it bigger as nearer
+- Bullet blast animation, bullet impact animation
+- Big power generators for laser, manufac facility, super conduct towers... (include obj acrrow)
+ if time downloading objective with loading bar, otherwise put to later
+- Next OBJECTIVE (green/yellow) arrow to speed to objective
+	- Start making objectives
+- Missiles are on timer, tick up to five, launch as many as targetted
 - ADD ALLY
 - ADD ALLY LOGIC
 - ALLY COMMAND
-- INCINERY FLARE EXPLOSIONS https://youtu.be/zXjBS382P2k?t=224
-- Want to be able to dodge enemy in shmup style, lockon camera centering clamp may be needed
-	- this makes jink manual
-	- more thinking required, because to get that flow, its hard if there are enemies in front and beside
-- dont allow multiple selects of enemy on one tile
+- improved explosion animations
+- APC
 
-ENEMIES: 
+
+
+- QUALITY CONTROL - Does it still have slug throwing SHmup feel? Are graphics isometric a bit
+- CLEARLY SIGNPOST: FREE MODE <-->LOCKON MODE
+- CLEARLY SIGNPOST: Boosting, side dodge etc
+
+
+
+
+
+## SECONDARY TO BE GROOMED 
+
+
+
+BETA TESTING
+- Add movement pivot around center point when not in lockon mode/ OR MODIFY LOCKON to pivot around center mass...adding more 
+	 - Add variations as schemas to test for beta testing
+
+
+ENEMIES TO ADD: 
 
 GIGA TANK - COME FROM UNDER GROUND
 GIGA TURRET / CANNON 
 SHIPS IN PORTS
 
 
-## SECONDARY 
+# BOSS 
 
-- Fine control, so rotation is inversed if facing down, (but only if r,l isn't already pressed)
+- Slog it battles, that is slugfest and boss chases you about screen
+- all aim for his core at the same time
+
+- Consider reducing sizes of sprites to make it more realistic (tanks,mlrs especially)
+- UPGRADE TREE
+	- MAINMENU UNLOCK
+	- LONGER BOOST TIME - Dual fire
+- Might wanna use the camToLocation from droneCommander
+- tanks to be smaller, so they can roll out as a pack
+- stretch - 'GOOD JOB' when enemy count ticks to zero in sector
 - Check Godzilla for human type ideas
 - Shmup into open world
 - Redo omega storm including canvas
 - Redo title text explaination with ai art gen - move to after game
-- UPGRADE TREE
-	- MAINMENU UNLOCK
-	- LONGER BOOST TIME - Dual fire
 - Boss target-points flash/Highlight
 - Shmup maybe not needed not for a long time anyway
-- GUI LAYOUT: HEALTH, INFO PANEL like DC
-- GUI LAYOUT: RIGHT VIDEO SCREEN FOR FAST, INGAME POPUP SCREEN FOR BLUR
 - release with twitter acc, automate reshares..adds, get list of shmups
 - load assets by lv
 - clean map editor, so it always checks number of rows, cols match actual in metaTiles 
+- Light source
+	- all shadows must change respectively
+	- Shadow wonky fix
+	- shadow that rotates about an origin point and not revolve around the player?
+- chaff efficiency (limit number of chaff on screen) or just go with a ball of particles (save trans)
+- movement wind/streak effect
+- More ground damagable structs
+
+
+
+
+## GUI IDEAS
+
+	- Minimap bottom right?
+	- GUI LAYOUT: HEALTH, INFO PANEL like DC
+	- GUI LAYOUT: RIGHT VIDEO SCREEN FOR FAST, INGAME POPUP SCREEN FOR BLUR
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ACCEPTANCE CRITERIA 
+
+KEEP: Currently, tank battles feel shmupy, lots of damage, carnage. 
+
+1. Must have, Lots to dodge, lots to shoot, a lot happening.
+2. Must have MULTIPLE LAYERS
+3. MUST BE differentiable from the 10000 other Shmups (RPG element, Summon attack, Gameplay mechanics???). Joint teams.Shmup/Open pivot
+
+
+
+
 
 
 ## UNDER CONSIDERATOIN
@@ -73,18 +151,16 @@ SHIPS IN PORTS
 [`JOINT SPECIAL ATTACK`, `Shmup intro`, `slow Underdefeat shmup levels`,   ]
 
 
-## DONE 
 
-DONE: make and render player DONE: Do a simple map DONE: Navigate with aswd DONE: Camera Nav
-DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion animation, allow player to die, Thinner fire, Double fire, radar cone, LOCK ON
-DONE: Finish isonscreen function - test using a viewport, TRISHOT - Like in Underdefeat, Multi-tile edit
-DONE: - JINK IF NOT IN PIVOT, LOCKON TOGGLE (left/right to scroll), LOCKON LIMIT 3, FACE ENEMY DURING LOCKON, PIVOT CLOCKWISE DURING LOCKON GROUND UNIT
 
 # ACCEPTANCE CRITERIA GLOBAL
 
+- QUALITY CONTROL - Does it still have slug throwing Shmup feel? Are graphics isometric a bit
+- Keep it different from Gyro blade, it should be fast, manic and fun. Not desert strike
 - Lots of variety on screen, AA, planes, ATB, etc
 - Good Map Detail 
-
+- FLOW FUGE MODE: Zoom to area with dog fight tailers...jump into lockon mode..clean up
+- Visuals still FAR below par - have they been improved to look nice? Think is a boss fight got that proboctor feel?
 
 
 
@@ -93,9 +169,18 @@ DONE: - JINK IF NOT IN PIVOT, LOCKON TOGGLE (left/right to scroll), LOCKON LIMIT
 # REFS 
 
 
-https://www.reddit.com/user/KrahsteertS/
 
-https://twitter.com/dantemendes/status/1605888637534707717
+
+
+AWESOME IDEA  
+
+https://youtu.be/e6RqIcdMlPc
+
+power of 10 artwork ideas https://store.steampowered.com/app/1319550/Power_of_Ten/ 
+
+Unity game https://www.reddit.com/user/KrahsteertS/
+
+saturn game https://twitter.com/dantemendes/status/1605888637534707717
 
 shmup maker https://twitter.com/bulostudio/status/1606030117133815808
 
@@ -104,8 +189,9 @@ https://twitter.com/HTProject073/status/1600464060428222464
 
 https://twitter.com/HTProject073/status/1601422278054449153
 
+music making https://www.youtube.com/watch?v=l61EBjVd9tw
 
-
+https://www.youtube.com/watch?v=-10qqJ_f8ak
 
 
 ================================
@@ -124,8 +210,9 @@ https://twitter.com/HTProject073/status/1601422278054449153
 
 
 
-# SCENE MECHANISMS 
+# SCENE MECHANICS 
 
+- simple ace combat pics for quick pass in game talk
 - Scene accepance criteria.. slow blur then pop up or in game side bar scene
 - Both.. side/bott/top for fast alert slow blur for story scene
 
@@ -138,6 +225,10 @@ BUNNIES, FOX, CATS on Mars, Venus and outposts
 Parallel world where we gen altered ourselves. Solar system has 40 billion peeps
 
 
+## MUST 
+- LV 1 TUTORIAL, SHOWING EACH MOVE WITH SLOWDOWN...TAP C FOR CHAFF, TO MUSIC RYTHM REALLY MATTERS
+
+
 ## 1 - TRAINING VR / THE BIG FURBALL
 
 ---CHATER 0 THE BIG FURBALL---
@@ -147,21 +238,30 @@ Parallel world where we gen altered ourselves. Solar system has 40 billion peeps
 - Race them to clearing objective points
 - Roxy goes - 'YESSSSS!' in quick pop up once she takes out sth
 - Chase each other with Lockon fights
+- Vr first has level bars rapidly changjng also show who captures objectives
 
+--TUTORIAL 
 
+	---- STEER
+	----- SHOW LOCKON RADARD AND LOCKON
+	----- DODGE A SHOT BY PUSHING CHAFF BUTTON, TIME SLOWS DOWN
+	----- DODGE BY BOOST WHICH BREAKS LOCKON 'GET THE HELL OUT OF THERE '
 
 
 ## 2 - DREADNOUGHT
 
-## MECHANISM: 
+
+implementation 
 
 battlship preview before coming to you
 Dreadaught restrict sections and slow scroll speed
 Dreadnaught regens...hence timed to take out at mars
 Boss target points flash
 
+show jupiter sphere, mars sphere, earth sphere, venus sphere
 
-# STORY 
+
+story
 
 Timer in big, 'x until end of Earth...or the sun, **shrinks to top right**'
 MASSIVE EXPLOSIONS, AIM BIGGER THAN THE REST
@@ -189,11 +289,7 @@ Snippets: https://youtu.be/H6kvP0h0g9M?t=5
 
 
 
-
-
 # Notes  
-
-
 
 
 
@@ -212,7 +308,7 @@ Snippets: https://youtu.be/H6kvP0h0g9M?t=5
 	
 	- setup ---- (importing images and setting up the main gui, game and other classes)
 	
-	- Coordinator [GAME CLASS] (managing the main scenes/phease of the game)
+	- Coordinator [GAME CLASS] (managing the main scenes/phase of the game)
 
 		- Intro 
 
@@ -243,6 +339,12 @@ Snippets: https://youtu.be/H6kvP0h0g9M?t=5
 
 ## STORY BOARDING
 
+....One ship... just one ship, thats all it takes to destroy a system
+fermi paradox
+we know its coming, other planets already destroyed
+immune system, turns them on to each other
+earth is so yesterday.. (make it in game jibes)
+
 
 - EARTH HAS COME A LONG WAY SINCE THE FORMATION OF A WEIGHED FEDERATED ALLIANCE
   (SPACE SHIPS, MANS SHAKING HANDS)
@@ -268,3 +370,33 @@ Snippets: https://youtu.be/H6kvP0h0g9M?t=5
 
 
 
+
+
+
+
+
+## MOVEMENT STRETCH CONSIDERATIONS 
+
+- MOVEMENT EXPERIMENT CONSIDERATIONS
+ 	- LOCKON SHOULDN'T FACE TARGET, cus you plough into it, should put you into jink mode, which you can swivel holding jink button
+	- Maybe just slow down when enemies are in range (unless you boost)
+	- Consider shooting puts you in Jink mode to strafe like under defeat
+	- Consider holding down lockon, when you let go, you are just in jink mode
+	- Make dodging a big element too zipping past until you get to a good part
+	- Jinkshoot spray and pray by slowing forward motion is a must.. to make chaff dodge work it should be in non shooting mode..you can lob missiles maybe
+	- Fine control, so rotation is inversed if facing down, (but only if r,l isn't already pressed)
+	- Want to be able to dodge enemy in shmup style, lockon camera centering clamp may be needed
+		- this makes jink manual
+		- more thinking required, because to get that flow, its hard if there are enemies in front and beside
+
+
+
+## DONE 
+
+DONE: make and render player DONE: Do a simple map DONE: Navigate with aswd DONE: Camera Nav
+DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion animation, allow player to die, Thinner fire, Double fire, radar cone, LOCK ON
+DONE: Finish isonscreen function - test using a viewport, TRISHOT - Like in Underdefeat, Multi-tile edit
+DONE: - JINK IF NOT IN PIVOT, LOCKON TOGGLE (left/right to scroll), LOCKON LIMIT 3, FACE ENEMY DURING LOCKON, PIVOT CLOCKWISE DURING LOCKON GROUND UNIT, Jink button switches lockon, or moves direction if held
+DONE: Enemy placer, Remove jink timer, especially if lockon disabled,dont allow multiple selects of enemy on one tile, MISSILE, Missiles- homin & horizontal jink only. need plume, contact explosion
+GROUND AA with bullets   [5], GROUND AA With missiles (MLRS), In lockoff 1. Shoot init X,Y. left/Right should always move you in that dir. , in lockoff 2. limit spray angle to 45
+- Camera shake - Split out controls - CHAFF - BOAT enemy - GROUND damagable structures - Destroyed tanks, ground units leave husks - Buildings as second layer non-interactable 

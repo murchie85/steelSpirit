@@ -14,6 +14,8 @@ class introScreen():
 		self.timer3     = stopTimer()
 		self.timer4     = stopTimer()
 		self.introY     = None
+		self.menuImage  = random.choice([gui.bunnyGirlYCover,gui.madgeInv,gui.bunnyTank,gui.apacheJack,gui.sarah])
+		#self.menuImage  = gui.bunnyGirlYCover
 
 		self.dynamicBorder = dynamicBorder(borderColour=(60,60,200),noShadeShifts=10)
 		self.reels         = []
@@ -118,7 +120,7 @@ class introScreen():
 			pygame.draw.rect(gui.screen,(5,9,20),(0.05*gui.w, 0.05*gui.h,0.9*gui.w ,0.9*gui.h))
 			# ANIMATE PLANET 
 
-			drawImage(gui.screen,gui.bunnyGirlYCover,[0,0])
+			drawImage(gui.screen,self.menuImage,[0,0])
 			
 
 
@@ -143,10 +145,9 @@ class introScreen():
 
 
 
+			startGame,tex,tey    = simpleButton(0.8*(gui.w-tw),0.3*gui.h,'Start Game',gui,chosenFont,setTw=tw,backColour=backColour[0],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
-			profile,tex,tey      = simpleButton(0.8*(gui.w-tw),0.3*gui.h,'Profile',gui,chosenFont,setTw=tw,backColour=backColour[0],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
-
-			startGame,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Start Game',gui,chosenFont,setTw=tw,backColour=backColour[1],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
+			profile,tex,tey      = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Profile',gui,chosenFont,setTw=tw,backColour=backColour[1],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
 			loadGame,tex,tey     = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Load Game',gui,chosenFont,setTw=tw,backColour=backColour[2],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
@@ -157,8 +158,8 @@ class introScreen():
 			
 			# IF ENTER PRESSED - SELECT THE CHOSEN BUTTON
 			if(gui.input.returnedKey=='return'):
-				profile = 0==self.buttonIndex
-				startGame = 1==self.buttonIndex
+				startGame = 0==self.buttonIndex
+				profile   = 1==self.buttonIndex
 				mapEditor = 3==self.buttonIndex
 				gui.input.returnedKey       = ''
 

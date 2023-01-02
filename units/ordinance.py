@@ -4,10 +4,11 @@ import pygame
 import math
 
 class bullet():
-	def __init__(self,gui,x,y,bid,classification,facing,bulletType,speed=5,w=5,h=5,colour=(255,177,42),damage=10,_range=1200):
+	def __init__(self,gui,x,y,bid,classification,facing,bulletType,speed=5,w=5,h=5,colour=(255,177,42),damage=10):
 		self.x,self.y       = x,y
 		self.ox,self.oy     = x,y
 		self.id             = bid
+		self.ordType        = 'bullet'
 		self.classification = classification
 		self.facing         = facing
 		self.speed          = speed
@@ -16,14 +17,22 @@ class bullet():
 		self.w,self.h       = w,h
 		self.debrisTimer    = stopTimer()
 		self.debrisDelay    = 0.3
-		self.range          = _range
+		self.range          = 1.5*gui.w
 
 		self.bulletType     = bulletType
 
-		if(self.bulletType in ['slitherShot','doubleSlither']):
+		self.slitherTypes   = ['slitherShot','doubleSlither']
+		self.triTypes       = ['triBlast']
+		self.smallAATypes   = ['smallAA']
+		self.hotRoundTypes  = ['hotRound','hotDouble','hotTripple']
+		if(self.bulletType in self.slitherTypes):
 			self.bulletImage   = imageAnimateAdvanced(gui.slitherShot,0.1)
-		if(self.bulletType in ['triBlast']):
+		if(self.bulletType in self.triTypes):
 			self.bulletImage   = imageAnimateAdvanced(gui.triBlast,0.1)
+		if(self.bulletType in self.smallAATypes):
+			self.bulletImage   = imageAnimateAdvanced(gui.yellowPlasma,0.1)
+		if(self.bulletType in self.hotRoundTypes):
+			self.bulletImage   = imageAnimateAdvanced(gui.hotRound,0.1)
 
 
 	def move(self,gui,lv,game):
@@ -58,15 +67,19 @@ class bullet():
 
 	# ONLY DRAW IF IN BOUNDARY
 
-	def drawSelf(self,gui,game):
+	def drawSelf(self,gui,game,lv):
 		x,y = self.x -gui.camX, self.y -gui.camY
 		
 		if(self.bulletType=='doublePellet'):
 			pygame.draw.circle(gui.screen, self.colour, (x,y), self.w, 0)
-		elif(self.bulletType in ['slitherShot','doubleSlither']):
+		elif(self.bulletType in self.slitherTypes):
 			self.bulletImage.animate(gui,'slitherShotBullet',[x-0.5*gui.slitherShot[0].get_width(),y],game,rotation=self.facing-90)
-		elif(self.bulletType in ['triBlast']):
+		elif(self.bulletType in self.triTypes):
 			self.bulletImage.animate(gui,'triBlast',[x-0.5*gui.triBlast[0].get_width(),y-0.5*gui.triBlast[0].get_height()],game,rotation=self.facing-90)
+		elif(self.bulletType in self.smallAATypes):
+			self.bulletImage.animate(gui,'smallAA fire',[x-0.5*gui.yellowPlasma[0].get_width(),y-0.5*gui.yellowPlasma[0].get_height()],game,rotation=self.facing-90)
+		elif(self.bulletType in self.hotRoundTypes):
+			self.bulletImage.animate(gui,'hotRound fire',[x-0.5*gui.hotRound[0].get_width(),y-0.5*gui.hotRound[0].get_height()],game,rotation=self.facing-90)
 		else:
 			pygame.draw.circle(gui.screen, self.colour, (x,y), self.w, 0)
 

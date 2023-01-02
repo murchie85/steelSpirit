@@ -8,6 +8,7 @@ class scout(parent):
 		super().__init__(gui)
 		self.id             = _id
 		self.name           = 'scout'
+		self.kind           = 'air'
 		self.images         = imageAnimateAdvanced(gui.scoutRed,0.2)
 		self.x,self.y       = 500,500
 		if(x!=None): self.x = x

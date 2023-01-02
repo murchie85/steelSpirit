@@ -2,10 +2,12 @@ import pygame
 import random
 from utils._utils import stopTimer
 from scenes.title import *
-from scenes.mapMaker import *
-from units.player import *
-from levels.levelOne import *
-from levels.levelTwo import *
+from levels.mapMaker   import *
+from units.player      import *
+from levels.levelOne   import *
+from levels.levelTwo   import *
+from levels.levelThree import *
+from levels.levelFour  import *
 
 """
 GAME OBJECT STORES SAVE STATE
@@ -76,7 +78,7 @@ class gameObject():
     def initLevels(self,gui):
         
         # ----------IN GAME
-        mandatoryLevels      = ['lv1','lv2']
+        mandatoryLevels      = ['lv1','lv2','lv3','lv4']
 
         if(self.leveltoLoad<=len(mandatoryLevels)-1):
             level = mandatoryLevels[self.leveltoLoad]
@@ -108,6 +110,8 @@ class gameObject():
         if(self.levelLoadComplete):
             self.levelOne             = levelOne(gui,self)
             self.levelTwo             = levelTwo(gui,self)
+            self.levelThree           = levelThree(gui,self)
+            self.levelFour            = levelFour(gui,self)
             self.levelsInitialised    = True
                     
 
@@ -124,16 +128,23 @@ class gameObject():
                 self.initLevels(gui)
                 return()
             
+            # ---RUN THE ACTUAL LEVEL 
+
             if(self.levelSelect==False):
 
                 if(self.selectedLevel=='levelOne'):
                     self.levelOne.run(gui,self)
                 if(self.selectedLevel=='levelTwo'):
                     self.levelTwo.run(gui,self)
+                if(self.selectedLevel=='levelThree'):
+                    self.levelThree.run(gui,self)
+                if(self.selectedLevel=='levelFour'):
+                    self.levelFour.run(gui,self)
 
 
 
-
+            # ----CHOSE A LEVEL 
+            
             if(self.levelSelect):
 
                 # DRAW COVER PICTURE
@@ -170,6 +181,12 @@ class gameObject():
                             self.levelSelect   = False
                         if(f[:-4] =='lv2'):
                             self.selectedLevel = 'levelTwo'
+                            self.levelSelect   = False
+                        if(f[:-4] =='lv3'):
+                            self.selectedLevel = 'levelThree'
+                            self.levelSelect   = False
+                        if(f[:-4] =='lv4'):
+                            self.selectedLevel = 'levelFour'
                             self.levelSelect   = False
                         
 

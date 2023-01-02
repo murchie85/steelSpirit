@@ -9,6 +9,7 @@ class tank(parent):
 		# MAIN OVERRIDES 
 		self.id             = _id
 		self.name           = 'tank'
+		self.kind           = 'vechicle'
 		self.images         = imageAnimateAdvanced(gui.tank,0.2)
 		self.turretImage    = imageAnimateAdvanced(gui.turret,0.2)
 		self.x,self.y       = 500,500
@@ -21,6 +22,11 @@ class tank(parent):
 		# HIT IMAGE
 		self.hitImage         = gui.tankHit
 		self.hitAnimation     = imageAnimateAdvanced(self.hitImage,0.2)
+		self.turretHitImg     = imageAnimateAdvanced(gui.turretHit,0.2)
+		self.hitsTaken        = 0
+
+		# REMAINS IMAGE 
+		self.remainsAnimation = imageAnimateAdvanced(gui.tankRemains,0.2)
 
 		# HEALTHBAR 
 		self.healthBar      = loadingBarClass(self.w,0.2*self.h,(80,220,80),(220,220,220),(0,0,200))
@@ -148,23 +154,41 @@ class tank(parent):
 			
 
 
+
+	# DRAW REMNANTS AFTER BEING DESTROYED
+	def drawRemains(self,gui,lv,game):
+		x,y = self.x - gui.camX,self.y  - gui.camY
+
+		# *******BE CAREFUL ABOUNT ON SCREEN
+		if(self.alive==False and onScreen(self.x,self.y,self.w,self.h,gui)):
+			self.remainsAnimation.animate(gui,str('smouldering tank remains'),[x,y],game,rotation=self.facing-90,repeat=True)
+
+	# DRAW SELF LOGIC
+
 	def drawSelf(self,gui,game,lv):
 		x,y = self.x - gui.camX,self.y  - gui.camY
 		
+
+
+		if(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) and not self.hit):
+			animate,self.blitPos     = self.images.animate(gui,'tank' + str(self.id),[x,y],game,rotation=self.facing-90)
+			turretAnimage,self.turretPos  = self.turretImage.animate(gui,'turret' + str(self.id),[x,y],game,rotation=self.turretFacing-90)
+
+			#pygame.draw.circle(gui.screen, (244,0,0), (self.patrolLocations[self.currentLocIndex][0]- gui.camX ,self.patrolLocations[self.currentLocIndex][1]- gui.camY) , 15, 0)
+
 		if(self.hit):
 
 			x,y = self.x - gui.camX,self.y  - gui.camY
 			
 			if(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui)):
-				complete,imageParms = self.hitAnimation.animate(gui,str(self.id) + ' hit',[x,y],game,rotation=self.facing-90)
-				if(complete):
+				
+				complete,imageParms            = self.hitAnimation.animate(gui,str(self.hitsTaken) + ' hit',[x,y],game,rotation=self.facing-90,repeat=True)
+				turretComplete,self.turretPos  = self.turretHitImg.animate(gui,str(self.hitsTaken) + ' hit',[x,y],game,rotation=self.turretFacing-90,repeat=True)
+
+				if(complete and turretComplete):
+					self.turretHitImg.reelComplete = False
 					self.hit = False
+					self.hitsTaken +=1
 
-
-
-		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) ):
-			animate,self.blitPos     = self.images.animate(gui,'tank' + str(self.id),[x,y],game,rotation=self.facing-90)
-			turretAnimage,self.turretPos  = self.turretImage.animate(gui,'turret' + str(self.id),[x,y],game,rotation=self.turretFacing-90)
-
-			#pygame.draw.circle(gui.screen, (244,0,0), (self.patrolLocations[self.currentLocIndex][0]- gui.camX ,self.patrolLocations[self.currentLocIndex][1]- gui.camY) , 15, 0)
+	
 
