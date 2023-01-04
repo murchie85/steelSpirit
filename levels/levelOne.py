@@ -34,7 +34,18 @@ class levelOne():
 		self.remainingEnemies = None
 		self.pauseGame        = False
 
+		# -------GUI STUFF
 
+		self.healthBar         = loadingBarClass(100,20,(80,220,80),(220,220,220),(0,0,200))
+		self.objectiveArrow    = imageAnimateAdvanced(gui.objectiveArrow,0.2)
+		
+
+		# --------- OBJECTIVES
+		# EACH ITEM IS AN OBJ, could be group of enemies, one enemy or location. 
+		self.objectives        = {'destroyAA': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyTanks', 'startMessage':'Welcome to training bootcamp rookie, first up, take out the enemy AA, good luck!', 'completionMessage': 'Great job!' },
+								  'destroyTanks': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':None, 'startMessage':'Next job, mop up them tanks.', 'completionMessage': 'Nicely done!' }
+								  }
+		self.currentObjective  = 'destroyAA'
 
 		# ------ LEVEL TIMER 
 
@@ -45,7 +56,7 @@ class levelOne():
 
 		# CUTSCENE STUFF
 
-		self.scene = 'start'
+		self.scene = 'gameUnderway'
 
 
 
@@ -53,6 +64,13 @@ class levelOne():
 
 		if(self.state=='init'):
 			init(self,gui,game)
+			# SETTING UP OBJECTIVES
+			for enemy in self.enemyList:
+				if(enemy.name=='aaSmall'):
+					self.objectives['destroyAA']['targetObjects'].append(enemy)
+				if(enemy.name=='tank'):
+					self.objectives['destroyTanks']['targetObjects'].append(enemy)
+
 			return()
 
 		# ------MAIN LOOP 
@@ -124,21 +142,29 @@ class levelOne():
 			self.player.drawSelf(gui,game,self)
 
 		# GUI GETS A LOT OF STATS 
-		levelGui(self,gui)
+		levelGui(self,gui,game)
 
 
 
-		self.lv1CutScenes(gui,game)
+		self.gameScenes(gui,game)
 
 
 
 
 
-	def lv1CutScenes(self,gui,game):
+	def gameScenes(self,gui,game):
 		
 		# ADDS THE CUTSCENE CLASS TO THIS CLASS
 		if(hasattr(self, 'cutScene')==False):
 			self.cutScene = cutScene(gui)
+
+		if(self.scene=='gameUnderway' and self.remainingEnemies >0):
+			self.objectiveManager(gui,game)
+
+
+
+
+		# ------------ INTRO AND EXIT	
 
 		# COUNT INTO SCENE 1
 		if(self.scene=='start'):
@@ -146,10 +172,7 @@ class levelOne():
 			complete,secondsCounted = self.levelTimer.countRealSeconds(alarmTime,game)
 			if(complete):
 				self.scene ='claire'
-
-
-
-		
+	
 
 		if(self.scene=='claire'):
 			self.pauseGame = True
@@ -166,17 +189,16 @@ class levelOne():
 				if(finished):
 					self.scene    ='gameUnderway'
 					self.pauseGame = False
-					self.cutScene.pannelOpen = False
+					self.cutScene.reset()
 
 
 
 		# MOVE INTO FINISH LEVEL CUTCENE 
 		if(self.scene =='gameUnderway' and self.remainingEnemies <=0):
-			print('end achieved')
-			self.scene = 'finishNotify'
+			self.scene = 'levelComplete'
 
 		# FINISH NOTIFICATION
-		if(self.scene=='finishNotify'):
+		if(self.scene=='levelComplete'):
 			self.cutScene.runCutScene(gui,game,scene='ally',underlay=True)
 			if(self.cutScene.pannelOpen):
 				gui.claireTalking.animateNoRotation(gui,'claireTalking',[self.cutScene.imageLeftX,self.cutScene.imageY],game)
@@ -185,5 +207,69 @@ class levelOne():
 				if(finished):
 					self.scene    ='complete'
 					self.cutScene.pannelOpen = False
+					self.cutScene.reset()
+
+
+	def objectiveManager(self,gui,game):
+	
+		currentObjective = self.objectives[self.currentObjective]
+		if(currentObjective==None):
+			self.scene='levelComplete'
+			return()
+
+		
+
+		# ----INTRODUCE NEXT OBJECTIVE 
+		
+		if(currentObjective['status']=='notStarted'):
+			self.pauseGame = True
+			sceneMessage = currentObjective['startMessage']
+			# OPEN WINDOW
+			self.cutScene.runCutScene(gui,game,scene='ally',underlay=True)
+			# ANIMATE ONCE WINDOW OPEN
+			if(self.cutScene.pannelOpen):
+				gui.claireTalking.animateNoRotation(gui,'claireTalking',[self.cutScene.imageLeftX,self.cutScene.imageY],game)
+				self.cutScene.drawMask(gui,game,overlay=False,border='ally',codec=True)
+				finished = self.cutScene.dialogue.drawScrollingDialogue(gui,game,self.cutScene.textW,self.cutScene.textH,gui.smallishFont, sceneMessage, textStartingPos=(self.cutScene.textX ,self.cutScene.textY),colour=(255,255,255),closeOutDelay=True)
+				if(finished):
+					currentObjective['status'] = 'inProgress'
+					self.pauseGame = False
+					self.cutScene.reset()
+
+		# -----IF ONE SUBTARGET COMPLETED/DESTROYED
+		
+		if(currentObjective['objective']=='eliminate'):
+			for target in currentObjective['targetObjects']:
+				if(target.alive==False):
+					print("Removing target from objective list")
+					currentObjective['targetObjects'].remove(target)
+
+
+		# -----SIGNAL OBJECTIVE COMPLETE
+		if(currentObjective['objective']=='eliminate'):
+			if(len(currentObjective['targetObjects'])<=0):
+				currentObjective['status'] = 'signalComplete'
+
+
+
+		# ----CONGRATULATE CURRENT OBJECTIVE 
+
+		if(currentObjective['status']=='signalComplete'):
+			self.pauseGame = True
+			sceneMessage = currentObjective['completionMessage']
+			# OPEN WINDOW
+			self.cutScene.runCutScene(gui,game,scene='ally',underlay=True)
+			# ANIMATE ONCE WINDOW OPEN
+			if(self.cutScene.pannelOpen):
+				gui.claireTalking.animateNoRotation(gui,'claireTalking',[self.cutScene.imageLeftX,self.cutScene.imageY],game)
+				self.cutScene.drawMask(gui,game,overlay=False,border='ally',codec=True)
+				finished = self.cutScene.dialogue.drawScrollingDialogue(gui,game,self.cutScene.textW,self.cutScene.textH,gui.smallishFont, sceneMessage, textStartingPos=(self.cutScene.textX ,self.cutScene.textY),colour=(255,255,255),closeOutDelay=True)
+				if(finished):
+					currentObjective['status'] = 'complete'
+					self.currentObjective = currentObjective['nextObjective']
+					if(self.currentObjective==None):
+						self.scene = 'levelComplete'
+					self.pauseGame = False
+					self.cutScene.reset()
 
 

@@ -170,14 +170,14 @@ gui.mlrsRemains       = loadImageFiles('mlrsRemains1.png',IMAGEASSETPATH + 'unit
 # ---------BUILDINGS INTERACTABLE
 
 
-gui.bioLab                    = [pygame.image.load(IMAGEASSETPATH + 'buildings/biolab/bioLab.png')]
-gui.bioLabHit                 = loadImageFiles('bioLabHit1.png',IMAGEASSETPATH + 'buildings/biolab/',convert=False)
-gui.bioLabRemains             = loadImageFiles('bioLabRemains1.png',IMAGEASSETPATH + 'buildings/biolab/',convert=False)
+gui.bioLab                    = [pygame.image.load(IMAGEASSETPATH + 'buildings_interactable/biolab/bioLab.png')]
+gui.bioLabHit                 = loadImageFiles('bioLabHit1.png',IMAGEASSETPATH + 'buildings_interactable/biolab/',convert=False)
+gui.bioLabRemains             = loadImageFiles('bioLabRemains1.png',IMAGEASSETPATH + 'buildings_interactable/biolab/',convert=False)
 
 
-gui.barrelGroupRed            = [pygame.image.load(IMAGEASSETPATH + 'buildings/barrel/barrelGroupRed.png')]
-gui.barrelGroupRedHit         = loadImageFiles('barrelGroupRedHit1.png',IMAGEASSETPATH + 'buildings/barrel/',convert=False)
-gui.barrelGroupRedRemains     = loadImageFiles('barellGroupRedRemains1.png',IMAGEASSETPATH + 'buildings/barrel/',convert=False)
+gui.barrelGroupRed            = [pygame.image.load(IMAGEASSETPATH + 'buildings_interactable/barrel/barrelGroupRed.png')]
+gui.barrelGroupRedHit         = loadImageFiles('barrelGroupRedHit1.png',IMAGEASSETPATH + 'buildings_interactable/barrel/',convert=False)
+gui.barrelGroupRedRemains     = loadImageFiles('barellGroupRedRemains1.png',IMAGEASSETPATH + 'buildings_interactable/barrel/',convert=False)
 
 
 
@@ -190,11 +190,11 @@ gui.hotRound               = loadImageFiles('hotRound1.png',IMAGEASSETPATH + 'or
 
 gui.streakerMissile        = loadImageFiles('missile1.png',IMAGEASSETPATH + 'ordinance/missiles/',convert=False)
 gui.streakerGray           = loadImageFiles('grayMissile1.png',IMAGEASSETPATH + 'ordinance/missiles/',convert=False)
-gui.missilePlume           = loadImageFiles('missilePlume1.png',IMAGEASSETPATH + 'ordinance/plumes/',convert=True)
+gui.missilePlume           = loadImageFiles('missilePlume1.png',IMAGEASSETPATH + 'ordinance/plumes/',convert=False,alphaConvert=True)
 
 # SETTING TRANS
 #[x.set_colorkey((0, 0, 0)) for x in gui.missilePlume]
-[x.set_alpha(130) for x in gui.missilePlume]
+#[x.set_alpha(130) for x in gui.missilePlume]
 
 
 #gui.missilePlumeLong       = loadImageFiles('missilePlumeLong1.png',IMAGEASSETPATH + 'ordinance/plumes/',convert=False)
@@ -213,8 +213,16 @@ gui.concreteTiles      = loadImageFiles('concrete1.png',IMAGEASSETPATH + 'tilese
 gui.sandTiles          = loadImageFiles('sand1.png',IMAGEASSETPATH + 'tilesets/sandv1/',convert=True)
 gui.base100            = loadImageFiles('base100_1.png',IMAGEASSETPATH + 'tilesets/template/',convert=True)
 gui.water              = loadImageFiles('water1.png',IMAGEASSETPATH + 'tilesets/water/',convert=True)
+
+# LAYER 2 
 gui.pilonDR            = loadImageFiles('pilon1.png',IMAGEASSETPATH + 'tilesets/pilonDiagonalRight/',convert=False)
 gui.pilonDL            = loadImageFiles('pilon1.png',IMAGEASSETPATH + 'tilesets/pilonDiagonalLeft/',convert=False)
+gui.backObjects        = loadImageFiles('obj1.png',IMAGEASSETPATH + 'tilesets/objects/',convert=False)
+
+# TILELESS LAYER 
+gui.missileBase        =loadImageFiles('missileBase1.png',IMAGEASSETPATH + 'tilesets/missileBase/',convert=False,alphaConvert=True)
+gui.missileBaseBldings =loadImageFiles('buildings1.png',IMAGEASSETPATH + 'tilesets/missileBase/',convert=False,alphaConvert=True)
+
 
 gui.tileDict           = {'Grass': gui.grassTiles,
 						  'grassLight': gui.grassLight,
@@ -232,6 +240,15 @@ gui.layer2Dict           = {'Grass': gui.grassTiles,
 						  'water': gui.water,
 						  'pilonDR': gui.pilonDR,
 						  'pilonDL:': gui.pilonDL,
+						  'objects': gui.backObjects
+						  }
+
+gui.tilelessL1Dict      = {
+						  'missileBase': gui.missileBase,
+						  'pilonDR': gui.pilonDR,
+						  'pilonDL': gui.pilonDL,
+						  'objects': gui.backObjects,
+						  'buildings': gui.missileBaseBldings
 						  }
 
 
@@ -257,8 +274,9 @@ gui.smallYellowExplosion   = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'e
 
 
 
+# ----- GUI ICONS 
 
-
+gui.objectiveArrow         = loadImageFiles('directionArrow1.png',IMAGEASSETPATH + 'gui/')
 
 
 #---------------------CUTSCENE
@@ -281,6 +299,8 @@ gui.claireTalk        = loadImageFiles('claireTalk1.png',IMAGEASSETPATH + 'chara
 gui.claireShocked     = loadImageFiles('claireShocked1.png',IMAGEASSETPATH + 'characters/claire/')
 talkFrames            = 3* gui.claireTalk + [gui.claireBlink]
 gui.claireTalking     = imageAnimateAdvanced(talkFrames,0.2)
+gui.talkScreenW       = gui.claireTalk[0].get_width()
+gui.talkScreenH       = gui.claireTalk[0].get_height()
 
 
 

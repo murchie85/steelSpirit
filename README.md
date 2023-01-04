@@ -19,6 +19,16 @@ Main focus
 ----
 
 
+GUI PREFERENCE, IS MINIMALIST, BTM/TOP LFT and popout box
+	 - Tradit gui to begin with, update map to chose if objective or not
+	 - objective arrow flashes to next objective. 
+	 	  - times out after 3 seconds, B to show it
+	 - 'next up, take out the three AA installations'
+	 - gui pops up on right - well done slick, 
+	 - XP/Points tick up on the Gui
+
+
+
 
 
 ## ART ADDITION
@@ -26,6 +36,7 @@ Main focus
 - Draw a bunch of stuff (Candc3 sprites long laser sect)
 - INCINERY FLARE EXPLOSIONS https://youtu.be/zXjBS382P2k?t=224
 - Special, Nuke Mussile
+Pixel geep https://www.youtube.com/watch?v=uX9r5J1WYko
 
 ## CODE CHANGES
 
@@ -173,6 +184,7 @@ KEEP: Currently, tank battles feel shmupy, lots of damage, carnage.
 
 
 AWESOME IDEA  
+https://www.youtube.com/watch?v=cD_n6TA2VXw
 
 https://youtu.be/e6RqIcdMlPc
 
@@ -390,6 +402,12 @@ earth is so yesterday.. (make it in game jibes)
 		- more thinking required, because to get that flow, its hard if there are enemies in front and beside
 
 
+## PIXEL ART 
+
+- SCULPT not draw
+- DEFINE A LIGHT SOURCE
+- start simple
+- ask why i'm adding another colour
 
 ## DONE 
 
@@ -400,3 +418,4 @@ DONE: - JINK IF NOT IN PIVOT, LOCKON TOGGLE (left/right to scroll), LOCKON LIMIT
 DONE: Enemy placer, Remove jink timer, especially if lockon disabled,dont allow multiple selects of enemy on one tile, MISSILE, Missiles- homin & horizontal jink only. need plume, contact explosion
 GROUND AA with bullets   [5], GROUND AA With missiles (MLRS), In lockoff 1. Shoot init X,Y. left/Right should always move you in that dir. , in lockoff 2. limit spray angle to 45
 - Camera shake - Split out controls - CHAFF - BOAT enemy - GROUND damagable structures - Destroyed tanks, ground units leave husks - Buildings as second layer non-interactable 
+ISOMETRIC MISSILE BASE  - PLACE ME ANYWHERE LAYER

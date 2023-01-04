@@ -74,6 +74,8 @@ class player():
 		self.jinkCoolDown      = stopTimer()
 		self.jinkAvailable     = True
 		self.jinkCount         = 0
+		self.initJinkFacing    = None # allows strafe in clear line
+		self.jinkFacingTotal   = 0    # USED TO LIMIT SPRAY ANGLE
 
 
 		# ---LOCKON 
@@ -93,6 +95,8 @@ class player():
 		self.shake_timer     = 0
 		self.camShakeStarted = False
 
+
+		self.lockOffMode     = 'strafing'
 		# SHOULD BE OVERRIDEN
 
 		self.hitImage         = gui.playerHit
@@ -176,9 +180,10 @@ class player():
 		# --------BUTTON CONTROLLS
 		# LOCKON OFF 
 		if(self.lockonActive==False):
-			self.TILTLEFT           = 'J'
-			self.TILTRIGHT          = 'K'
-			self.SPECIAL            = 'L'
+			if(self.lockOffMode=='strafing'):
+				self.TILTLEFT           = 'J'
+				self.TILTRIGHT          = 'K'
+				self.SPECIAL            = 'L'
 		# LOCKED ON 
 		if(self.lockonActive==True):
 			self.SHOOTKEY           = 'H'
@@ -491,6 +496,7 @@ class player():
 
 	def lockonControl(self,gui,pressedKeys,lv,game):
 
+		self.hp = 10000000
 		# ------MOVEMENT
 		self.accellerating= False # ACCELELRATION FLAG
 
@@ -578,32 +584,61 @@ class player():
 		# maybe simplify to ENABLE_LOCKON_BUTTON = FALSE...NOT SURE
 		if( (self.JINK_BUTTON in pressedKeys and not self.lockedOn ) or (self.SHOOTKEY in pressedKeys and not self.lockedOn)):
 			
+			# This ensures the left/right strafing line doesn't keep changing witj angle
+			if(self.initJinkFacing==None):
+				self.initJinkFacing = self.facing
+
+			invert = 1
+			if(self.initJinkFacing>220 and self.initJinkFacing<330):
+				invert = -1
 			
 
 			self.maxSpeed       = 5
 			self.maxStrafeSpeed = 7
+			sprayRange          = 80
 
 
 			# FOR MOVING HORIZONTALLY
-			vel_x = self.maxStrafeSpeed * math.cos(math.radians(360-self.facing-90))
-			vel_y = self.maxStrafeSpeed * math.sin(math.radians(360-self.facing-90))
-
+			vel_x = self.maxStrafeSpeed * math.cos(math.radians(360-self.initJinkFacing-90))
+			vel_y = self.maxStrafeSpeed * math.sin(math.radians(360-self.initJinkFacing-90))
 			
 			# RIGHT
 			if('D' in pressedKeys):
-				if('J' in pressedKeys and self.firing):
-					self.facing +=0.8
-				self.x -= vel_x 
-				self.y -= vel_y 
+				self.x -= vel_x * invert
+				self.y -= vel_y * invert
 
+				
+				if(self.lockOffMode=='spinning'):
+					if(self.SHOOTKEY in pressedKeys and self.JINK_BUTTON in pressedKeys):
+						self.facing -= 2
 			# LEFT
 			if('A' in pressedKeys):
-				if('J' in pressedKeys and self.firing):
-					self.facing -=0.8
-				self.x += vel_x 
-				self.y += vel_y 
+				self.x += vel_x * invert
+				self.y += vel_y * invert
 				
+				if(self.lockOffMode=='spinning'):
+					if(self.SHOOTKEY in pressedKeys and self.JINK_BUTTON in pressedKeys):
+						self.facing += 2
 
+			
+
+			if(self.lockOffMode=='strafing'):
+				TILTRIGHT = self.TILTRIGHT
+				TILTLEFT = self.TILTLEFT
+				if(invert==-1):
+					TILTRIGHT = self.TILTLEFT
+					TILTLEFT = self.TILTRIGHT
+
+				if(self.SHOOTKEY in pressedKeys and TILTRIGHT in pressedKeys):
+					if(self.jinkFacingTotal - 2  > -sprayRange):
+						self.jinkFacingTotal -= 2 
+						self.facing -= 2 
+				
+				if(self.SHOOTKEY in pressedKeys and TILTLEFT in pressedKeys):
+					if(self.jinkFacingTotal+2  < sprayRange):
+						self.jinkFacingTotal += 2 
+						self.facing += 2 
+					
 			
 			# UP
 			if('W' in pressedKeys ):
@@ -614,6 +649,10 @@ class player():
 			if('S' in pressedKeys):
 				self.speed -= 0.7 
 				self.accellerating = True
+		else:
+			# RESETS JINK STATE
+			self.initJinkFacing = None
+			self.jinkFacingTotal = 0
 
 
 	
@@ -829,18 +868,7 @@ class player():
 			self.damageAnimation(gui,lv,game)
 		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui)):
 			
-
-			#shadow_x = x + shadow_offset * math.cos(math.radians(self.facing-90))
-			#shadow_y = y + shadow_offset * math.sin(math.radians(self.facing-90))
-			#self.shadowPos[0],self.shadowPos[1]
-			vel_x = -100 * math.cos(math.radians(360-self.facing-40)) 
-			vel_y = -100 * math.sin(math.radians(360-self.facing-40))
-			# UPDATE POSITION
-			shadow_x = x + int(vel_x )
-			shadow_y = y + int(vel_y)
-
-			self.shadow.animate(gui,'player shadow',[shadow_x,shadow_y],game,rotation=self.facing-90,noseAdjust=True)
-			#drawImage(gui.screen,gui.playerShadow[0],(self.shadowPos[0],self.shadowPos[1]))
+			self.shadow.animate(gui,'player shadow',[self.shadowPos[0],self.shadowPos[1]],game,rotation=self.facing-90,noseAdjust=True)
 			
 			if(self.boosting):
 				animate,imageParms = self.boostImage.animate(gui,'playerBoosting',[x,y],game,rotation=self.facing-90)

@@ -1098,7 +1098,7 @@ def drawSelectableImage(image,image2,pos,gui,trim=False):
 
 
 # returns image array iterating last filedigit
-def loadImageFiles(firstFile,path,convert=False,log=False):
+def loadImageFiles(firstFile,path,convert=False,log=False,alphaConvert=False):
     imgFiles = []
     prefix = firstFile.split('.')[0][:-1]
     try:
@@ -1114,6 +1114,12 @@ def loadImageFiles(firstFile,path,convert=False,log=False):
                 if(log):
                     print('converting ' + str(tfile))
                 img = pygame.image.load(tfile).convert()
+            elif(alphaConvert):
+                if(log):
+                    print('Alpha converting ' + str(tfile))
+                img = pygame.image.load(tfile)
+                img = pygame.Surface.convert_alpha(img)
+
             else:
                 img = pygame.image.load(tfile)
             imgFiles.append(img)
@@ -1761,7 +1767,7 @@ class imageAnimate():
         self.state       = None
         self.name        = None
     
-    def animate(self,gui,gamestate,introSlides,pfs,blitPos):
+    def animate(self,gui,gamestate,introSlides,pfs,blitPos,skipBlit=False):
         """p = page f = count s = reset count
         """
 
@@ -1783,10 +1789,8 @@ class imageAnimate():
             if(self.p>=end): self.p = 0
 
 
-
-        
-
-        gui.screen.blit(introSlides[self.p],blitPos)
+        if(not skipBlit):
+            gui.screen.blit(introSlides[self.p],blitPos)
 
 
 
@@ -1803,7 +1807,7 @@ class imageAnimateAdvanced():
         self.reelComplete    = False
 
     
-    def animate(self,gui,trackedName,blitPos,game,rotation=None,centerOfRotation=(0.5,0.5),repeat=True, noseAdjust=False):
+    def animate(self,gui,trackedName,blitPos,game,rotation=None,centerOfRotation=(0.5,0.5),repeat=True, noseAdjust=False,skipBlit=False):
         # TIMER THAT ITERATES THROUGH A FRAME EACH GIVEN INTERVAL
         changeFrame = self.frameTimer.stopWatch(self.changeDuration,trackedName, str(self.changeCount) + trackedName, game,silence=True)
         
@@ -1832,14 +1836,16 @@ class imageAnimateAdvanced():
         blitx,blity         = blitPos[0]+centerOfRotation[0]*(imgW-rotatedWidth),blitPos[1]+centerOfRotation[1]*(imgH-rotatedHeight)
         
 
-        if(noseAdjust):
-            noseX,noseY = (blitPos[0]+0.5*imgW + imgW * 0.5*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH  -imgH*0.5*math.sin(wrapAngle(rotation+90)*math.pi/180))
-            bx,by = blitPos[0],blitPos[1]
+        if(not skipBlit):
+            if(noseAdjust):
+                noseX,noseY = (blitPos[0]+0.5*imgW + imgW * 0.5*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH  -imgH*0.5*math.sin(wrapAngle(rotation+90)*math.pi/180))
+                bx,by = blitPos[0],blitPos[1]
+
+                gui.screen.blit(rotated_image, (bx,by ))
+            else:
+                gui.screen.blit(rotated_image, (blitx,blity))
 
 
-            gui.screen.blit(rotated_image, (bx,by ))
-        else:
-            gui.screen.blit(rotated_image, (blitx,blity))
 
         # GET MUTATED COORDINATES
         midTopX,midTopY     = (blitPos[0]+0.5*imgW + imgW * 0.5*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH  -imgH*0.5*math.sin(wrapAngle(rotation+90)*math.pi/180))

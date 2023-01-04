@@ -90,7 +90,7 @@ def placeUnits(self,gui,game):
 		x = 0
 
 
-
+	showUnderLayer(self,gui)
 	# -------PLACE ENEMY MODE
 	if(self.placingEnemy):
 		selectEnemy(self,gui)
@@ -187,3 +187,11 @@ def selectEnemy(self,gui):
 			self.remove 			   = False
 
 
+def showUnderLayer(self,gui):
+
+
+	# SHOW ANYTHING THAT MIGHT BE ON THIS LAYER
+	for item in self.gameMap['tilelessL1']:
+		image = gui.tilelessL1Dict[item['dictKey']][item['index']]
+		if(onScreen(item['x'],item['y'],image.get_width(),image.get_height(),gui)):
+			drawImage(gui.screen,image,(item['x']- gui.camX,item['y']-gui.camY))

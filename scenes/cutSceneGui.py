@@ -7,24 +7,30 @@ from utils._utils import drawBlinkingText,countDownTimer,scrollingDilaogue,image
 
 class cutScene():
 	def __init__(self,gui):
-		self.state        = None
-		self.themes       = {'ally': (49,105,213) , 'enemy': (150,20,20), 'neutral':(0,200,0)}
-		self.theme        = self.themes['ally']
+		self.state          = None
+		self.themes         = {'ally': (49,105,213) , 'enemy': (150,20,20), 'neutral':(0,200,0)}
+		self.theme          = self.themes['ally']
+		self.orientation    = 'topCenter'
+		self.orientationSet = False 
+
+		# TOP CENTER ORIENTATION DEFAULT DIMENSIONS
 		self.x            = 0.25*gui.w
 		self.y            = 1
 		self.w 		      = 0.5*gui.w
 		self.h 		      = 0.26 *gui.h
-
-		# OPENING SFX 
+		#  MESSAGE X,Y FOR INCOMING ALERT
 		self.incomingX    = self.x + 0.3*self.w
 		self.incomingY    = self.y + 0.45*self.h
-		self.openingTimer = countDownTimer()
-		self.msgFlashtime = 3
-
-		
 		# WHERE THE LEFT PICTURE IS SHOWN
 		self.imageLeftX = self.x + 0.05*self.w
 		self.imageY     = self.y + 10
+
+		# OPENING SFX 
+		self.openingTimer = countDownTimer()
+		self.msgFlashtime = 3
+
+
+
 
 
 
@@ -65,14 +71,22 @@ class cutScene():
 		self.rxText        = self.rx + 0.15*self.rw
 		self.ryText        = self.ry + 0.35*self.rh
 
-
+		
 	#----------------------------------------
 	# OPENS DIALOGUE WINDOW, 
 	#----------------------------------------
-	def runCutScene(self,gui,game,scene='ally',underlay=True):
+	def runCutScene(self,gui,game,scene='ally',underlay=True,orientation='topCenter'):
 
 		# --------OPENING SFX
 		self.theme = self.themes[scene]
+
+		# -------GET DIMENSIONS
+		if(self.orientationSet==False):
+			self.orientation = orientation
+			self.getOrientationDimensions(gui)
+			self.orientationSet = True
+
+
 
 		# -----------EXPAND PANNEL TO OPEN UP
 
@@ -108,6 +122,49 @@ class cutScene():
 	#----------------------------------------
 	# IMAGE MASK, CODEC AND BORDER
 	#----------------------------------------
+
+
+	def runRHSCutScene(self,gui,game,scene='ally',underlay=True,orientation='topRight'):
+
+		# --------OPENING SFX
+		self.theme = self.themes[scene]
+
+		# -------GET DIMENSIONS
+		if(self.orientationSet==False):
+			self.orientation = orientation
+			self.getOrientationDimensions(gui)
+			self.orientationSet = True
+
+		# -----------EXPAND PANNEL TO OPEN UP
+
+		if(self.pannelOpen==False and self.openingMessage==False):
+			pygame.draw.rect(gui.screen, (0,0,0), [self.x,self.y,self.wOpening,self.hOpening])
+			pygame.draw.rect(gui.screen, self.theme, [self.x,self.y,self.wOpening,self.hOpening],3)
+			if(self.wOpening<= self.w): self.wOpening += self.w/25
+			if(self.hOpening<= self.h): self.hOpening += self.h/25
+
+			if(self.wOpening>= self.w and self.hOpening>=self.h):
+				self.openingMessage=True
+		
+		# -----------FTL REQUEST MESSAGE
+
+		elif(self.pannelOpen==False and self.openingMessage):
+			pygame.draw.rect(gui.screen, (0,0,0), [self.x,self.y,self.w,self.h])
+			pygame.draw.rect(gui.screen, self.theme, [self.x,self.y,self.w,self.h],4)
+			drawBlinkingText(gui.screen,gui.font, 'FTL Message Request',self.incomingX,self.incomingY, colour=(self.theme),blinkFraction=0.5)
+			complete,timeRemaining = self.openingTimer.countDownReal(self.msgFlashtime,game)
+			if(complete):
+				self.pannelOpen           = True # opening animation complete
+				self.openingTimer.counter = None # reset
+
+
+		else:
+			# ---------- DRAW CANVAS ONLY 
+			pygame.draw.rect(gui.screen, (0,0,0), [self.x,self.y,self.w,self.h])
+			pygame.draw.rect(gui.screen, self.theme, [self.x,self.y,self.w,self.h],3)
+			if(scene=='ally'):
+				gui.screen.blit(gui.allyUnderlay, (self.imageLeftX,self.imageY))
+
 
 	def drawMask(self,gui,game,overlay=True,codec=True,border=None,mask='ally'):
 		
@@ -146,3 +203,31 @@ class cutScene():
 				if(complete):
 					self.notifyReinforcements = False
 					self.reinforcementTimer.counter = None # reset
+
+
+	def getOrientationDimensions(self,gui):
+		if(self.orientation=='topCenter'):
+			# TOP CENTER ORIENTATION DEFAULT DIMENSIONS
+			self.x            = 0.25*gui.w
+			self.y            = 1
+			self.w 		      = 0.5*gui.w
+			self.h 		      = 0.26 *gui.h
+			#  MESSAGE X,Y FOR INCOMING ALERT
+			self.incomingX    = self.x + 0.3*self.w
+			self.incomingY    = self.y + 0.45*self.h
+			# WHERE THE LEFT PICTURE IS SHOWN
+			self.imageLeftX = self.x + 0.05*self.w
+			self.imageY     = self.y + 10
+		if(self.orientation=='topRight'):
+			self.x            = gui.w - 1.4*gui.talkScreenW
+			self.y            = 10
+			self.w 		      = gui.w - self.x
+			self.h 		      = 1.1*gui.talkScreenH
+			self.incomingX    = self.x + 0.3*self.w
+			self.incomingY    = self.y + 0.45*self.h
+			self.imageLeftX = self.x + 0.05*self.w
+			self.imageY     = self.y + 10
+
+	def reset(self):
+		self.pannelOpen     = False
+		self.orientationSet = False

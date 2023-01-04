@@ -57,20 +57,33 @@ def drawMap(self,gui):
 			y+= image.get_height()
 			x = 0
 
+	# SHOW ANYTHING THAT MIGHT BE ON THIS LAYER
+	if('tilelessL1' in self.gameMap.keys()):
+		for item in self.gameMap['tilelessL1']:
+			image = gui.tilelessL1Dict[item['dictKey']][item['index']]
+			if(onScreen(item['x'],item['y'],image.get_width(),image.get_height(),gui)):
+				drawImage(gui.screen,image,(item['x']- gui.camX,item['y']-gui.camY))
 
 
-
-def levelGui(self,gui):
+def levelGui(self,gui,game):
 	setWidth=getTextWidth(gui.hugeFont,'ENEMIES.')
 	
 	# SELF REFERS TO LEVEL OBJECT
-	self.remainingEnemies = str(len([x for x in self.enemyList if(x.alive)]))
-	drawTextWithBackground(gui.screen,gui.hugeFont,self.remainingEnemies,50,20, setWidth=setWidth,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
-	#sentence = "Map Size: [" + str(self.gameMap['width']) + ':' + str(self.gameMap['height']) +']'
-	#drawTextWithBackground(gui.screen,gui.font,sentence,50,20,setWidth=setWidth ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
-	#sentence = '(' +str(gui.mx+gui.camX) + ',' + str(gui.my+gui.camY) +')'
-	#drawTextWithBackground(gui.screen,gui.font,sentence,50,800,setWidth=setWidth ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
-	
+	self.remainingEnemies = len([x for x in self.enemyList if(x.alive)])
+	drawTextWithBackground(gui.screen,gui.hugeFont,str(self.remainingEnemies),50,20, setWidth=setWidth,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+	if(hasattr(self,'healthBar')):
+		self.healthBar.load(100,0.9*gui.h,gui,self.player.hp/self.player.defaultHp,borderThickness=2)
+
+	# ANIMATE OBJECTIVE BY LOOKING AT TARGETS IN THE OBJECTIVES DICT
+	if(hasattr(self, 'objectives')):
+		if('targetObjects' in self.objectives[self.currentObjective].keys()):
+			if(self.objectives[self.currentObjective]!=None):
+				targetObjectives = self.objectives[self.currentObjective]['targetObjects']
+				if(len(targetObjectives)>0):
+					target = targetObjectives[0]
+					angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = angleToTarget(self.player,self.player.x,self.player.y, target.x , target.y)
+					self.objectiveArrow.animate(gui,str(self.currentObjective),[self.player.x - gui.camX +50, self.player.y-gui.camY -300],game,rotation=enemyTargetAngle-90) 
+		
 def init(self,gui,game):
 
 

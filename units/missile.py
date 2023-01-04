@@ -251,12 +251,14 @@ class plume():
 		self.y               = y
 		self.plumeImg        = gui.missilePlume
 		self.plumeFrames     = imageAnimateAdvanced(self.plumeImg,0.2)
+		self.w,self.h        = self.plumeImg[0].get_width(),self.plumeImg[0].get_height()
 		self.facing          = facing
 
 	def drawSelf(self,gui,game,lv):
 		x,y = self.x -gui.camX, self.y -gui.camY
-		
-		complete, frames = self.plumeFrames.animate(gui,'plume Frames',[x,y],game,rotation=self.facing-90)
+		plumeOnScreen = onScreen(self.x,self.y,self.w,self.h,gui)
+
+		complete, frames = self.plumeFrames.animate(gui,'plume Frames',[x,y],game,rotation=self.facing-90,skipBlit= not plumeOnScreen)
 		if(complete):
 			lv.plumeList.remove(self)
 

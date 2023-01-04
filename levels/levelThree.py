@@ -35,6 +35,11 @@ class levelThree():
 
 
 
+		# -------GUI STUFF
+
+		self.healthBar         = loadingBarClass(100,20,(80,220,80),(220,220,220),(0,0,200))
+		self.objectiveArrow    = imageAnimateAdvanced(gui.objectiveArrow,0.2)
+
 		# ------ LEVEL TIMER 
 
 		self.levelTimer      = countUpTimer()
@@ -53,7 +58,6 @@ class levelThree():
 
 
 	def run(self,gui,game):
-
 		if(self.state=='init'):
 			init(self,gui,game)
 		else:
@@ -126,7 +130,7 @@ class levelThree():
 		#self.lv3CutScenes(gui,game)
 
 
-		levelGui(self,gui)
+		levelGui(self,gui,game)
 
 
 	def lv3CutScenes(self,gui,game):

@@ -30,6 +30,14 @@ class levelFour():
 		self.enemyDestroyed = False
 
 
+
+
+		# -------GUI STUFF
+
+		self.healthBar         = loadingBarClass(100,20,(80,220,80),(220,220,220),(0,0,200))
+		self.objectiveArrow    = imageAnimateAdvanced(gui.objectiveArrow,0.2)
+
+
 		self.log         = []
 
 
@@ -110,7 +118,7 @@ class levelFour():
 
 
 
-		levelGui(self,gui)
+		levelGui(self,gui,game)
 
 
 

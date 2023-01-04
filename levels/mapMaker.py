@@ -5,6 +5,7 @@ from levels.mapMakerLoadMap import *
 from levels.mapMakerEdit import *
 from levels.mapMakerLayer2 import *
 from levels.mapMakerUnits import *
+from levels.mapMakerTileLessL1 import * 
 
 import os
 
@@ -21,16 +22,26 @@ class mapEditor():
 		self.gameMap           = None
 
 		# TILE SELECTION 
-		self.tileModes             = ['layer1','layer2','Enemies']
+		self.tileModes             = ['layer1','layer2','tilelessL1', 'Enemies']
 		self.tileMode              = 'layer1'
 		self.editingTile           = False
+
+		# layer 1
 		self.tileOptions           = list(gui.tileDict.keys())
 		self.tileOptionsIndex      = 0
 		self.tileOptionsSubIndex   = 0
 		
+		# layer 2
 		self.l2Options             = list(gui.layer2Dict.keys())
 		self.l2OptionsIndex      = 0
 		self.l2OptionsSubIndex   = 0
+
+		# tileLess
+		self.t1Options           = list(gui.tilelessL1Dict.keys())
+		self.t1OptionsIndex      = 0
+		self.t1OptionsSubIndex   = 0
+		self.tl1SelectedCoords   = []
+		self.tl1SelectionState   = None
 
 		self.tileSelecting         = False
 		self.tileSelectionList     = []
@@ -42,7 +53,6 @@ class mapEditor():
 
 		self.placingEnemy           = False
 		self.enemyOptions          = list(gui.enemyDict.keys())
-		self.l2Options             = list(gui.layer2Dict.keys())
 		self.enemyOptionsIndex     = 0
 		self.enemyOptionsSubIndex  = 0
 		self.enemySelecting        = False
@@ -75,9 +85,10 @@ class mapEditor():
 		self.gameMap           = None
 
 		# TILE SELECTION 
-		self.tileModes             = ['layer1','layer2','Enemies']
+		self.tileModes             = ['layer1','layer2','tilelessL1', 'Enemies']
 		self.tileMode              = 'layer1'
 		self.editingTile           = False
+		
 		self.tileOptions           = list(gui.tileDict.keys())
 		self.tileOptionsIndex      = 0
 		self.tileOptionsSubIndex   =  0
@@ -85,6 +96,18 @@ class mapEditor():
 		self.tileSelectionList     = []
 		self.tileHovered 		   = False
 		self.pagedIndex			   = 0
+
+		# layer 2
+		self.l2Options             = list(gui.layer2Dict.keys())
+		self.l2OptionsIndex      = 0
+		self.l2OptionsSubIndex   = 0
+
+		# tileLess
+		self.t1Options           = list(gui.tilelessL1Dict.keys())
+		self.t1OptionsIndex      = 0
+		self.t1OptionsSubIndex   = 0
+		self.tl1SelectedCoords   = []
+		self.tl1SelectionState   = None
 
 		# ENEMY SELECTION 
 
@@ -126,10 +149,13 @@ class mapEditor():
 		if(self.state=='editMap'):
 			editMap(self,gui,game)
 
-		# ----------EDIT MAP (LAYER ONE)
+		# ----------EDIT MAP (LAYER TWO)
 
-		if(self.state=='editLayer2'):
-			editLayer2(self,gui,game)
+		if(self.state=='editLayer2'): editLayer2(self,gui,game)
+
+		# ----------EDIT MAP (LAYER TWO)
+
+		if(self.state=='tilelessL1'): tilelessL1(self,gui,game)
 
 		# ----------EDIT ENEMIES
 
@@ -235,6 +261,9 @@ class mapEditor():
 				self.state='editMap'
 			if(self.tileMode =='layer2'):
 				self.state='editLayer2'
+				gui.clicked = False
+			if(self.tileMode =='tilelessL1'):
+				self.state='tilelessL1'
 				gui.clicked = False
 			if(self.tileMode =='Enemies'):
 				self.state='enemyPlacement'

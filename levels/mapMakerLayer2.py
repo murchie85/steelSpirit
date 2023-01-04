@@ -217,7 +217,7 @@ def showUnderLayer(self,gui):
 	for row in mapTiles:
 		for c in row:
 			if(c['animated']==False ):
-				image = gui.layer2Dict[c['type']][c['index']]
+				image = gui.tileDict[c['type']][c['index']]
 				#image.set_alpha(200)
 				if(onScreen(x,y,image.get_width(),image.get_height(),gui)):
 
