@@ -12,8 +12,8 @@ class barrelRed(parent):
 		self.kind           = 'structure'
 		self.images         = imageAnimateAdvanced(gui.barrelGroupRed,0.2)
 
-		self.chosenExplosionImg = gui.redExplosion
-		self.explosion          = imageAnimateAdvanced(self.chosenExplosionImg,0.1)
+		self.chosenExplosionImg = gui.barrelExplosion
+		self.explosion          = imageAnimateAdvanced(self.chosenExplosionImg,0.04)
 		self.x,self.y       = 500,500
 		if(x!=None): self.x = x
 		if(y!=None): self.y = y
@@ -107,4 +107,32 @@ class barrelRed(parent):
 					self.hit = False
 					self.hitsTaken +=1
 
+	
+	def animateDestruction(self,gui,lv,game):
+		x,y = self.x - gui.camX,self.y  - gui.camY
+
+		# *******BE CAREFUL ABOUNT ON SCREEN
+
+		if(self.destructionComplete==False and self.alive==False):
+			if(hasattr(self,'centerPoint')):
+				x += 0.5*self.centerPoint[0]
+				y += 0.5*self.centerPoint[1]
+			
+			complete,blitPos = self.explosion.animate(gui,str(str(self.name) +' explosion'),[x - 0.5*self.chosenExplosionImg[0].get_width(),y-0.5*self.chosenExplosionImg[0].get_height()],game)
+			bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+
+
+			if(self.debris<=12):
+				self.debris +=1
+				# ADDS DEBRIS TO TO LIST
+				lv.bulletList.append(bullet(gui,self.x + 0.5* self.chosenExplosionImg[0].get_width(),self.y+ 0.5* self.chosenExplosionImg[0].get_height(),bid,'debris',random.randrange(0,360),'debris',speed=10, w=3,h=3,colour=(192,192,192)))
+			
+			# ADD FLYING SHRAPNELL 50% of the time
+			if(random.choice([1,2])==1 and not self.shrapnellEjected):
+				self.shrapnellEjected = True
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.x + 0.5* self.chosenExplosionImg[0].get_width(),self.y+ 0.5* self.chosenExplosionImg[0].get_height(),bid,'shrapnell',random.randrange(0,360),'shrapnell',speed=5,shrapnellType='A'))
+			
+			if(complete):
+				self.destructionComplete = True
 

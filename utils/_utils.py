@@ -1574,7 +1574,9 @@ class scrollingDialogueSimple():
         # TIMER TO END OUT
         self.closeOutTimer      = stopTimer()
         self.closeOutCount      = 0
-        self.closeOutDelay      = 1.5
+        self.closeOutDelay      = 3
+
+        self.pageTimer          = stopTimer()
 
         self.textBuffer         = []
         self.baseArray          = []
@@ -1586,9 +1588,10 @@ class scrollingDialogueSimple():
         self.y2                 = 0
 
 
-    def drawScrollingDialogue(self,gui,game,w,h,myfont, text, textStartingPos=(-1,-1),colour=None,interval=0,skipEnabled=False,closeOutDelay=True,startupDelay=True,vertInc= 1.2,maxLines=5):
+    def drawScrollingDialogue(self,gui,game,w,h,myfont, text, textStartingPos=(-1,-1),colour=None,interval=0,skipEnabled=False,closeOutDelay=True,startupDelay=True,vertInc= 1.2,maxLines=5,scrollInterval=0.03,pageWait=False):
         
-        
+        self.scrollInterval = scrollInterval
+
         #---------DELAY STARTUP UP 
 
         if(startupDelay):
@@ -1650,7 +1653,7 @@ class scrollingDialogueSimple():
 
             self.baseArray       = dialogueArray   # Full Dialogue
             self.textBuffer      = dialogueArray   # Actual Dialogue being printed
-            self.arrIndex        = 5        # array index is the last line of given array slice
+            self.arrIndex        = maxLines        # array index is the last line of page(array slice)
             
 
             # SET TEMPORARY TEXT ARRAY BASED UPON LINE LIMIT 
@@ -1678,6 +1681,20 @@ class scrollingDialogueSimple():
                 if(skip):
                     self.finished            = True
                     self.scrollSpeedOverride = None
+
+        # GOING TO NEXT PAGE
+        if(type(pageWait)==int):
+            # Adding in these values means if anythign changes the timer resets state
+            nextPage = self.pageTimer.stopWatch(pageWait, 'waiting to go to next page','next page' + str([self.arrIndex,self.baseArray,self.currentArrayIndex,self.senPos]),game,silence=True)
+            if(nextPage and self.arrIndex<len(self.baseArray)):
+                self.textBuffer = self.baseArray[self.arrIndex:(self.arrIndex+maxLines)] # GO TO NEXT PAGE
+                self.arrIndex  = self.arrIndex + maxLines
+                self.currentArrayIndex     = 0
+                self.senPos     = 0
+                self.y          = yStart
+                self.pageTimer.reset()
+
+
 
 
 
@@ -1725,17 +1742,18 @@ class scrollingDialogueSimple():
         nextWordReady = self.scrollTimer.stopWatch(self.scrollInterval, 'textScroll', str(self.scrollCount) + str(text),game,silence=True)
         if(nextWordReady):
             self.scrollCount +=1
+            
+            # keep increementing sentence position until it is the len of the full sen for this line
             if(len(currentSentence)-2 >=self.senPos):
                 self.senPos+=1
+            elif(len(self.textBuffer)-2>=self.currentArrayIndex):
+                self.currentArrayIndex +=1
+                self.y= self.y+vertInc *h
+                self.senPos=0
             else:
-                if(len(self.textBuffer)-2>=self.currentArrayIndex):
-                    self.currentArrayIndex +=1
-                    self.y=self.y+vertInc *h
-                    self.senPos=0
-                else:
-                    # If at end of array, end of elem and true end
-                    if(self.arrIndex>=len(self.baseArray)):
-                        self.finished    = True
+                # If at end of array, end of elem and true end
+                if(self.arrIndex>=len(self.baseArray)):
+                    self.finished    = True
 
         #---------DELAY CLOSING OUT 
 
@@ -1806,7 +1824,11 @@ class imageAnimateAdvanced():
         self.imageFrames     = imageFrames
         self.reelComplete    = False
 
-    
+    def reset(self):
+        self.currentFrame    = 0
+        self.reelComplete    = False
+        self.changeCount     = 0
+
     def animate(self,gui,trackedName,blitPos,game,rotation=None,centerOfRotation=(0.5,0.5),repeat=True, noseAdjust=False,skipBlit=False):
         # TIMER THAT ITERATES THROUGH A FRAME EACH GIVEN INTERVAL
         changeFrame = self.frameTimer.stopWatch(self.changeDuration,trackedName, str(self.changeCount) + trackedName, game,silence=True)
@@ -1823,6 +1845,8 @@ class imageAnimateAdvanced():
             else:
                 # LATE ADDITION MIGHT NEED ROLLED BACK
                 self.reelComplete = False
+        if(skipBlit):
+            return(self.reelComplete,{})
 
         if(rotation==None): rotation = 0
         rotation = wrapAngle(rotation)
@@ -1836,14 +1860,14 @@ class imageAnimateAdvanced():
         blitx,blity         = blitPos[0]+centerOfRotation[0]*(imgW-rotatedWidth),blitPos[1]+centerOfRotation[1]*(imgH-rotatedHeight)
         
 
-        if(not skipBlit):
-            if(noseAdjust):
-                noseX,noseY = (blitPos[0]+0.5*imgW + imgW * 0.5*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH  -imgH*0.5*math.sin(wrapAngle(rotation+90)*math.pi/180))
-                bx,by = blitPos[0],blitPos[1]
+        
+        if(noseAdjust):
+            noseX,noseY = (blitPos[0]+0.5*imgW + imgW * 0.5*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH  -imgH*0.5*math.sin(wrapAngle(rotation+90)*math.pi/180))
+            bx,by = blitPos[0],blitPos[1]
 
-                gui.screen.blit(rotated_image, (bx,by ))
-            else:
-                gui.screen.blit(rotated_image, (blitx,blity))
+            gui.screen.blit(rotated_image, (bx,by ))
+        else:
+            gui.screen.blit(rotated_image, (blitx,blity))
 
 
 
@@ -1894,6 +1918,60 @@ class imageAnimateAdvanced():
         gui.screen.blit(self.imageFrames[self.currentFrame], (blitPos[0],blitPos[1]))
 
         return(self.reelComplete)
+
+
+    def animateLowCompute(self,gui,trackedName,blitPos,game,repeat=True,rotation=None,skipBlit=False):
+        # TIMER THAT ITERATES THROUGH A FRAME EACH GIVEN INTERVAL
+        changeFrame = self.frameTimer.stopWatch(self.changeDuration,trackedName, str(self.changeCount) + trackedName, game,silence=True)
+        
+        if(changeFrame):
+            self.changeCount +=1
+            self.currentFrame +=1
+            if(self.currentFrame>=len(self.imageFrames)):
+                if(repeat==False):
+                    self.currentFrame = len(self.imageFrames)-1
+                else:
+                    self.currentFrame = 0
+                self.reelComplete = True
+            else:
+                # LATE ADDITION MIGHT NEED ROLLED BACK
+                self.reelComplete = False
+
+        # SKIP BLIT
+        if(skipBlit):
+            return(self.reelComplete)
+
+        if(rotation==None): rotation = 0
+        rotation = wrapAngle(rotation)
+
+        # GET ORIGINAL AND ROTATED LEN AND WIDTH
+        rotated_image = pygame.transform.rotate(self.imageFrames[self.currentFrame], rotation)
+        rotatedWidth,rotatedHeight     = rotated_image.get_width(),rotated_image.get_height()
+        imgW,imgH = self.imageFrames[self.currentFrame].get_width(), self.imageFrames[self.currentFrame].get_height()
+
+        # GET MUTATED COORDINATES
+        blitx,blity         = blitPos[0]+0.5*(imgW-rotatedWidth),blitPos[1]+0.5*(imgH-rotatedHeight)
+        gui.screen.blit(rotated_image, (blitx,blity))
+
+
+        # GET ORIGINAL AND ROTATED LEN AND WIDTH
+        imgW,imgH = self.imageFrames[self.currentFrame].get_width(), self.imageFrames[self.currentFrame].get_height()
+
+        return(self.reelComplete)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2027,11 +2105,7 @@ class countUpTimer():
         if(self.alarmTime==None): 
             self.alarmTime = alarmTime
 
-        try:
-            self.counter+=game.dt/1000
-        except:
-            print("Failed to add to counter in countUpTimer, likely you didn't reset it ")
-            exit()
+        self.counter+=game.dt/1000
         
         # RESET COUNTER, RETURN TRUE
         if(self.counter>self.alarmTime):
@@ -2373,7 +2447,7 @@ class dragSelector():
         self.borderThickness = 3
 
 
-    def dragSelect(self,gui,bm,camx,camy):
+    def dragSelect(self,gui,camx,camy):
 
         # IF NOTHIGN SELECTED AND BUTTON HELD DOWN
         if(self.selecting==False):

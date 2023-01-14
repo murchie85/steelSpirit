@@ -3,7 +3,7 @@ from utils.gameUtils import *
 from utils._utils import stopTimer
 from units.ordinance import *
 from units.missile import *
-from units.flare import *
+from units.chaff import *
 import time
 import numpy
 import random
@@ -43,14 +43,24 @@ class player():
 		self.lockOnImage    = imageAnimateAdvanced(gui.lockOn,0.05)
 		self.flareTimer     = stopTimer()
 
+
 		self.w              = int(gui.player[0].get_width())
 		self.h              = int(gui.player[0].get_height())
 		self.blitPos         = None
 		self.shadowPos       = [self.x,self.y]
 		self.rotatedW	     = self.w
 		self.rotatedH	     = self.h
-		self.vel_x           = 0
-		self.vel_y           = 0
+		self.vel_x             = 0
+		self.vel_y             = 0
+		self.cumulatedDistance = 0
+
+
+
+		self.rightBoundary   = None
+		self.leftBoundary    = None
+		self.topBoundary     = None
+		self.bottomBoundary  = None
+
 		
 		# ------KEYS 
 		self.SHOOTKEY                  = 'H'
@@ -59,6 +69,7 @@ class player():
 		self.ENABLE_LOCKON_BUTTON      = 'Y'
 		self.SPECIAL                   = 'J'
 		self.FLARE_BUTTON              = 'F'
+		self.BOMBKEY  				   = 'B'
 		
 		self.TILTLEFT           = '--' # INITIALLY DISABLED IF LOCKON ON
 		self.TILTRIGHT          = '--'
@@ -101,7 +112,7 @@ class player():
 
 
 		# ATTRIBUTES 
-		self.defaultHp         = 100
+		self.defaultHp         = 200
 		self.hp                = self.defaultHp
 		self.speed             = 0
 		self.maxSpeed          = 8
@@ -113,8 +124,8 @@ class player():
 		# BOOSTING 
 
 		self.boosting          = False
-		self.boostDuration     = 5
-		self.boostCooldownTime = 3
+		self.boostDuration     = 15
+		self.boostCooldownTime = 1
 		self.boostTimer        = stopTimer()           # BUFF
 		self.boostCoolDown     = stopTimer()
 		self.boostAvailable    = True
@@ -136,9 +147,9 @@ class player():
 		self.invincibleCount     = 0
 
 		# BULLETS 
-		self.shotType			= 'hotRound'
+		self.shotType			= 'hotTripple'
 		self.availableWeapons   = ['hotRound','hotDouble','hotTripple','pellet','doublePellet' ,'slitherShot','doubleSlither','triBlast']
-		self.bulletAttrs        = {'hotRound':{'speed':10,'damage':10}, 'hotDouble':{'speed':10,'damage':8}, 'hotTripple':{'speed':10,'damage':7},  'pellet':{'speed':15,'damage':7}, 'doublePellet':{'speed':15,'damage':7},  'slitherShot':{'speed':3,'damage':20}, 'doubleSlither':{'speed':3,'damage':20} , 'triBlast':{'speed':12,'damage':30} }
+		self.bulletAttrs        = {'hotRound':{'speed':20,'damage':6}, 'hotDouble':{'speed':20,'damage':5}, 'hotTripple':{'speed':20,'damage':4},  'pellet':{'speed':15,'damage':7}, 'doublePellet':{'speed':15,'damage':7},  'slitherShot':{'speed':3,'damage':20}, 'doubleSlither':{'speed':3,'damage':20} , 'triBlast':{'speed':12,'damage':30} }
 		
 		self.bulletTimer        = stopTimer()           # BUFF
 		self.shootDelay         = 0.1                   # BUFF
@@ -147,7 +158,7 @@ class player():
 		# MISSILES 
 		self.missileType	     = 'streaker'
 		self.availableMissiles   = ['streaker']
-		self.missileAttrs        = { 'streaker':{'speed':6,'damage':150}}
+		self.missileAttrs        = { 'streaker':{'speed':6,'damage':150},'nuke':{'speed':6,'damage':1000}, }
 		self.missileTimer        = stopTimer()           # BUFF
 		self.missileDelay        = 1                   # BUFF
 		self.missilesFired       = 0
@@ -161,6 +172,12 @@ class player():
 		self.flareBatchDelay     = 3
 		self.flareBatchComplete  = False 
 		self.flareBachNo         = 0
+
+
+		# BOMB 
+
+		self.nukesDropped        = 0
+		self.nukeAway            = False
 
 		# DESTROY 
 		self.destructionComplete = False
@@ -228,6 +245,9 @@ class player():
 		if(self.SPECIAL in pressedKeys):
 			self.launchMissiles(game,lv,gui,enemies)
 
+		if(self.BOMBKEY in gui.input.returnedKey.upper()):
+			self.launchNuke(game,lv,gui)
+
 	def detectEnemies(self,gui,lv,cone_points):
 
 		# Create a Rect object for the cone of vision
@@ -291,7 +311,7 @@ class player():
 
 						# ------RENDER LOCKON AROUND POTENTIAL ENEMY
 
-						complete,blitPos = self.lockOnImage.animate(gui,str(enemies[0].id) + str(self.lockedOn),[lx,ly],game,repeat=False)
+						complete,blitPos = self.lockOnImage.animate(gui,str(enemies[0].id) + str(self.lockedOn),[lx,ly],game,repeat=True)
 
 						# ------ IF YOU CHOSE TO LOCKON TO THIS ENEMY
 						# ALWAYS LOCKON
@@ -340,7 +360,7 @@ class player():
 				
 
 				#drawImage(gui.screen,gui.lockOn[0],(lx-gui.camX,ly-gui.camY))
-				complete= self.lockOnImage.animateNoRotation(gui,str(self.lockedEnemy.id) + str(self.lockedOn),[lx-gui.camX,ly-gui.camY],game,repeat=False)
+				complete= self.lockOnImage.animateNoRotation(gui,str(self.lockedEnemy.id) + str(self.lockedOn),[lx-gui.camX,ly-gui.camY],game,repeat=True)
 				
 				# FACE ENEMY 
 				angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, self.lockedEnemy.x , self.lockedEnemy.y)
@@ -430,7 +450,7 @@ class player():
 				self.bulletsFired +=1
 				# ADDS BULLET TO BULLET LIST
 				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
-				lv.bulletList.append(bullet(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+				lv.bulletList.append(bullet(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
 
 	def launchMissiles(self,game,lv,gui,enemies):
 
@@ -462,6 +482,17 @@ class player():
 			# READY TO FIRE AGAIN
 			if((missilesReady )):
 				self.missileFiring = False
+
+
+	def launchNuke(self,game,lv,gui):
+		
+
+		if(self.nukeAway==False):
+			#ADDS MISSILES TO BULLET LIST
+			bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+			lv.bulletList.append(missile(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, self.facing,'nuke',playerSpeed=self.speed, speed=abs(self.maxSpeed) + self.missileAttrs['nuke']['speed'], damage=self.missileAttrs['nuke']['damage']))
+			#self.nukeAway=True
+
 
 
 	def setInvincible(self,game):
@@ -501,7 +532,7 @@ class player():
 			if(self.initLockonFacing==None or self.switchedLockon):
 				self.initLockonFacing = self.facing
 
-			self.maxSpeed = 5
+			self.maxSpeed = 7
 			
 			# THE RELATIVE COMPONENTS NEEDED TO GO FORWARD, NOT ACTUAL X,Y VELS
 			vel_x = self.maxSpeed * math.cos(math.radians(360-self.facing-90))
@@ -509,33 +540,36 @@ class player():
 
 			vx = self.maxSpeed * math.cos(math.radians(360-self.facing))
 			vy = self.maxSpeed * math.sin(math.radians(360-self.facing))
-			
-			# RIGHT    - TURN IF JINK BUTTON HELD
-			if('D' in pressedKeys and self.JINK_BUTTON in pressedKeys):
-				self.facing -= 3
-			# OTHER WISE MOVE IN JINK FASHION
-			if('D' in pressedKeys):
-				self.x  += 0.8*self.maxSpeed
 
-			# LEFT     - TURN IF JINK BUTTON HELD
-			if('A' in pressedKeys and self.JINK_BUTTON in pressedKeys):
-				self.facing += 3
-			# OTHER WISE MOVE IN JINK FASHION
+			
+
+			# MOVE X COMP
+			if('D' in pressedKeys):
+				self.x  +=    0.8*self.maxSpeed
+			# TURN
+			if('D' in pressedKeys and self.JINK_BUTTON in pressedKeys):
+				self.facing -= 4
+
+			# MOVE X COMP
 			if('A' in pressedKeys):
 				self.x  -= 0.8*self.maxSpeed
+			# LEFT     - TURN IF JINK BUTTON HELD
+			if('A' in pressedKeys and self.JINK_BUTTON in pressedKeys):
+				self.facing += 4
 			
 			# UP
 			if('W' in pressedKeys ):
 				#self.x += vx
+				#self.vel_y -= 0.8*self.maxSpeed # ALSO MOVES RADIALLY
 				self.y     -= 0.6*self.maxSpeed # MOVES UP/DOWN REL
-				self.vel_y -= 0.8*self.maxSpeed # ALSO MOVES RADIALLY
 
 			# DOWN
 			if('S' in pressedKeys):	
 				#self.x -= vel_x
+				#self.vel_y += 0.8*self.maxSpeed
 				self.y     += 0.6*self.maxSpeed
-				self.vel_y += 0.8*self.maxSpeed
 		
+
 		# ---------JINK FOR LOCKON MODE NOT LOCKED ON
 
 		if((self.JINK_BUTTON in pressedKeys or self.firing) and not self.lockedOn):
@@ -545,14 +579,14 @@ class player():
 			
 			if('D' in pressedKeys):
 				if('J' in pressedKeys and self.firing):
-					self.facing +=0.6
+					self.facing -=1.4
 				
 				self.x -= vel_x
 				self.y -= vel_y
 
 			if('A' in pressedKeys):
 				if('J' in pressedKeys and self.firing):
-					self.facing -=0.6
+					self.facing +=1.4
 				self.x += vel_x
 				self.y += vel_y
 			if('W' in pressedKeys ):
@@ -677,7 +711,8 @@ class player():
 		# APPLY SPEED COMPONENT
 		self.vel_x = self.speed * math.cos(math.radians(360-self.facing)) 
 		self.vel_y = self.speed * math.sin(math.radians(360-self.facing))
-
+		self.cumulatedDistance += math.sqrt(self.vel_x**2 + self.vel_y**2)
+		
 		# UPDATE POSITION
 		self.x += int(self.vel_x )
 		self.y += int(self.vel_y)
@@ -686,11 +721,23 @@ class player():
 		if(self.accellerating==False):
 			self.speed = zero(self.speed,self.decelleration)
 
+
+
+
 		# BORDER CLAMP
-		if(self.x + self.w > lv.mapw): self.x -= self.maxSpeed
-		if(self.x < lv.mapx): self.x += self.maxSpeed
-		if(self.y + self.h > lv.maph): self.y -= self.maxSpeed
-		if(self.y < lv.mapy): self.y += self.maxSpeed
+
+		# update once 
+		if(self.rightBoundary==None):
+			self.rightBoundary   = lv.mapw
+			self.leftBoundary    = lv.mapx
+			self.topBoundary     = lv.maph
+			self.bottomBoundary  = lv.mapy
+
+
+		if(self.x + self.w > self.rightBoundary): self.x -= self.maxSpeed
+		if(self.x < self.leftBoundary): self.x += self.maxSpeed
+		if(self.y + self.h > self.topBoundary): self.y -= self.maxSpeed
+		if(self.y < self.bottomBoundary): self.y += self.maxSpeed
 
 
 
@@ -714,10 +761,10 @@ class player():
 			
 			#ADDS MISSILES TO BULLET LIST
 			bid = max(([x.id for x in lv.bulletList]),default=0) + 1
-			lv.bulletList.append(flare(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, wrapAngle(self.facing+random.randrange(35,65)),playerSpeed=self.speed, speed=self.speed,jink='left'))
+			lv.bulletList.append(chaff(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, wrapAngle(self.facing+random.randrange(35,65)),playerSpeed=self.speed, speed=self.speed,jink='left'))
 			
 			bid = max(([x.id for x in lv.bulletList]),default=0) + 1
-			lv.bulletList.append(flare(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, wrapAngle(self.facing-random.randrange(35,65)),playerSpeed=self.speed, speed=self.speed,jink='right'))
+			lv.bulletList.append(chaff(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, wrapAngle(self.facing-random.randrange(35,65)),playerSpeed=self.speed, speed=self.speed,jink='right'))
 			
 			self.flaresAvailable = False
 
@@ -789,7 +836,19 @@ class player():
 		
 		gui.camX = (1 - interpolation_factor) * gui.camX + interpolation_factor * target_camX
 		gui.camY = (1 - interpolation_factor) * gui.camY + interpolation_factor * target_camY
-
+		
+		if(hasattr(lv,'objectives')):
+			if(lv.currentObjective not in [None,'complete']):
+				currentObjective = lv.objectives[lv.currentObjective]
+				activeQuandrant  = currentObjective['activeQuandrant']
+				if(gui.camX > activeQuandrant['x'] + activeQuandrant['w'] - gui.camW):
+					gui.camX = activeQuandrant['x'] + activeQuandrant['w'] - gui.camW
+				if(gui.camX < activeQuandrant['x']): 
+					gui.camX = activeQuandrant['x']
+				if(gui.camY > activeQuandrant['y'] + activeQuandrant['h'] - gui.camH):
+					gui.camY = activeQuandrant['y'] + activeQuandrant['h'] - gui.camH
+				if(gui.camY < activeQuandrant['y']): 
+					gui.camY = activeQuandrant['y']
 
 
 		
@@ -828,18 +887,11 @@ class player():
 		if(self.hit):
 			self.damageAnimation(gui,lv,game)
 		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui)):
-			
-
-			#shadow_x = x + shadow_offset * math.cos(math.radians(self.facing-90))
-			#shadow_y = y + shadow_offset * math.sin(math.radians(self.facing-90))
-			#self.shadowPos[0],self.shadowPos[1]
-			vel_x = -100 * math.cos(math.radians(360-self.facing-40)) 
-			vel_y = -100 * math.sin(math.radians(360-self.facing-40))
 			# UPDATE POSITION
-			shadow_x = x + int(vel_x )
-			shadow_y = y + int(vel_y)
+			shadow_x = x + 60
+			shadow_y = y + 80
 
-			self.shadow.animate(gui,'player shadow',[shadow_x,shadow_y],game,rotation=self.facing-90,noseAdjust=True)
+			self.shadow.animate(gui,'player shadow',[shadow_x,shadow_y],game,rotation=self.facing-90)
 			#drawImage(gui.screen,gui.playerShadow[0],(self.shadowPos[0],self.shadowPos[1]))
 			
 			if(self.boosting):

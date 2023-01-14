@@ -1,7 +1,7 @@
 from utils._utils import *
 from utils.gameUtils import *
 
-def loadMap(self,gui):
+def loadMap(self,gui,game):
 	borderColour = (153, 204, 255)
 	backColour   = (51, 102, 255)
 	textColour   = (255,255,255)

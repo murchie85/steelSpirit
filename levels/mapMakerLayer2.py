@@ -37,7 +37,7 @@ def editLayer2(self,gui,game):
 	# MANAGES STATE
 	
 	if(gui.clicked and self.tileHovered and self.buttonsHovered!=True):
-		if(self.tileSelecting==False and self.editingTile==False):
+		if(self.tileSelecting==False and self.editingTile==False and self.deleteL2Flag==False):
 			self.tileSelecting = True
 			gui.clicked        = False
 		elif(self.tileSelecting==True and self.editingTile==False):
@@ -55,7 +55,29 @@ def editLayer2(self,gui,game):
 			col = row[c]
 
 			if(col['animated']==False ):
-				image = gui.layer2Dict[col['type']][col['index']]
+				if(col['type'] in gui.layer2Dict.keys()):
+					image = gui.layer2Dict[col['type']][col['index']]
+				else:
+					# IMAGE NO LONGER EXISTS IN REF DICT - SO REPLACE
+					image = gui.layer2Dict['base'][0]
+
+
+
+				# -----------REMOVE TILE
+
+				if(gui.mouseCollides(x-gui.camX,y-gui.camY,image.get_width(),image.get_height())):
+					if(self.tileSelecting==False and len(self.tileSelectionList)==0):
+						if(mapTiles[r][c]['placed'] == True):
+							self.deleteL2Flag = True
+							drawImage(gui.screen,gui.base100[3],(x-gui.camX,y-gui.camY))
+							if(gui.clicked):
+								self.gameMap['layer2'][r][c] = {'placed': False, 'animated':False,'type':'base','index':8}
+								gui.clicked = False
+								self.tileSelectionList   = []
+						else:
+							self.deleteL2Flag = False
+
+
 
 
 				# -----------IF HOVER MULTI-SELECT 
@@ -67,6 +89,7 @@ def editLayer2(self,gui,game):
 						selectedCoords = [r,c]
 						if(selectedCoords not in self.tileSelectionList): 
 							self.tileSelectionList.append(selectedCoords)
+
 
 				#  -----------IF SELECTED, SHOW BASE SELECTING TILE
 

@@ -18,40 +18,69 @@ SHOW
 Main focus
 ----
 
+- create spawn point placer, drag/drop perimeter (toggle box one more-  it should show a number)
 
-GUI PREFERENCE, IS MINIMALIST, BTM/TOP LFT and popout box
-	 - Tradit gui to begin with, update map to chose if objective or not
-	 - objective arrow flashes to next objective. 
-	 	  - times out after 3 seconds, B to show it
-	 - 'next up, take out the three AA installations'
-	 - gui pops up on right - well done slick, 
-	 - XP/Points tick up on the Gui
+- SNOW ( a weeks work)
+	-  Draw trees, muddy paths, mountains
+	- AA in shell, 
+	- small copters 10 attack if in area (raiden AI), 
+	- Big copter volley of 4
+	- snow tank, 
+	- tribarreled tanks (for later stages)
+	- 4 Loaders, 
+	- Guard towers
+	- blizzard effect
+	- toggle lockon view
+	- units chase you a bit
+	- groups of enemies (tanks roll out, copters group attack...etc)
 
 
+ - gui
+	 - display panel slides up
+	 - gui must include current objective (can show on pause menu)
+	 - Game timer
+	 - full sidebar might be best
+	 - **KEY** XP/Points tick up on the Gui
 
 
 
 ## ART ADDITION
 
+- Billowing black smoke
+- Shockwave for barell, include shrapnell
+- Backgrounds, cram more stuff into a 100/100 tile 
+- More raiden explosions (check stuff falling, lv 1)
 - Draw a bunch of stuff (Candc3 sprites long laser sect)
 - INCINERY FLARE EXPLOSIONS https://youtu.be/zXjBS382P2k?t=224
 - Special, Nuke Mussile
+- Use contrast for background
 Pixel geep https://www.youtube.com/watch?v=uX9r5J1WYko
+Look for concrete samples
+- Terrain should be smaller...maybe...think about it (small view like raiden or big like under attack)
+
+
+## UNITS TO ADD
+
+- DOUBLE BARREL 2 SHOTS SAME TIME
+- Shrapnell flying out should land and puff
+- Surfacing sub
 
 ## CODE CHANGES
 
 - Enemy Respawn
-- Facing south when shooting inverts u/d
 - Third layer with paralax canv Speed (possibly cloud cover) - canvas transparent. MOD to pick layer size
-- Probably want lockon/lockoff buttons all to be the same - controll still feels offf, storyboard
 - PROPER SCREEN PANNING so north,south gets more coverage in facing dir
 - ANIMATED TILES
 H - shoot in lockon J - strafe mode JJ - clockwise mode  J hold - break off K - missile
 
 ## FEATURES 
 
+- GUI TEXT SCROLL TIMER
+- When flying ships get hit, they crash and leave a crater
+- Big cannons you destroy and black smoke pours out
 - RADAR
 - GROUND AA LASER CANNON builds up
+- Propaganda stations
 - Next ENEMY Arrow/s (red) this will help when vision is down..make it bigger as nearer
 - Bullet blast animation, bullet impact animation
 - Big power generators for laser, manufac facility, super conduct towers... (include obj acrrow)
@@ -64,6 +93,8 @@ H - shoot in lockon J - strafe mode JJ - clockwise mode  J hold - break off K - 
 - ALLY COMMAND
 - improved explosion animations
 - APC
+- Procedural level generator (start with enemy)
+- raidal lockon speed is unlockable boost
 
 
 
@@ -71,14 +102,21 @@ H - shoot in lockon J - strafe mode JJ - clockwise mode  J hold - break off K - 
 - CLEARLY SIGNPOST: FREE MODE <-->LOCKON MODE
 - CLEARLY SIGNPOST: Boosting, side dodge etc
 
+## CONSIDER ONLY
 
+Tanks can only move in 12 directions maybe 18 making animations look more 3d
+bomb self frag
 
+## CONTROLLER 
 
+- Hold button to lock on and turn otherwise free roam
+- Facing south when shooting inverts u/d
+- Probably want lockon/lockoff buttons all to be the same - controll still feels offf, storyboard
 
 ## SECONDARY TO BE GROOMED 
 
 
-
+- Tank bumping over - gives realistic feel, with dust thrown up by treds
 BETA TESTING
 - Add movement pivot around center point when not in lockon mode/ OR MODIFY LOCKON to pivot around center mass...adding more 
 	 - Add variations as schemas to test for beta testing
@@ -91,10 +129,9 @@ GIGA TURRET / CANNON
 SHIPS IN PORTS
 
 
-# BOSS 
 
-- Slog it battles, that is slugfest and boss chases you about screen
-- all aim for his core at the same time
+- BOSS Slog it battles, that is slugfest and boss chases you about screen
+- BOSS all aim for his core at the same time
 
 - Consider reducing sizes of sprites to make it more realistic (tanks,mlrs especially)
 - UPGRADE TREE
@@ -119,8 +156,7 @@ SHIPS IN PORTS
 - chaff efficiency (limit number of chaff on screen) or just go with a ball of particles (save trans)
 - movement wind/streak effect
 - More ground damagable structs
-
-
+- NAVI ALLY, include story etc
 
 
 ## GUI IDEAS
@@ -151,6 +187,8 @@ KEEP: Currently, tank battles feel shmupy, lots of damage, carnage.
 1. Must have, Lots to dodge, lots to shoot, a lot happening.
 2. Must have MULTIPLE LAYERS
 3. MUST BE differentiable from the 10000 other Shmups (RPG element, Summon attack, Gameplay mechanics???). Joint teams.Shmup/Open pivot
+4. Dodging huge boss like bullet hell stream
+
 
 
 
@@ -235,7 +273,8 @@ https://www.youtube.com/watch?v=-10qqJ_f8ak
 
 BUNNIES, FOX, CATS on Mars, Venus and outposts
 Parallel world where we gen altered ourselves. Solar system has 40 billion peeps
-
+ - "Your earth isnt the same as ours"
+ - "Ssw the solar system wars"
 
 ## MUST 
 - LV 1 TUTORIAL, SHOWING EACH MOVE WITH SLOWDOWN...TAP C FOR CHAFF, TO MUSIC RYTHM REALLY MATTERS
@@ -351,6 +390,9 @@ Snippets: https://youtu.be/H6kvP0h0g9M?t=5
 
 ## STORY BOARDING
 
+
+
+
 ....One ship... just one ship, thats all it takes to destroy a system
 fermi paradox
 we know its coming, other planets already destroyed
@@ -360,6 +402,8 @@ earth is so yesterday.. (make it in game jibes)
 
 - EARTH HAS COME A LONG WAY SINCE THE FORMATION OF A WEIGHED FEDERATED ALLIANCE
   (SPACE SHIPS, MANS SHAKING HANDS)
+  - SSW 1 SSW 2
+  - propoganda, 
 
 - EARTH EXPANDED OUT FURTHER INTO THE HEAVENS 
 	 - PICTURES OF SHIPS BUILDING HABBITATES
@@ -419,3 +463,13 @@ DONE: Enemy placer, Remove jink timer, especially if lockon disabled,dont allow 
 GROUND AA with bullets   [5], GROUND AA With missiles (MLRS), In lockoff 1. Shoot init X,Y. left/Right should always move you in that dir. , in lockoff 2. limit spray angle to 45
 - Camera shake - Split out controls - CHAFF - BOAT enemy - GROUND damagable structures - Destroyed tanks, ground units leave husks - Buildings as second layer non-interactable 
 ISOMETRIC MISSILE BASE  - PLACE ME ANYWHERE LAYER
+- Objective class and automated progressor
+- objective arrow flashes to next objective.
+- Limit sectors until objectives complete
+- pointer times out after 3 seconds, B to show it
+ - keep enemies in quandrant
+
+ isometric base (build parts like fence) 
+ 	- Bomb
+- bomb
+- change selection criteria to be simply a square  

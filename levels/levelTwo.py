@@ -36,12 +36,30 @@ class levelTwo():
 
 
 
+		# --------- OBJECTIVES
+		# EACH ITEM IS AN OBJ, could be group of enemies, one enemy or location. 
+		self.objectives        = {'destroyAAQ1': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyTanksQ1','pauseGame':False, 'startMessage':'First up, take out the enemy AA, good luck!', 'completionMessage': 'Great job!','activeQuandrant': {'x':0 ,'w':0.5 *self.mapw ,'y':self.maph-2200 ,'h':2200} },
+								  'destroyTanksQ1': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'eliminateMissileBase','pauseGame':True,  'startMessage':'Next up, take out the heavy armoured tanks, use your range and missiles to make short work of them.', 'completionMessage': 'Nicely done!','activeQuandrant': {'x':0 ,'w':self.mapw ,'y':self.maph-2200 ,'h':self.maph} },
+								  'eliminateMissileBase': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyBioLab', 'pauseGame':False, 'startMessage':'Ok, next up is a real challenge, take out all MLRS launchers in the missile base - dont forget to use chaff!.', 'completionMessage': "Impressive! Keep it up!",'activeQuandrant': {'x':0 ,'w':self.mapw ,'y':5090 ,'h':self.maph} },
+								  'destroyBioLab': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'complete', 'pauseGame':True, 'startMessage':'You are doing great, now comes the real reason we brought you here. There is a Bio weapons lab to the north, take it out before they can get those cannisters into trucks. Good hunting!', 'completionMessage': "Damn! If this wasn't VR training i'd have to promote you or something.",'activeQuandrant': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph} }
+								  }
+		self.currentObjective    = 'destroyAAQ1'
+		self.objectiveTimer      = countUpTimer()
+		self.objectiveIntroState = 'notIntroduced'
+
+		self.objectives        = {'destroyAA': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyTanks', 'startMessage':'Welcome to training bootcamp rookie, first up, take out the enemy AA, good luck!', 'completionMessage': 'Great job!','activeQuandrant': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph}  },
+								  'destroyTanks': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':None, 'startMessage':'Next job, mop up them tanks.', 'completionMessage': 'Nicely done!' ,'activeQuandrant': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph} }
+								  }
+		self.currentObjective  = 'destroyAA'
+
+
 		# -------GUI STUFF
 
-		self.healthBar         = loadingBarClass(100,20,(80,220,80),(220,220,220),(0,0,200))
-		self.objectiveArrow    = imageAnimateAdvanced(gui.objectiveArrow,0.2)
-
-
+		self.healthBar             = loadingBarClass(100,20,(80,220,80),(220,220,220),(0,0,200))
+		self.objectiveArrow        = imageAnimateAdvanced(gui.objectiveArrow,0.2)
+		self.displayObjectiveArrow = False 
+		self.showObjectiveTimer  = stopTimer()
+		
 		# ------ LEVEL TIMER 
 
 		self.levelTimer      = countUpTimer()

@@ -12,10 +12,12 @@ def placeUnits(self,gui,game):
 		print("****Initializing Enemy list on gameMap as does not exist")
 		self.gameMap['enemyList'] = []
 
+	#print(len(self.gameMap['enemyList']))
 
 	# GET MAPTILE LIST
 	mapTiles = self.gameMap['metaTiles']
 	x,y = 0,0
+
 
 	self.tileHovered = False
 	for r in range(len(mapTiles)):
@@ -46,13 +48,14 @@ def placeUnits(self,gui,game):
 
 				
 
-				# --------SHOW ALL PLACED ENEMIES
+					# --------SHOW ALL PLACED ENEMIES
 
-				for enemy in self.gameMap['enemyList']:
-					if(r == enemy['row'] and c== enemy['col']):
+					for enemy in self.gameMap['enemyList']:
+						if(r == enemy['row'] and c== enemy['col']):
 
-						name = enemy['kind']
-						drawImage(gui.screen,gui.enemyDict[name]['image'],(x-gui.camX,y-gui.camY))
+							name = enemy['kind']
+							if(onScreen(x,y,200,200,gui)):
+								drawImage(gui.screen,gui.enemyDict[name]['image'],(x-gui.camX,y-gui.camY))
 
 
 				# --------DISPLAY SELECTED ENEMY

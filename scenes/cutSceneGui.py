@@ -34,6 +34,7 @@ class cutScene():
 
 
 
+
 		# STATE 
 		self.pannelOpen     = False
 		self.openingMessage = False
@@ -44,6 +45,7 @@ class cutScene():
 		# TEXT 
 		#self.dialogue       = scrollingDilaogue(gui,self.x,self.y,self.w,self.h,self.theme)
 		self.dialogue       = scrollingDialogueSimple()
+		self.backColour     = (0,0,0)
 
 		# LEFT SIDE
 		self.textX          = self.x + 0.4*self.w
@@ -138,7 +140,7 @@ class cutScene():
 		# -----------EXPAND PANNEL TO OPEN UP
 
 		if(self.pannelOpen==False and self.openingMessage==False):
-			pygame.draw.rect(gui.screen, (0,0,0), [self.x,self.y,self.wOpening,self.hOpening])
+			pygame.draw.rect(gui.screen, self.backColour, [self.x,self.y,self.wOpening,self.hOpening])
 			pygame.draw.rect(gui.screen, self.theme, [self.x,self.y,self.wOpening,self.hOpening],3)
 			if(self.wOpening<= self.w): self.wOpening += self.w/25
 			if(self.hOpening<= self.h): self.hOpening += self.h/25
@@ -149,7 +151,7 @@ class cutScene():
 		# -----------FTL REQUEST MESSAGE
 
 		elif(self.pannelOpen==False and self.openingMessage):
-			pygame.draw.rect(gui.screen, (0,0,0), [self.x,self.y,self.w,self.h])
+			pygame.draw.rect(gui.screen, self.backColour, [self.x,self.y,self.w,self.h])
 			pygame.draw.rect(gui.screen, self.theme, [self.x,self.y,self.w,self.h],4)
 			drawBlinkingText(gui.screen,gui.font, 'FTL Message Request',self.incomingX,self.incomingY, colour=(self.theme),blinkFraction=0.5)
 			complete,timeRemaining = self.openingTimer.countDownReal(self.msgFlashtime,game)
@@ -160,7 +162,7 @@ class cutScene():
 
 		else:
 			# ---------- DRAW CANVAS ONLY 
-			pygame.draw.rect(gui.screen, (0,0,0), [self.x,self.y,self.w,self.h])
+			pygame.draw.rect(gui.screen, self.backColour, [self.x,self.y,self.w,self.h])
 			pygame.draw.rect(gui.screen, self.theme, [self.x,self.y,self.w,self.h],3)
 			if(scene=='ally'):
 				gui.screen.blit(gui.allyUnderlay, (self.imageLeftX,self.imageY))
@@ -218,15 +220,35 @@ class cutScene():
 			# WHERE THE LEFT PICTURE IS SHOWN
 			self.imageLeftX = self.x + 0.05*self.w
 			self.imageY     = self.y + 10
+
+			self.textX          = self.x + 0.4*self.w
+			self.textY          = self.y + 0.11* self.h
+			self.textW  		= 0.5*self.w
+			self.textH          = 0.6*self.h
+			self.backColour     = (0,0,0)
+
+
 		if(self.orientation=='topRight'):
-			self.x            = gui.w - 1.4*gui.talkScreenW
-			self.y            = 10
-			self.w 		      = gui.w - self.x
-			self.h 		      = 1.1*gui.talkScreenH
+			self.x            = 0.84*gui.w
+			self.y            = 0.26 *gui.h
+			self.w 		      = 0.15*gui.w
+			self.h 		      = 0.19 *gui.h
 			self.incomingX    = self.x + 0.3*self.w
 			self.incomingY    = self.y + 0.45*self.h
-			self.imageLeftX = self.x + 0.05*self.w
-			self.imageY     = self.y + 10
+			
+			self.imageLeftX   = self.x
+			self.imageY       = 10
+			self.msgFlashtime = 1
+
+
+			self.textX          = self.x + 0.06*self.w
+			self.textW  		= 0.85*self.w
+			self.textY          = self.y + 0.07* self.h
+			self.textH          = 0.6*self.h
+
+			self.backColour     = (34,45,65)
+
+
 
 	def reset(self):
 		self.pannelOpen     = False

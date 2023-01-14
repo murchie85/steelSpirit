@@ -2,123 +2,89 @@ from utils._utils import *
 from utils.gameUtils import *
 
 
-def editMap(self,gui,game):
-	# GET MAPTILE LIST
-	mapTiles = self.gameMap['metaTiles']
+def spawnZones(self,gui,game):
 	
-	# USES THE type and index as keys to gui.tileDict
 
-	# MANAGES STATE
-	
-	if(gui.clicked and self.tileHovered and self.buttonsHovered!=True):
-		if(self.selectMode=='tile'):
-			if(self.tileSelecting==False and self.editingTile==False):
-				self.tileSelecting = True
-				gui.clicked        = False
-			elif(self.tileSelecting==True and self.editingTile==False):
-				self.editingTile = True
-				self.tileSelecting = False
-				gui.clicked = False
-		
+	# ------ draw back canvas
 
-
-	self.tileHovered = False
-	# draw back canvas
 	showUnderLayer(self,gui)
+	# ------ GET MAPTILE LIST
+	if('spawnZones' not in self.gameMap.keys()):
+		self.gameMap['spawnZones'] = []
 
-	if(self.selectMode=='tile'):
-		tileSelector(self,gui,game,mapTiles)
-	if(self.selectMode=='box'):
-		boxSelector(self,gui,game,mapTiles)
+	# ------USES THE type and index as keys to gui.tileDict
+	collidesWithExisting = False
+	startingColour       = (20,30,70)
+	collideIndex = 0
+	for sz in range(len(self.gameMap['spawnZones'])):
+		spawnZone = self.gameMap['spawnZones'][sz]
+		# DELETE EXISTING IF CLICKED
+		if(gui.mouseCollides(spawnZone[0]-gui.camX,spawnZone[1]-gui.camY,spawnZone[2],spawnZone[3])):
+			collidesWithExisting = True
+			collideIndex = sz
 
-
-
-
-	# SELECT TILES OR NAVIGATE MODE 
-
-	if(self.editingTile):
-		selectTile(self,gui)
-	else:
-		self.nav(gui)
-
-
-	self.guiMenuItems(gui,game)
-
-
-
-# --------TILE SELECTOR MODE 
-
-def tileSelector(self,gui,game,mapTiles):
-	x = 0
-	y = 0
-	for r in range(len(mapTiles)):
-		row = mapTiles[r]
-		
-		for c in range(len(row)):
-			col = row[c]
-
-			if(col['animated']==False ):
-				image = gui.tileDict[col['type']][col['index']]
-
-
-				# -----------IF HOVER MULTI-SELECT 
-
-				if(gui.mouseCollides(x-gui.camX,y-gui.camY,image.get_width(),image.get_height())):
-					self.tileHovered = True
-					if(self.tileSelecting):
-						# ADD TO EDIT LIST
-						selectedCoords = [r,c]
-						if(selectedCoords not in self.tileSelectionList): 
-							self.tileSelectionList.append(selectedCoords)
-
-				#  -----------IF SELECTED, SHOW BASE SELECTING TILE
-
-				if([r,c] in self.tileSelectionList and self.tileSelecting):
-					drawImage(gui.screen,gui.base100[2],(x-gui.camX,y-gui.camY))
-			
-				#  -----------IF EDITING, SHOW THE CURRENT BROWSED IMAGE
-
-				elif([r,c] in self.tileSelectionList and self.editingTile):
-					drawImage(gui.screen, gui.tileDict[self.tileOptions[self.tileOptionsIndex]][self.tileOptionsSubIndex],(x-gui.camX,y-gui.camY))
+		# MERGE JOINT BOXES
+		for sz2 in range(len(self.gameMap['spawnZones'])):
+			spawnZoneTwo = self.gameMap['spawnZones'][sz2]
+			if(sz==sz2):
+				pass
+			elif(collidesObjectless(spawnZone[0],spawnZone[1],spawnZone[2],spawnZone[3], spawnZoneTwo[0],spawnZoneTwo[1],spawnZoneTwo[2],spawnZoneTwo[3])):
+				rhs = max((spawnZone[0] + spawnZone[2]),(spawnZoneTwo[0] + spawnZoneTwo[2]))
+				bhs = max((spawnZone[1] + spawnZone[3]),(spawnZoneTwo[1] + spawnZoneTwo[3]))
+				nbx = min(spawnZone[0],spawnZoneTwo[0])
+				nby = min(spawnZone[1],spawnZoneTwo[1])
+				
+				newBox = [nbx,nby,rhs-nbx,bhs-nby]
+				print([sz,sz2])
+				print("{} and {} collide".format(str(spawnZone),str(spawnZone)))
+				# DELETE OLD BOXES
+				self.gameMap['spawnZones'].remove(spawnZone)
+				self.gameMap['spawnZones'].remove(spawnZoneTwo)
+				self.gameMap['spawnZones'].append(newBox)
+				return()
 
 
-			x += image.get_width()
+		# DRAW SPAWN ZONE
+		pygame.draw.rect(gui.screen,startingColour,(spawnZone[0]-gui.camX,spawnZone[1]-gui.camY,spawnZone[2],spawnZone[3]))
+		startingColour  = lighten(startingColour)
+		drawTextWithBackground(gui.screen,gui.font,str(sz),spawnZone[0]-gui.camX + 0.4*spawnZone[2],spawnZone[1]-gui.camY + 0.3*spawnZone[3],textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
 
-		y+= image.get_height()
-		x = 0
 
-def boxSelector(self,gui,game,mapTiles):
+
+	# ------MAKE A SPAWN ZONE BY DRAGGING MOUSE
+
+
+	if(collidesWithExisting and gui.clicked):
+		print('deleting ' + str(collideIndex))
+		del self.gameMap['spawnZones'][collideIndex]
+		gui.pressed=False
+		gui.clicked = False
+		return()
+	elif(self.buttonsHovered!=True):
+		boxSelector(self,gui,game)
+
+
+
+
+
+
+
+	# ------ SELECT TILES OR NAVIGATE MODE 
+
+	self.nav(gui)
+
+	# ------ MENU DISPLAY
+	self.guiMenuItems(gui,game,showSelectMode=False)
+
+
+
+def boxSelector(self,gui,game):
 
 	# SELECTING UNITS 
 	selectedArea = self.dragSelect.dragSelect(gui,gui.camX,gui.camY)
-	
-	# if CURSOR AREA SELECTION
 	if(selectedArea!=None):
-
-		mapTiles = self.gameMap['metaTiles']
-		x,y = 0,0
-		# USES THE type and index as keys to gui.layer2Dict
-		counter = 0
-
-		for r in range(len(mapTiles)):
-			row = mapTiles[r]
-			for c in range(len(row)):
-				col = row[c]
-				if(col['animated']==False ):
-					image = gui.tileDict[col['type']][col['index']]
-					if(collidesObjectless(x,y,image.get_width(),image.get_height(),selectedArea[0],selectedArea[1],selectedArea[2],selectedArea[3])):
-						selectedCoords = [r,c]
-						if(selectedCoords not in self.tileSelectionList): 
-							self.tileSelectionList.append(selectedCoords)
-
-				x += image.get_width()
-			y+= image.get_height()
-			x = 0
-
-		self.editingTile   = True
-		self.tileSelecting = False
-		self.selectMode    ='tile'  
-
+		if(selectedArea[2] > 1 and selectedArea[3] > 1):
+			self.gameMap['spawnZones'].append(selectedArea)
 
 
 

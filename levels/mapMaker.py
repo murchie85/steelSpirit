@@ -6,6 +6,7 @@ from levels.mapMakerEdit import *
 from levels.mapMakerLayer2 import *
 from levels.mapMakerUnits import *
 from levels.mapMakerTileLessL1 import * 
+from levels.mapMakerSpawnZones import *
 
 import os
 
@@ -21,10 +22,17 @@ class mapEditor():
 
 		self.gameMap           = None
 
+		# CURSOR SELECTION
+		self.dragSelect             = dragSelector()
+
+
 		# TILE SELECTION 
-		self.tileModes             = ['layer1','layer2','tilelessL1', 'Enemies']
+		self.tileModes             = ['layer1','layer2','tilelessL1', 'Enemies','spawnZones']
 		self.tileMode              = 'layer1'
 		self.editingTile           = False
+
+		self.selectModes           = ['tile','box']
+		self.selectMode            = 'tile'
 
 		# layer 1
 		self.tileOptions           = list(gui.tileDict.keys())
@@ -35,6 +43,7 @@ class mapEditor():
 		self.l2Options             = list(gui.layer2Dict.keys())
 		self.l2OptionsIndex      = 0
 		self.l2OptionsSubIndex   = 0
+		self.deleteL2Flag		 = False
 
 		# tileLess
 		self.t1Options           = list(gui.tilelessL1Dict.keys())
@@ -84,11 +93,19 @@ class mapEditor():
 
 		self.gameMap           = None
 
+		# CURSOR SELECTION
+		self.dragSelect             = dragSelector()
+
 		# TILE SELECTION 
-		self.tileModes             = ['layer1','layer2','tilelessL1', 'Enemies']
+		self.tileModes             = ['layer1','layer2','tilelessL1', 'Enemies','spawnZones']
 		self.tileMode              = 'layer1'
 		self.editingTile           = False
 		
+
+		self.selectModes           = ['tile','box']
+		self.selectMode            = 'tile'
+
+
 		self.tileOptions           = list(gui.tileDict.keys())
 		self.tileOptionsIndex      = 0
 		self.tileOptionsSubIndex   =  0
@@ -142,7 +159,7 @@ class mapEditor():
 		# ----------LOAD MAP 
 
 		if(self.state=='loadMap'):
-			loadMap(self,gui)
+			loadMap(self,gui,game)
 		
 		# ----------EDIT MAP (LAYER ONE)
 
@@ -159,8 +176,11 @@ class mapEditor():
 
 		# ----------EDIT ENEMIES
 
-		if(self.state=='enemyPlacement'):
-			placeUnits(self,gui,game)
+		if(self.state=='enemyPlacement'): placeUnits(self,gui,game)
+
+		# ----------EDIT SPAWN ZONES
+
+		if(self.state=='spawnZones'): spawnZones(self,gui,game)
 
 
 	def createNewMap(self,gui,game,externallyCalled=False,specifiedName='notSpecified'):
@@ -209,7 +229,10 @@ class mapEditor():
 			for row in range(gameMap['rows']):
 				currentRow = []
 				for col in range(gameMap['cols']):
-					currentRow.append({'placed': False, 'animated':False,'type':'base','index':0})
+					tileType= 'base'
+					if(gameMap['tileDims']==50):
+						tileType='smallbase'
+					currentRow.append({'placed': False, 'animated':False,'type':tileType,'index':0})
 
 				metaTiles.append(currentRow)
 
@@ -231,17 +254,24 @@ class mapEditor():
 		if(externallyCalled): 
 			return(False)
 
-	def guiMenuItems(self,gui,game):
+	def guiMenuItems(self,gui,game,showSelectMode=True):
 		# SAVE OR GO BACK
 
 		chosenFont = gui.largeFont
 		borderColour=(60,60,200)
 		
-		tw,th                          = getTextWidth(chosenFont,'A menu item.'),getTextHeight(chosenFont,'A menu item yep sure.')
-		save,tex,tey,saveHovered       = simpleButtonHovered(1100,0.93*gui.h,'Save',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
-		back,ttx,tty,backHovered       = simpleButtonHovered(tex + 0.1*tw,0.93*gui.h,'Back',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
-		tileMode,tex,tey,tileHovered   = simpleButtonHovered(tex + 0.1*tw,0.05*gui.h,self.tileMode,gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=(10,170,80), textColour=(255,255,255))
-		self.buttonsHovered            = saveHovered or backHovered or tileHovered
+		tw,th                                = getTextWidth(chosenFont,'A menu item.'),getTextHeight(chosenFont,'A menu item yep sure.')
+		save,tex,tey,saveHovered             = simpleButtonHovered(1100,0.93*gui.h,'Save',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+		back,ttx,tty,backHovered             = simpleButtonHovered(tex + 0.1*tw,0.93*gui.h,'Back',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+		tileMode,tex,tey,tileHovered         = simpleButtonHovered(tex + 0.1*tw,0.05*gui.h,self.tileMode,gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=(10,170,80), textColour=(255,255,255))
+		if(showSelectMode):
+			selectMode,tex,tey,selectModeHovered = simpleButtonHovered(0.1*tw,0.07*gui.h,self.selectMode,gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=(10,170,80), textColour=(255,255,255))
+		else:
+			selectMode,selectModeHovered  = False,False
+		
+		#self.selectModes           = ['tile','box']
+
+		self.buttonsHovered            = saveHovered or backHovered or tileHovered or selectModeHovered
 
 
 
@@ -267,6 +297,12 @@ class mapEditor():
 				gui.clicked = False
 			if(self.tileMode =='Enemies'):
 				self.state='enemyPlacement'
+			if(self.tileMode =='spawnZones'):
+				self.state='spawnZones'
+
+
+		if(selectMode):
+			self.selectMode = self.selectModes[(self.selectModes.index(self.selectMode) + 1) %len(self.selectModes)]
 
 		# -----PRINT OUT TEXT INFORMATION SUCH AS MAP SIZE
 
@@ -276,6 +312,8 @@ class mapEditor():
 		sentence = '(' +str(gui.mx+gui.camX) + ',' + str(gui.my+gui.camY) +')'
 		drawTextWithBackground(gui.screen,gui.font,sentence,50,800,setWidth=setWidth ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
 		
+
+
 		dictKeys    = list(self.gameMap.keys())
 		currentKey = dictKeys[self.guiDebugDisplayIndex]
 		printObj   = str(currentKey) + ': ' + str(self.gameMap[currentKey])
@@ -316,7 +354,7 @@ class mapEditor():
 		# ACCELELRATION FLAG
 		speed = 20
 		if('L' in pressedKeys):
-			speed = 40
+			speed = 60
 		# GET DIRECTION OF ACCELLERATION
 		if('W' in pressedKeys ):
 			gui.camY -= speed

@@ -108,18 +108,18 @@ gui.bunnyGirlYCover   = pygame.image.load(IMAGEASSETPATH + 'cover/bunnyGirlYello
 
 # ----- UNITS AND PLAYER 
 
-gui.player            = loadImageFiles('fighter1.png',IMAGEASSETPATH + 'fighter/',convert=False)
-gui.playerShooting    = loadImageFiles('fighterShooting1.png',IMAGEASSETPATH + 'fighter/',convert=False)
-gui.playerBoost       = loadImageFiles('fighterBoost1.png',IMAGEASSETPATH + 'fighter/',convert=False)
-gui.playerShadow      = loadImageFiles('shadow1.png',IMAGEASSETPATH + 'fighter/',convert=False)
-gui.playerHit         = loadImageFiles('playerHit1.png',IMAGEASSETPATH + 'fighter/',convert=False)
+gui.player            = loadImageFiles('fighter1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerShooting    = loadImageFiles('fighterShooting1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerBoost       = loadImageFiles('fighterBoost1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerShadow      = loadImageFiles('shadow1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerHit         = loadImageFiles('playerHit1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 
 
-gui.player            = loadImageFiles('g12_1.png',IMAGEASSETPATH + 'fighter/',convert=False)
-gui.playerShooting    = loadImageFiles('g12_Shooting1.png',IMAGEASSETPATH + 'fighter/',convert=False)
-gui.playerBoost       = loadImageFiles('g12_boost1.png',IMAGEASSETPATH + 'fighter/',convert=False)
-gui.playerShadow      = loadImageFiles('g12_Shadow1.png',IMAGEASSETPATH + 'fighter/',convert=False)
-gui.playerHit         = loadImageFiles('g12_Hit1.png',IMAGEASSETPATH + 'fighter/',convert=False)
+gui.player            = loadImageFiles('g12_1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerShooting    = loadImageFiles('g12_Shooting1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerBoost       = loadImageFiles('g12_boost1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerShadow      = loadImageFiles('g12_Shadow1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerHit         = loadImageFiles('g12_Hit1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 
 
 
@@ -127,6 +127,14 @@ gui.playerHit         = loadImageFiles('g12_Hit1.png',IMAGEASSETPATH + 'fighter/
 
 gui.scoutRed          = loadImageFiles('crabRed1.png',IMAGEASSETPATH + 'units/crab/',convert=False)
 gui.scoutRedHit       = loadImageFiles('crabRedhit1.png',IMAGEASSETPATH + 'units/crab/',convert=False)
+
+
+
+gui.hind              = loadImageFiles('hind1.png',IMAGEASSETPATH + 'units/hind/',convert=False)
+gui.hindHit           = loadImageFiles('hindHit1.png',IMAGEASSETPATH + 'units/hind/',convert=False)
+
+
+
 
 gui.tank              = loadImageFiles('sandTank1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
 gui.tankHit           = loadImageFiles('sandTankHit1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
@@ -142,6 +150,13 @@ gui.greenTurret            = [pygame.image.load(IMAGEASSETPATH + 'units/tank/gre
 gui.greenTurretHit         = loadImageFiles('greenTankTurretHit1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
 gui.greenTankStatic        = pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTankStatic.png')
 gui.greenTankRemains       = loadImageFiles('greenTankCarcass1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
+
+gui.snowTank               = loadImageFiles('snowTank1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
+gui.snowTankHit            = loadImageFiles('snowTankhit1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
+gui.snowTurret             = [pygame.image.load(IMAGEASSETPATH + 'units/tank/snowTurret.png')]
+gui.snowTurretHit          = loadImageFiles('snowTurretHit1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
+gui.snowTankStatic         = pygame.image.load(IMAGEASSETPATH + 'units/tank/snowTankStatic.png')
+gui.snowTurretRemains      = loadImageFiles('tankCarcass1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
 
 
 gui.attackBoat              = loadImageFiles('attackBoat1.png',IMAGEASSETPATH + 'units/attackBoat/',convert=False)
@@ -183,14 +198,23 @@ gui.barrelGroupRedRemains     = loadImageFiles('barellGroupRedRemains1.png',IMAG
 
 # ---------BULLETS AND WEAPONS
 
-gui.slitherShot            = loadImageFiles('slither1.png',IMAGEASSETPATH + 'ordinance/',convert=False)
+gui.slitherShot            = loadImageFiles('slither1.png',IMAGEASSETPATH + 'ordinance/slither/',convert=False)
 gui.triBlast               = loadImageFiles('triBlast1.png',IMAGEASSETPATH + 'ordinance/',convert=False)
-gui.yellowPlasma           = loadImageFiles('yellowPlasmaBall1.png',IMAGEASSETPATH + 'ordinance/',convert=False)
+gui.yellowPlasma           = loadImageFiles('yellowPlasmaBall1.png',IMAGEASSETPATH + 'ordinance/plasma/yellowPlasma/',convert=False)
+gui.redPlasma              = loadImageFiles('redPlasmaBall1.png',IMAGEASSETPATH + 'ordinance/plasma/redPlasma/',convert=False)
 gui.hotRound               = loadImageFiles('hotRound1.png',IMAGEASSETPATH + 'ordinance/hotRound/',convert=False)
 
 gui.streakerMissile        = loadImageFiles('missile1.png',IMAGEASSETPATH + 'ordinance/missiles/',convert=False)
 gui.streakerGray           = loadImageFiles('grayMissile1.png',IMAGEASSETPATH + 'ordinance/missiles/',convert=False)
+gui.nukeMissile            = loadImageFiles('nuke1.png',IMAGEASSETPATH + 'ordinance/missiles/',convert=False)
 gui.missilePlume           = loadImageFiles('missilePlume1.png',IMAGEASSETPATH + 'ordinance/plumes/',convert=False,alphaConvert=True)
+
+
+gui.bombShockFrames        = loadImageFiles('bombShock1.png',IMAGEASSETPATH + 'ordinance/bomb/',convert=False,alphaConvert=True)
+gui.bombBlastFrames        = loadImageFiles('bomb1.png',IMAGEASSETPATH + 'ordinance/bomb/',convert=False,alphaConvert=True)
+
+
+
 
 # SETTING TRANS
 #[x.set_colorkey((0, 0, 0)) for x in gui.missilePlume]
@@ -198,7 +222,7 @@ gui.missilePlume           = loadImageFiles('missilePlume1.png',IMAGEASSETPATH +
 
 
 #gui.missilePlumeLong       = loadImageFiles('missilePlumeLong1.png',IMAGEASSETPATH + 'ordinance/plumes/',convert=False)
-gui.missileExplosion       = loadImageFiles('missileExplosion1.png',IMAGEASSETPATH + 'explosions/missileExplosion/',convert=False)
+gui.missileExplosion       = loadImageFiles('missileExplosion1.png',IMAGEASSETPATH + 'ordinance/explosions/missileExplosion/',convert=False)
 
 gui.chaffHead              = loadImageFiles('chaffHead1.png',IMAGEASSETPATH + 'ordinance/flares/',convert=False)
 
@@ -207,21 +231,37 @@ gui.lockOn                 = loadImageFiles('lockon1.png',IMAGEASSETPATH + 'gui/
 gui.lockOnStill            = pygame.image.load(IMAGEASSETPATH + '/gui/stillLockedOn.png')
 
 # ---------TILE SETS
-gui.grassTiles         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/grassV1/',convert=True)
-gui.grassLight         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/grassLight/',convert=True)
+gui.grassTiles         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/grass/grassV1/',convert=True)
+gui.grassLight         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/grass/grassLight/',convert=True)
 gui.concreteTiles      = loadImageFiles('concrete1.png',IMAGEASSETPATH + 'tilesets/concrete/',convert=True)
-gui.sandTiles          = loadImageFiles('sand1.png',IMAGEASSETPATH + 'tilesets/sandv1/',convert=True)
+gui.sandTiles          = loadImageFiles('sand1.png',IMAGEASSETPATH + 'tilesets/sand/sandv1/',convert=True)
 gui.base100            = loadImageFiles('base100_1.png',IMAGEASSETPATH + 'tilesets/template/',convert=True)
 gui.water              = loadImageFiles('water1.png',IMAGEASSETPATH + 'tilesets/water/',convert=True)
+gui.snow               = loadImageFiles('snow1.png',IMAGEASSETPATH + 'tilesets/snowlv/snow/',convert=True)
+gui.snowLake           = loadImageFiles('snowlake1.png',IMAGEASSETPATH + 'tilesets/snowlv/snowLake/',convert=True)
+
+gui.smallGrassTiles         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/50/grass/grassV1/',convert=True)
+gui.smallConcreteTiles      = loadImageFiles('concrete1.png',IMAGEASSETPATH + 'tilesets/50/concrete/',convert=True)
+gui.smallSandTiles          = loadImageFiles('sand1.png',IMAGEASSETPATH + 'tilesets/50/sand/sandv1/',convert=True)
+gui.smallBase100            = loadImageFiles('base100_1.png',IMAGEASSETPATH + 'tilesets/50/template/',convert=True)
+gui.smallWater              = loadImageFiles('water1.png',IMAGEASSETPATH + 'tilesets/50/water/',convert=True)
+gui.smallSnow               = loadImageFiles('snow1.png',IMAGEASSETPATH + 'tilesets/50/snowlv/snow/',convert=True)
+gui.smallSnowLake           = loadImageFiles('snowlake1.png',IMAGEASSETPATH + 'tilesets/50/snowlv/snowLake/',convert=True)
+
 
 # LAYER 2 
-gui.pilonDR            = loadImageFiles('pilon1.png',IMAGEASSETPATH + 'tilesets/pilonDiagonalRight/',convert=False)
-gui.pilonDL            = loadImageFiles('pilon1.png',IMAGEASSETPATH + 'tilesets/pilonDiagonalLeft/',convert=False)
+gui.pilonDR            = loadImageFiles('pilon1.png',IMAGEASSETPATH + 'tilesets/pilons/pilonDiagonalRight/',convert=False)
+gui.pilonDL            = loadImageFiles('pilon1.png',IMAGEASSETPATH + 'tilesets/pilons/pilonDiagonalLeft/',convert=False)
 gui.backObjects        = loadImageFiles('obj1.png',IMAGEASSETPATH + 'tilesets/objects/',convert=False)
 
 # TILELESS LAYER 
-gui.missileBase        =loadImageFiles('missileBase1.png',IMAGEASSETPATH + 'tilesets/missileBase/',convert=False,alphaConvert=True)
-gui.missileBaseBldings =loadImageFiles('buildings1.png',IMAGEASSETPATH + 'tilesets/missileBase/',convert=False,alphaConvert=True)
+#gui.missileBase        =loadImageFiles('missileBase1.png',IMAGEASSETPATH + 'tilesets/missileBase/',convert=False,alphaConvert=True)
+#gui.missileBaseBldings =loadImageFiles('buildings1.png',IMAGEASSETPATH + 'tilesets/missileBase/',convert=False,alphaConvert=True)
+#gui.snowBase           =loadImageFiles('snowbase1.png',IMAGEASSETPATH + 'tilesets/snowlv/snowBase/',convert=False,alphaConvert=True)
+
+#gui.isoMetric           =loadImageFiles('iso1.png',IMAGEASSETPATH + 'tilesets/ISOMETRIC/',convert=True,alphaConvert=False)
+#[x.set_colorkey((0, 0, 0)) for x in gui.isoMetric]
+#[x.set_alpha(130) for x in gui.isoMetric]
 
 
 gui.tileDict           = {'Grass': gui.grassTiles,
@@ -230,49 +270,63 @@ gui.tileDict           = {'Grass': gui.grassTiles,
 						  'sand': gui.sandTiles,
 						  'base': gui.base100,
 						  'water': gui.water,
+						  'snow': gui.snow,
+						  'snowLake':gui.snowLake,
+
+						  'smallGrass': gui.smallGrassTiles,
+						  'smallConcrete': gui.smallConcreteTiles,
+						  'smallsand': gui.smallSandTiles,
+						  'smallbase': gui.smallBase100,
+						  'smallwater': gui.smallWater,
+						  'smallsnow': gui.smallSnow,
+						  'smallsnowLake':gui.smallSnowLake
+
+
 						  }
 
-gui.layer2Dict           = {'Grass': gui.grassTiles,
-						  'grassLight': gui.grassLight,
-						  'Concrete': gui.concreteTiles,
-						  'sand': gui.sandTiles,
-						  'base': gui.base100,
-						  'water': gui.water,
+gui.layer2Dict           = {'base': gui.base100,
 						  'pilonDR': gui.pilonDR,
 						  'pilonDL:': gui.pilonDL,
 						  'objects': gui.backObjects
 						  }
 
 gui.tilelessL1Dict      = {
-						  'missileBase': gui.missileBase,
 						  'pilonDR': gui.pilonDR,
 						  'pilonDL': gui.pilonDL,
 						  'objects': gui.backObjects,
-						  'buildings': gui.missileBaseBldings
 						  }
 
-
+"""
+						  'missileBase': gui.missileBase,
+						  'buildings': gui.missileBaseBldings,
+						  'snowBase': gui.snowBase
+"""
 
 gui.enemyDict          = {'scout':{'special':['command1','command2'],'image': gui.scoutRed[0]}, 
 						  'tank':{'special':['command1','command2'],'image': gui.tankStatic},
 						  'greenTank':{'special':['command1','command2'],'image': gui.greenTankStatic},
+						  'snowTank':{'special':['command1','command2'],'image': gui.snowTankStatic},
 						  'attackBoat':{'special':['command1','command2'],'image': gui.attackBoatStatic},
 						  'mlrs':{'special':['command1','command2'],'image': gui.mlrsStatic},
 						  'aaSmall':{'special':['command1','command2'],'image': gui.aaSmallStatic}, 
 						  'bioLab':{'special':['command1','command2'],'image': gui.bioLab[0]},
 						  'barrelRed':{'special':['command1','command2'],'image': gui.barrelGroupRed[0]}, 
+						  'hind':{'special':['command1','command2'],'image': gui.hind[0]}, 
 
 							}
 
 
 
-gui.smallRedExplosion      = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'explosions/smallExplosion/')
-gui.redExplosion          = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'explosions/explosion/')
-gui.bigCloudyExplosion     = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'explosions/bigCloud/')
-gui.smallCloudyExplosion   = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'explosions/cloudExplosion/')
-gui.smallYellowExplosion   = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'explosions/explosionParticle/')
+gui.smallRedExplosion      = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'ordinance/explosions/smallExplosion/')
+gui.redExplosion           = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'ordinance/explosions/explosion/')
+gui.barrelExplosion        = loadImageFiles('barrelExplosion1.png',IMAGEASSETPATH + 'ordinance/explosions/barrellExplosion/')
+gui.bigCloudyExplosion     = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'ordinance/explosions/bigCloud/')
+gui.smallCloudyExplosion   = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'ordinance/explosions/cloudExplosion/')
+gui.smallYellowExplosion   = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'ordinance/explosions/explosionParticle/')
 
 
+gui.shrapnellA             =  loadImageFiles('shrapnell1.png',IMAGEASSETPATH + 'SFX/shrapnell/')      
+gui.shrapnellPlume         =  loadImageFiles('plume1.png',IMAGEASSETPATH + 'SFX/shrapnellPlume/')      
 
 # ----- GUI ICONS 
 
@@ -298,7 +352,9 @@ gui.claireBlink       = pygame.image.load(IMAGEASSETPATH + 'characters/claire/cl
 gui.claireTalk        = loadImageFiles('claireTalk1.png',IMAGEASSETPATH + 'characters/claire/')
 gui.claireShocked     = loadImageFiles('claireShocked1.png',IMAGEASSETPATH + 'characters/claire/')
 talkFrames            = 3* gui.claireTalk + [gui.claireBlink]
+gui.claireSmileFrames = loadImageFiles('claireSmiling1.png',IMAGEASSETPATH + 'characters/claire/')
 gui.claireTalking     = imageAnimateAdvanced(talkFrames,0.2)
+gui.clareSmiling      = imageAnimateAdvanced(gui.claireSmileFrames,0.2)
 gui.talkScreenW       = gui.claireTalk[0].get_width()
 gui.talkScreenH       = gui.claireTalk[0].get_height()
 

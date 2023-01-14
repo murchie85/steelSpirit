@@ -40,7 +40,8 @@ class bioLab(parent):
 
 
 		# CLASS OVERRIDES
-		self.hp              = 200
+		self.defaultHp       = 2000
+		self.hp              = 2000
 		self.defaultSpeed    = 1
 		self.maxSpeed        = 1
 		self.maxSpeedDefault = 1

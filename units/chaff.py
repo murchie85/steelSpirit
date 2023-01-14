@@ -7,7 +7,7 @@ import random
 
 
 
-class flare():
+class chaff():
 	def __init__(self,gui,x,y,bid,classification,facing,playerSpeed=3, speed=3,damage=10,jink='left', source='player'):
 		self.x,self.y          = x,y
 		self.ox,self.oy        = x,y
@@ -128,12 +128,16 @@ class plume():
 		self.y               = y
 		self.plumeImg        = gui.missilePlume
 		self.plumeFrames     = imageAnimateAdvanced(self.plumeImg,0.2)
+		self.w 				 = self.plumeImg[0].get_width()
+		self.h 				 = self.plumeImg[1].get_height()
 		self.facing          = facing
 
 	def drawSelf(self,gui,game,lv):
 		x,y = self.x -gui.camX, self.y -gui.camY
+
+		plumeOnScreen = onScreen(self.x,self.y,self.w,self.h,gui)
 		
-		complete, frames = self.plumeFrames.animate(gui,'plume Frames',[x,y],game,rotation=self.facing-90)
+		complete, frames = self.plumeFrames.animate(gui,'plume Frames',[x,y],game,rotation=self.facing-90,skipBlit= not plumeOnScreen)
 		if(complete):
 			lv.plumeList.remove(self)
 

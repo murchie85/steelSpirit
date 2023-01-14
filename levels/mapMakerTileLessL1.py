@@ -52,13 +52,31 @@ def tilelessL1(self,gui,game):
 
 		# SHOW BOTTOM LAYER
 		showUnderLayer(self,gui)
-
 		if(self.buttonsHovered!=True):
+
+
+			# --- TILE ALREADY EXISTS
+			if(not self.editingTile and self.tl1SelectionState == None):
+				
+				for t in range(0,len(self.gameMap['tilelessL1'])):
+					tile = self.gameMap['tilelessL1'][t]
+					image = gui.tilelessL1Dict[tile['dictKey']][tile['index']]
+					if(gui.mouseCollides(tile['x']-gui.camX,tile['y']-gui.camY,image.get_width(),image.get_height())):
+						drawImage(gui.screen,gui.base100[3],(gui.mx,gui.my))
+						if(gui.clicked):
+							del self.gameMap['tilelessL1'][t]
+							gui.clicked=False
+							return()
+
+
+
 			# ---- GO TO SELECT ITEM 
 			if(gui.clicked and not self.editingTile and self.tl1SelectionState == None):
 				self.editingTile = True
 				gui.clicked = False
+
 			
+
 			# DRAW THE ITEM AT THE CURSOR 
 			if(not self.editingTile and self.tl1SelectionState == 'placingItem'):
 				image = gui.tilelessL1Dict[self.t1Options[self.t1OptionsIndex]][self.t1OptionsSubIndex]
@@ -114,22 +132,30 @@ def selectL2Tile(self,gui):
 
 	#---------TILE LIST SELECTOR
 
-	tx,ty = 0.75*gui.w,0.2*gui.h
+	tx,ty = 0.25*gui.w,0.6*gui.h
 	tcx = tx
 	currentTiles  = gui.tilelessL1Dict[self.t1Options[self.t1OptionsIndex]]
 	colCounter,rowCounter = 0,0
 	hoverSelectedTileSubIndex = None
 	inrementPageB  = gui.input.returnedKey.upper() == 'F'
-	inrementPage   = drawSelectableImage(gui.base100[4],gui.base100[5],(tx+190	,ty+480),gui)
-	decrementPage  = drawSelectableImage(gui.base100[6],gui.base100[7],(tx,ty+480),gui)
+	inrementPage   = drawSelectableImage(gui.base100[4],gui.base100[5],(tx-190	,ty),gui)
+	decrementPage  = drawSelectableImage(gui.base100[6],gui.base100[7],(tx-190,ty+100),gui)
 
-	if(decrementPage):  self.pagedIndex -= self.previousIndex
+	if(decrementPage):  self.pagedIndex = self.previousIndex
 	if(self.pagedIndex<0): self.pagedIndex = 0
 	
+	# SHOW TILE PREVIEW 
 	if(self.pagedIndex>len(currentTiles)-1): self.pagedIndex = len(currentTiles)-1
 	for i in range(self.pagedIndex,len(currentTiles)):
 		x = currentTiles[i]
-		drawImage(gui.screen,x,(tx,ty))
+		
+		# draw the image 
+		if(x.get_width() > 300):
+			drawImage(gui.screen,x,(tx,ty),(0.5*x.get_width(),0.5*x.get_height(),100,100))
+		else:
+			drawImage(gui.screen,x,(tx,ty))
+		
+
 		if(gui.mouseCollides(tx,ty,100,100)):
 			pygame.draw.rect(gui.screen,(200,200,200),(tx,ty,100,100),5)
 			hoverSelectedTileSubIndex = i
@@ -137,12 +163,12 @@ def selectL2Tile(self,gui):
 			pygame.draw.rect(gui.screen,(5,9,20),(tx,ty,100,100),5)
 		tx+= 95
 		colCounter+=1
-		if(colCounter>=3):
+		if(colCounter>=10):
 			rowCounter +=1
 			tx = tcx
 			ty += 95
 			colCounter = 0
-			if(rowCounter>4):
+			if(rowCounter>3):
 				if(inrementPage or inrementPageB):
 					self.previousIndex = self.pagedIndex
 					self.pagedIndex = i

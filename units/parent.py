@@ -19,12 +19,14 @@ class parent():
 		self.facing          = 90
 		self.alive           = True
 
+
 		# SHOULD BE OVERRIDEN
 
 		self.hitImage         = gui.scoutRedHit
 		self.hitAnimation     = imageAnimateAdvanced(self.hitImage,0.2)
 
 
+		self.seekStrafe      = False
 		# ATTRIBUTES 
 		self.hp              = 100
 		self.speed           = 0
@@ -34,6 +36,8 @@ class parent():
 		self.slowDown        = False
 
 		self.decelleration  = 0.2
+
+		self.shrapnellEjected = False
 
 
 
@@ -101,7 +105,24 @@ class parent():
 			if(self.speed<=0):
 				self.speed =0
 				self.slowDown = False
-		
+	
+	def moveBackwards(self):
+		vel_x = self.speed * math.cos(math.radians(360-self.facing))
+		vel_y = self.speed * math.sin(math.radians(360-self.facing))
+
+		self.x -= vel_x 
+		self.y -= vel_y
+
+		# BRING SPEED TO SLOW STOP
+		if(self.slowDown):
+			self.speed -= self.slowAmount * self.defaultSpeed
+			if(self.speed<=0):
+				self.speed =0
+				self.slowDown = False
+
+
+
+	
 	
 	def stayOnField(self,lv):
 		# BORDER CLAMP
@@ -127,6 +148,13 @@ class parent():
 				self.debris +=1
 				# ADDS DEBRIS TO TO LIST
 				lv.bulletList.append(bullet(gui,self.x + 0.5* self.chosenExplosionImg[0].get_width(),self.y+ 0.5* self.chosenExplosionImg[0].get_height(),bid,'debris',random.randrange(0,360),'debris',speed=10, w=3,h=3,colour=(192,192,192)))
+			
+			# ADD FLYING SHRAPNELL 50% of the time
+			if(random.choice([1,2])==1 and not self.shrapnellEjected):
+				self.shrapnellEjected = True
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.x + 0.5* self.chosenExplosionImg[0].get_width(),self.y+ 0.5* self.chosenExplosionImg[0].get_height(),bid,'shrapnell',random.randrange(0,360),'shrapnell',speed=7,shrapnellType='A'))
+			
 			if(complete):
 				self.destructionComplete = True
 

@@ -223,18 +223,55 @@ def collidesWith(self,enemy,spacing=1):
 
 def collidesWithHitBox(self,enemy):
 
-  # Check if the self's x-coordinate is within the enemy's x-coordinate range
-  if self.x >= enemy.x and self.x <= enemy.x + enemy.w:
-    # Check if the self's y-coordinate is within the enemy's y-coordinate range
-    if self.y >= enemy.y and self.y <= enemy.y + enemy.h:
-      return (True)
+	# Check if the self's x-coordinate is within the enemy's x-coordinate range
+	if self.x >= enemy.x and self.x <= enemy.x + enemy.w:
+		# Check if the self's y-coordinate is within the enemy's y-coordinate range
+		if self.y >= enemy.y and self.y <= enemy.y + enemy.h:
+			return (True)
  
-  # Check if the enemy's x-coordinate is within the self's x-coordinate range
-  if enemy.x >= self.x and enemy.x <= self.x + self.w:
-    # Check if the enemy's y-coordinate is within the self's y-coordinate range
-    if enemy.y >= self.y and enemy.y <= self.y + self.h:
-      return (True)
-  return (False)
+	# Check if the enemy's x-coordinate is within the self's x-coordinate range
+	if enemy.x >= self.x and enemy.x <= self.x + self.w:
+		# Check if the enemy's y-coordinate is within the self's y-coordinate range
+		if enemy.y >= self.y and enemy.y <= self.y + self.h:
+			return (True)
+	return (False)
+
+
+
+def collidesWithObjectLess(x,y,w,h,vehicle):
+
+	# Check if the self's x-coordinate is within the vehicle's x-coordinate range
+	if x >= vehicle.x and x <= vehicle.x + vehicle.w:
+		# Check if the self's y-coordinate is within the vehicle's y-coordinate range
+		if y >= vehicle.y and y <= vehicle.y + vehicle.h:
+			return (True)
+ 
+	# Check if the vehicle's x-coordinate is within the self's x-coordinate range
+	if vehicle.x >= x and vehicle.x <= x + w:
+		# Check if the vehicle's y-coordinate is within the self's y-coordinate range
+		if vehicle.y >= y and vehicle.y <= y + h:
+			return (True)
+	return (False)
+
+
+def collidesObjectless(x,y,w,h,x1,y1,w1,h1):
+
+	# Check if the self's x-coordinate is within the vehicle's x-coordinate range
+	if x >= x1 and x <= x1 + w1:
+		# Check if the self's y-coordinate is within the vehicle's y-coordinate range
+		if y >= y1 and y <= y1 + h1:
+			return (True)
+ 
+	# Check if the vehicle's x-coordinate is within the self's x-coordinate range
+	if x1 >= x and x1 <= x + w:
+		# Check if the vehicle's y-coordinate is within the self's y-coordinate range
+		if y1 >= y and y1 <= y + h:
+			return (True)
+	return (False)
+
+
+
+
 
 
 
