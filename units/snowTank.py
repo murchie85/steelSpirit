@@ -12,6 +12,7 @@ class snowTank(parent):
 		self.kind           = 'vechicle'
 		self.images         = imageAnimateAdvanced(gui.snowTank,0.2)
 		self.turretImage    = imageAnimateAdvanced(gui.snowTurret,0.2)
+		self.shadow         = imageAnimateAdvanced(gui.snowTankShadow,0.2)
 		self.x,self.y       = 500,500
 		if(x!=None): self.x = x
 		if(y!=None): self.y = y
@@ -150,7 +151,7 @@ class snowTank(parent):
 				self.bulletsFired +=1
 				# ADDS BULLET TO BULLET LIST
 				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
-				lv.bulletList.append(bullet(gui,self.turretPos['midTop'][0] + gui.camX,self.turretPos['midTop'][1]+ gui.camY,bid,self.classification, self.turretFacing,'tankShell', speed=7,damage=2,colour=[200,80,20],w=10,h=10 ))
+				lv.bulletList.append(bullet(gui,self.turretPos['midTop'][0] + gui.camX,self.turretPos['midTop'][1]+ gui.camY,bid,self.classification, self.turretFacing,'tankShell', speed=7,damage=2,colour=[200,80,20],w=8,h=8 ))
 			
 
 
@@ -168,9 +169,12 @@ class snowTank(parent):
 	def drawSelf(self,gui,game,lv):
 		x,y = self.x - gui.camX,self.y  - gui.camY
 		
-
+		shadow_x = x + 15
+		shadow_y = y + 15
+		self.shadow.animate(gui,'aa shadow',[shadow_x,shadow_y],game,rotation=self.facing-90)
 
 		if(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) and not self.hit):
+
 			animate,self.blitPos     = self.images.animate(gui,'tank' + str(self.id),[x,y],game,rotation=self.facing-90)
 			turretAnimage,self.turretPos  = self.turretImage.animate(gui,'turret' + str(self.id),[x,y],game,rotation=self.turretFacing-90)
 

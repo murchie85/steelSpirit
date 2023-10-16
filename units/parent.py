@@ -56,18 +56,6 @@ class parent():
 		self.hit 				 = False
 
 
-
-
-		# ERRATIC STEERING
-		self.steeringToggle   = True
-		self.steeringLimit    = 60
-		self.steeringMaxDelay = 3
-		self.steeringDelay    = 1                       # BUFF
-		self.steeringTimer    = stopTimer()
-		self.steeringCounter  = 0
-
-
-
 		# SHOOTING
 		self.shootToggle        = True  				#	SET BY BUTTON 
 		self.shootEnabled       = True                  # BUFF

@@ -158,7 +158,7 @@ class missile():
 
 			# CHECK IF DISTANCE EXCEEDS RANGE
 			if(abs(self.cumulatedDistance)> self.nukeRange):
-				self.killMissile(lv,killMissilesssage=' detonating Nuke')
+				self.killSelf(lv,killMessage=' detonating Nuke')
 
 
 
@@ -219,16 +219,16 @@ class missile():
 			if(bullet.classification!=self.classification and bullet.classification!='debris' and self.missileType!='nuke'):
 				if(collidesWithHitBox(bullet,self)):
 					# destroy self
-					self.killMissile(lv,killMissilesssage=str(self.missileType) + ' struck by bullet')
+					self.killSelf(lv,killMessage=str(self.missileType) + ' struck by bullet')
 					# destroy attacking bullet
 					if(bullet.ordType=='bullet'):
-						bullet.killBullet(lv,killBulletsssage='struck by missile',printme=True)
+						bullet.killSelf(lv,killMessage='struck by missile',printme=True)
 
 
 
 		
 		# IGNORING ON SCREEN, TERMINATES WITH RANGE
-		#if(not onScreen(self.x,self.y,self.w,self.h,gui)): self.killMissile(lv,killMissilesssage='bullet out of screen')
+		#if(not onScreen(self.x,self.y,self.w,self.h,gui)): self.killSelf(lv,killMessage='bullet out of screen')
 
 	
 	def getRelativeDistanceTravelled(self):
@@ -241,7 +241,7 @@ class missile():
 		
 		# CHECK IF DISTANCE EXCEEDS RANGE
 		if(abs(self.cumulatedDistance)> self.range):
-			self.killMissile(lv,killMissilesssage=' Missile fuel burnout OUT OF RANGE')
+			self.killSelf(lv,killMessage=' Missile fuel burnout OUT OF RANGE')
 
 
 
@@ -255,7 +255,7 @@ class missile():
 			
 			target.hp -= self.damage
 			target.hit = True
-			self.killMissile(lv,killMissilesssage='struck enemy')
+			self.killSelf(lv,killMessage='struck enemy')
 
 			# ----KILL THE ENEMY 
 			if(target.hp<=0):
@@ -264,14 +264,14 @@ class missile():
 
 	# ENSURE MISSILE DIES. 
 
-	def killMissile(self,lv,killMissilesssage=None,printme=False):
+	def killSelf(self,lv,killMessage=None,printme=False):
 		for i in lv.bulletList:
 			if(self.id==i.id):
 				self.alive = False
 				lv.bulletList.remove(self)
 				lv.deadList.append(self)
 				if(printme):
-					print("Missile destroyed : " + killMissilesssage + ' ' + str(self.classification))
+					print("Missile destroyed : " + killMessage + ' ' + str(self.classification))
 
 
 	# ONLY DRAW IF IN BOUNDARY

@@ -12,6 +12,7 @@ class greenTank(parent):
 		self.kind           = 'vechicle'
 		self.images         = imageAnimateAdvanced(gui.greenTank,0.2)
 		self.turretImage    = imageAnimateAdvanced(gui.greenTurret,0.2)
+		self.shadow         = imageAnimateAdvanced(gui.greenTankShadow,0.2)
 		self.x,self.y       = 500,500
 		if(x!=None): self.x = x
 		if(y!=None): self.y = y
@@ -168,7 +169,9 @@ class greenTank(parent):
 	def drawSelf(self,gui,game,lv):
 		x,y = self.x - gui.camX,self.y  - gui.camY
 		
-
+		shadow_x = x + 10
+		shadow_y = y + 10
+		self.shadow.animate(gui,'aa shadow',[shadow_x,shadow_y],game,rotation=self.facing-90)
 
 		if(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) and not self.hit):
 			animate,self.blitPos     = self.images.animate(gui,'tank' + str(self.id),[x,y],game,rotation=self.facing-90)

@@ -20,21 +20,24 @@ class levelFour():
 
 		# in game objects
 
-		self.bulletList        = []
-		self.plumeList         = []
-		self.allyList          = []
-		self.enemyList         = []
-		self.unfieldedEnemies  = [] # this contains remaining enemies to put on the  board
-		self.defaultEnemyList  = [] # This contains a backup
-		self.deadList          = []
-		self.fids              = [1]
+		self.bulletList         = []
+		self.plumeList          = []
+		self.allyList           = []
+		self.enemyList          = []
+		self.enemyComponentList = [] # THINGS LIKE TURRETS ETC
+		self.unfieldedEnemies   = [] # this contains remaining enemies to put on the  board
+		self.defaultEnemyList   = [] # This contains a backup
+		self.deadList           = []
+		self.terrainList        = []
+		self.fids               = [1]
 
 		self.enemyDestroyed = False
 
 
 		self.log              = []
 		self.remainingEnemies = None
-		self.pauseGame        = False
+		self.holdGame        = False
+		self.gamePaused 		  = False
 
 		# -------GUI STUFF
 
@@ -46,15 +49,18 @@ class levelFour():
 		
 
 		# --------- OBJECTIVES
-		# EACH ITEM IS AN OBJ, could be group of enemies, one enemy or location. 
-		self.spawn_1           = {'spawnCount': 3,'spawnIndex':0, 'spawn' : [{'type': 'hind','count':5, 'direction': 'front','spawnLocation':self.gameMap['spawnZones'][0]}, {'type': 'hind','count':3, 'direction': 'front','spawnLocation': self.gameMap['spawnZones'][1]},{'type': 'hind','count':8, 'direction': 'front','spawnLocation': self.gameMap['spawnZones'][2]} ]}
+		# each spawn sequentially called 
+		self.spawn_1           = {'spawnCount': 1,'spawnIndex':0, 'spawn' : [{'type': 'hind','count':3, 'direction': 'front','spawnLocation':self.gameMap['spawnZones'][0]}]}
+		self.spawn_2           = {'spawnCount': 2,'spawnIndex':0, 'spawn' : [{'type': 'hind','count':4, 'direction': 'front','spawnLocation': self.gameMap['spawnZones'][1]}, {'type': 'hind','count':7, 'direction': 'front','spawnLocation': self.gameMap['spawnZones'][2]}]}
+
 		
-		self.objectives        = {'destroyAAQ1': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyTanksQ1','pauseGame':False, 'startMessage':'First up, take out the enemy AA, good luck!', 'completionMessage': 'Great job!','activeQuandrant': {'x':self.mapw-3000 ,'w':3000 ,'y':self.maph-6000 ,'h':6000}, 'enemySpawn':self.spawn_1},
-								  'destroyTanksQ1': {'objective':'wait','targetObjects':[], 'status': 'notStarted', 'nextObjective':'eliminateMissileBase','pauseGame':True,  'startMessage':'Next up, take out the heavy armoured tanks, use your range and missiles to make short work of them.', 'completionMessage': 'Nicely done!','activeQuandrant': {'x':0 ,'w':self.mapw ,'y':self.maph-8000 ,'h':8000} },
-								  'eliminateMissileBase': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyBioLab', 'pauseGame':False, 'startMessage':'Ok, next up is a real challenge, take out all MLRS launchers in the missile base - dont forget to use chaff!.', 'completionMessage': "Impressive! Keep it up!",'activeQuandrant': {'x':self.mapw-3000 ,'w':3000 ,'y':self.maph-6000 ,'h':6000} },
-								  'destroyBioLab': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'complete', 'pauseGame':True, 'startMessage':'You are doing great, now comes the real reason we brought you here. There is a Bio weapons lab to the north, take it out before they can get those cannisters into trucks. Good hunting!', 'completionMessage': "Damn! If this wasn't VR training i'd have to promote you or something.",'activeQuandrant': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph} }
+		self.objectives        = {'firstWave': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyBarracks','holdGame':False, 'startMessage':'Rookie, clear a path into the base, good luck!', 'completionMessage': 'skipme','activeQuandrant': {'x':self.mapw-3000 ,'w':3000 ,'y':self.maph-6000 ,'h':6000},'enemySpawn':self.spawn_1},
+								  'destroyBarracks': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'sinkNavalYard','holdGame':False,  'startMessage':'Push on to those heavy armoured tanks!.', 'completionMessage': 'Nicely done!','activeQuandrant': {'x':0 ,'w':self.mapw ,'y':self.maph-8000 ,'h':8000},'enemySpawn':self.spawn_2 },
+								  'sinkNavalYard': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'complete', 'holdGame':True, 'startMessage':'Im calling in our guys to mop up, but I need you to push on to sink the naval base for us, it wont be easy but you got this!', 'completionMessage': "Wow, I don't think I can call you rookie any more.",'activeQuandrant': {'x':0 ,'w':self.mapw ,'y':self.maph-8000 ,'h':8000} },
+								  'destroyBioLab': {'objective':'wait','targetObjects':[], 'status': 'notStarted', 'nextObjective':'complete', 'holdGame':True, 'startMessage':'You are doing great, now comes the real reason we brought you here. There is a Bio weapons lab to the north, take it out before they can get those cannisters into trucks. Good hunting!', 'completionMessage': "Damn! If this wasn't VR training i'd have to promote you or something.",'activeQuandrant': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph} }
 								  }
-		self.currentObjective    = 'destroyAAQ1'
+		self.objectivesMap       = list(self.objectives.keys())
+		self.currentObjective    = 'firstWave'
 		self.objectiveIntroState = 'notIntroduced'
 		self.objectiveTimer      = countUpTimer()
 		self.spawnIndex          = 0 # index of the enemy spawn list
@@ -83,10 +89,41 @@ class levelFour():
 
 
 		# ------MAIN LOOP 
-
 		drawMap(self,gui)
 		
-		if(not self.pauseGame):
+		if(not self.holdGame):
+
+
+			#-----Death animations
+
+
+			for dead in self.deadList:
+				if(dead.alive==False):
+
+					# DRAW STREWN CARCAS
+					if(hasattr(dead,'drawRemains')):
+						dead.drawRemains(gui,self,game)
+
+					# SHAKE CAMERA ONCE
+					if(dead.name.upper() in ['TANK','MLRS','FRIGATE']):
+						if(not hasattr(dead,'deathShake')):
+							dead.deathShake = False
+						elif(dead.deathShake == False):
+							# Initiates shake and Will be reset by player
+							self.enemyDestroyed = True
+							dead.deathShake = True
+
+					# DRAW DEATH EXPLOSION
+					dead.animateDestruction(gui,self,game)
+
+
+
+			# ------DISPLAY OBJECTIVES 
+
+			if('O' in gui.input.returnedKey.upper()):
+				print('displaying objective')
+				self.displayObjectiveArrow = True
+
 
 			# ------BULLET MANAGER
 
@@ -108,6 +145,12 @@ class levelFour():
 				bullet.drawSelf(gui,game,self)
 				bullet.move(gui,self,game)
 
+			# ----PLAYER 
+
+			self.player.drawSelf(gui,game,self)
+			if(self.player.alive): 
+				self.player.actions(gui,game,self)
+				#game.calculatePlayerSpeed(self.player)
 
 
 			# ------MISSILE PLUME
@@ -115,6 +158,10 @@ class levelFour():
 
 			for plume in self.plumeList:
 				plume.drawSelf(gui,game,self)
+
+			# DRAW ANIMATED TERRAIN
+			for terrain in self.terrainList:
+				terrain.drawSelf(gui,game,self)
 
 
 			# ENEMY ACTIONS
@@ -124,49 +171,29 @@ class levelFour():
 				enemy.actions(gui,game,self)
 
 				manageCollisions(self,enemy,gui,game)
+				# Note: bullet kills the enemy
 
 
 
-			#-----Death animations
-
-
-			for dead in self.deadList:
-				if(dead.alive==False):
-
-					# DRAW STREWN CARCAS
-					if(hasattr(dead,'drawRemains')):
-						dead.drawRemains(gui,self,game)
-
-					# SHAKE CAMERA ONCE
-					if(dead.name=='tank'):
-						if(not hasattr(dead,'deathShake')):
-							dead.deathShake = False
-						elif(dead.deathShake == False):
-							# Initiates shake and Will be reset by player
-							self.enemyDestroyed = True
-							dead.deathShake = True
-
-					# DRAW DEATH EXPLOSION
-					dead.animateDestruction(gui,self,game)
-
-
-			# ----PLAYER 
-
+		if(self.holdGame):
 			self.player.drawSelf(gui,game,self)
-			if(self.player.alive): 
-				self.player.actions(gui,game,self)
-				#game.calculatePlayerSpeed(self.player)
+			
+			# IF GAME PAUSED
+			if(self.gamePaused):
+				drawTextWithBackground(gui.screen,gui.bigFont,str('Paused'),850,400 ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
 
-			# ------DISPLAY OBJECTIVES 
+				if(gui.input.returnedKey=='return'):
+					gui.input.returnedKey = ''
+					self.gamePaused = False
+					self.holdGame   = False
 
-			if('O' in gui.input.returnedKey.upper()):
-				print('displaying objective')
-				self.displayObjectiveArrow = True
+				return()
 
+		# PAUSE GAME
+		if(gui.input.returnedKey=='return' and self.scene in ['gameUnderway','debug']):
+			self.holdGame   = True
+			self.gamePaused = True
 
-
-		if(self.pauseGame):
-			self.player.drawSelf(gui,game,self)
 
 		# GUI GETS A LOT OF STATS 
 		levelGui(self,gui,game)
@@ -214,7 +241,7 @@ class levelFour():
 	
 
 		if(self.scene=='claire'):
-			self.pauseGame = True
+			self.holdGame = True
 
 			# OPEN WINDOW
 			self.cutScene.runCutScene(gui,game,scene='ally',underlay=True)
@@ -227,7 +254,7 @@ class levelFour():
 				finished = self.cutScene.dialogue.drawScrollingDialogue(gui,game,self.cutScene.textW,self.cutScene.textH,gui.smallishFont, "Welcome to training rookie, time to learn the ropes. You have a number of air, land and sea targets. Get going, good luck. Remember you will go into automatic lockon mode which changes your button inputs, press y to toggle lockon on and off.", textStartingPos=(self.cutScene.textX ,self.cutScene.textY),colour=(255,255,255),closeOutDelay=True)
 				if(finished):
 					self.scene    ='gameUnderway'
-					self.pauseGame = False
+					self.holdGame = False
 					self.cutScene.reset()
 
 
@@ -241,25 +268,34 @@ class levelFour():
 			if(not complete):
 				return()
 			else:
-				self.scene = 'notifyComplete'
+				self.scene = 'notifyLevelComplete'
+				return()
 	
-		if(self.scene=='notifyComplete'):
+		if(self.scene=='notifyLevelComplete'):
 			self.cutScene.runCutScene(gui,game,scene='ally',underlay=True)
 			if(self.cutScene.pannelOpen):
 				gui.claireTalking.animateNoRotation(gui,'claireTalking',[self.cutScene.imageLeftX,self.cutScene.imageY],game)
 				self.cutScene.drawMask(gui,game,overlay=False,border='ally',codec=True)
+				
 				finished = self.cutScene.dialogue.drawScrollingDialogue(gui,game,self.cutScene.textW,self.cutScene.textH,gui.font, "Hah not bad, this is still a Beta game in very early development, but try out level 2 for more of a challenge.", textStartingPos=(self.cutScene.textX ,self.cutScene.textY),colour=(255,255,255),closeOutDelay=True)
+				
 				if(finished):
-					self.scene    ='complete'
+					print('stage complete, not managed closure yet')
+					exit(0)
 					self.cutScene.pannelOpen = False
 					self.cutScene.reset()
 
 
 	def objectiveManager(self,gui,game):
 
-		# IF ALL OBJECTIVES COMPLETE
+		# -----DONT PROCEED IF LEVEL COMPLETE 
+
 		if(self.currentObjective==None or self.currentObjective=='complete'):
-			self.scene = 'levelComplete'
+			if(self.scene!='levelComplete' and self.scene!='notifyLevelComplete'):
+				self.scene = 'levelComplete'
+			return()
+
+		if(self.scene=='levelComplete' or self.scene=='notifyLevelComplete'):
 			return()
 
 	
@@ -282,8 +318,8 @@ class levelFour():
 		
 		if(currentObjective['status']=='notStarted'):
 			
-			if(currentObjective['pauseGame']):
-				self.pauseGame = True
+			if(currentObjective['holdGame']):
+				self.holdGame = True
 			
 			sceneMessage = currentObjective['startMessage']
 			# OPEN WINDOW
@@ -295,16 +331,18 @@ class levelFour():
 				gui.claireTalking.animateNoRotation(gui,'claireTalking',[self.cutScene.imageLeftX,self.cutScene.imageY],game)
 				self.cutScene.drawMask(gui,game,overlay=False,border='ally',codec=True)
 				
-				finished = self.cutScene.dialogue.drawScrollingDialogue(gui,game,self.cutScene.textW,self.cutScene.textH,gui.smallFont, sceneMessage, textStartingPos=(self.cutScene.textX ,self.cutScene.textY),colour=(51,189,251),closeOutDelay=True,maxLines=4,scrollInterval=0.02)
+				finished = self.cutScene.dialogue.drawScrollingDialogue(gui,game,self.cutScene.textW,self.cutScene.textH,gui.smallFont, sceneMessage, textStartingPos=(self.cutScene.textX ,self.cutScene.textY),colour=(51,189,251),closeOutDelay=True,maxLines=4,scrollInterval=0.02,pageWait=3)
 				if(finished):
 					currentObjective['status'] = 'inProgress'
-					if(currentObjective['pauseGame']):
-						self.pauseGame = False
+					if(currentObjective['holdGame']):
+						self.holdGame = False
 					
 					self.cutScene.reset()
 
-		# -----IF ONE SUBTARGET COMPLETED/DESTROYED
+		# -----REMOVE DEAD ENEMIES FROM TARGET
+
 		if(currentObjective['objective']=='eliminate'):
+			
 			for target in currentObjective['targetObjects']:
 				# if target dead or already removed from the enemy list
 				if(target.alive==False or target not in self.enemyList):
@@ -321,7 +359,10 @@ class levelFour():
 		# ---- MOVE TO NEXT OBJECTIVE, CONGRATULATE and POPULATE NEW OBJECTIVE TARGETS
 
 		if(currentObjective['status']=='signalComplete'):
+			skipOutro = False
 			sceneMessage = currentObjective['completionMessage']
+			if('skipme' in sceneMessage): skipOutro = True
+
 			# OPEN WINDOW
 			self.cutScene.runRHSCutScene(gui,game,scene='ally',underlay=True,orientation='topRight')
 			# ANIMATE ONCE WINDOW OPEN
@@ -331,7 +372,7 @@ class levelFour():
 				self.cutScene.drawMask(gui,game,overlay=False,border='ally',codec=True)
 				finished = self.cutScene.dialogue.drawScrollingDialogue(gui,game,self.cutScene.textW,self.cutScene.textH,gui.smallFont, sceneMessage, textStartingPos=(self.cutScene.textX ,self.cutScene.textY),colour=(51,189,251),closeOutDelay=True,maxLines=4,scrollInterval=0.02)
 				
-				if(finished):
+				if(finished or skipOutro):
 					#NEXT OBJECTIVE 
 					currentObjective['status'] = 'complete'
 					self.currentObjective = currentObjective['nextObjective']
@@ -350,7 +391,7 @@ class levelFour():
 		
 
 
-		# ------********LEVEL SPECIFIC OBJECTIVE LOADING ******
+	# ------********LEVEL SPECIFIC OBJECTIVE LOADING ******
 
 	def fieldNewObjective(self,gui,game):
 
@@ -382,19 +423,6 @@ class levelFour():
 		self.unfieldedEnemies = newList
 
 
-		# UPDATE TARGET OBJECTIVES (WE ONLY CARE ABOUT THE ONES WE WANT TO TAKE OUT)
-		for enemy in self.enemyList:
-
-			# OBJECTIVE 2
-
-			if(enemy.name=='tank' and self.currentObjective=='destroyTanksQ1'):
-				self.objectives['destroyTanksQ1']['targetObjects'].append(enemy)
-
-			if(enemy.name=='mlrs' and self.currentObjective=='eliminateMissileBase'):
-				self.objectives['eliminateMissileBase']['targetObjects'].append(enemy)
-
-			if(enemy.name=='bioLab' and self.currentObjective=='destroyBioLab'):
-				self.objectives['destroyBioLab']['targetObjects'].append(enemy)
 
 
 	def quandrantManager(self,gui,game):
@@ -420,6 +448,7 @@ class levelFour():
 		if(self.currentObjective!= None and self.currentObjective != 'complete'):
 			currentObjective = self.objectives[self.currentObjective]
 			# 'enemySpawn':{'spawnCount': 3,  'spawn' : [{'type': 'hind','count':5, 'direction': 'front','spawnLocation': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph-400}}, {'type': 'hind','count':5, 'direction': 'back','spawnLocation': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph-400}},{'type': 'hind','count':5, 'direction': 'any','spawnLocation': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph-400}} ]}
+			
 			# IF ENEMY SPAWN IS SET
 			if('enemySpawn' in currentObjective.keys()):
 				enemySpawnDict = currentObjective['enemySpawn']
@@ -462,7 +491,7 @@ class levelFour():
 
 					#  add to enemy list
 
-					# incriment counter
+					# increment counter
 
 					# random timer 1-5 seconds
 
@@ -485,7 +514,15 @@ class levelFour():
 		if(self.currentObjective=='complete' or self.currentObjective==None):
 			return
 
+		# ASSIGN ENEMIES TO TARGET OBJECTS BASED ON THEIR OBJECTIVE NUMBER
 
+		for o in range(len(self.objectivesMap)):
+			objectiveKey = self.objectivesMap[o]
+			for enemy in self.enemyList:
+				if(hasattr(enemy,'objectiveNumber')):
+					if(o ==enemy.objectiveNumber):
+						print('Appending enemy ' + str(enemy.id) + ' to objective ' + str(objectiveKey))
+						self.objectives[objectiveKey]['targetObjects'].append(enemy)
 
 
 
@@ -523,11 +560,6 @@ class levelFour():
 		self.unfieldedEnemies = newList
 
 
-		
-		# Load selected enemies in range to given objectives
-		for enemy in self.enemyList:
-			if(enemy.name=='aaSmall'):
-				self.objectives['destroyAAQ1']['targetObjects'].append(enemy)
 
 
 def inQuandrant(unit, quandrant):

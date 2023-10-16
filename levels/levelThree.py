@@ -20,12 +20,13 @@ class levelThree():
 
 		# in game objects
 
-		self.bulletList  = []
-		self.plumeList   = []
-		self.allyList    = []
-		self.enemyList   = []
-		self.deadList    = []
-		self.fids        = [1]
+		self.bulletList         = []
+		self.plumeList          = []
+		self.allyList           = []
+		self.enemyList          = []
+		self.enemyComponentList = [] # THINGS LIKE TURRETS ETC
+		self.deadList           = []
+		self.fids               = [1]
 
 		self.enemyDestroyed = False
 
@@ -81,6 +82,40 @@ class levelThree():
 			drawMap(self,gui)
 			
 
+
+
+			# ENEMY ACTIONS
+
+			for enemy in self.enemyList:
+				enemy.drawSelf(gui,game,self)
+				enemy.actions(gui,game,self)
+				manageCollisions(self,enemy,gui,game)
+
+			#-----Death animations
+			for dead in self.deadList:
+				if(dead.alive==False):
+
+					# DRAW STREWN CARCAS
+					if(hasattr(dead,'drawRemains')):
+						dead.drawRemains(gui,self,game)
+
+					# SHAKE CAMERA ONCE
+					if(dead.name.upper() in ['TANK','MLRS']):
+						if(not hasattr(dead,'deathShake')):
+							dead.deathShake = False
+						elif(dead.deathShake == False):
+							# Initiates shake and Will be reset by player
+							self.enemyDestroyed = True
+							dead.deathShake = True
+
+					# DRAW DEATH EXPLOSION
+					dead.animateDestruction(gui,self,game)
+
+			# ----PLAYER 
+
+			self.player.drawSelf(gui,game,self)
+			if(self.player.alive): self.player.actions(gui,game,self)
+
 			# ------BULLET MANAGER
 
 			for bullet in self.bulletList:
@@ -104,40 +139,6 @@ class levelThree():
 			# ------MISSILE PLUME
 			for plume in self.plumeList:
 				plume.drawSelf(gui,game,self)
-
-
-			# ENEMY ACTIONS
-
-			for enemy in self.enemyList:
-				enemy.drawSelf(gui,game,self)
-				enemy.actions(gui,game,self)
-				manageCollisions(self,enemy,gui,game)
-
-			#-----Death animations
-			for dead in self.deadList:
-				if(dead.alive==False):
-
-					# DRAW STREWN CARCAS
-					if(hasattr(dead,'drawRemains')):
-						dead.drawRemains(gui,self,game)
-
-					# SHAKE CAMERA ONCE
-					if(dead.name=='tank'):
-						if(not hasattr(dead,'deathShake')):
-							dead.deathShake = False
-						elif(dead.deathShake == False):
-							# Initiates shake and Will be reset by player
-							self.enemyDestroyed = True
-							dead.deathShake = True
-
-					# DRAW DEATH EXPLOSION
-					dead.animateDestruction(gui,self,game)
-
-			# ----PLAYER 
-
-			self.player.drawSelf(gui,game,self)
-			if(self.player.alive): self.player.actions(gui,game,self)
-
 
 
 		#self.lv3CutScenes(gui,game)

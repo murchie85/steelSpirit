@@ -10,6 +10,7 @@ class hind(parent):
 		self.name           = 'hind'
 		self.kind           = 'air'
 		self.images         = imageAnimateAdvanced(gui.hind,0.05)
+		self.shadow         = imageAnimateAdvanced(gui.hindShadow,0.05)
 		self.x,self.y       = 500,500
 		if(x!=None): self.x = x
 		if(y!=None): self.y = y
@@ -30,7 +31,9 @@ class hind(parent):
 		self.hitAnimation     = imageAnimateAdvanced(self.hitImage,0.2)
 
 		# CLASS OVERRIDES
-		self.defaultSpeed     = 3
+		self.defaultSpeed     = 2
+		self.maxSpeed         = 2
+		self.maxSpeedDefault  = 2
 
 		# ENEMY COORDS 
 
@@ -110,7 +113,7 @@ class hind(parent):
 		
 		if(self.seekStrafe):
 			seekDistance = 6*gui.w
-			self.defaultSpeed = 5
+			self.defaultSpeed = 3
 		else:
 			seekDistance = 0.7*gui.w
 		
@@ -137,7 +140,7 @@ class hind(parent):
 			# FORWARD OR JINK
 			if(DistanceToEnemy > 0.45*gui.h):
 				self.moveForwards()
-			if(DistanceToEnemy < 0.35*gui.h):
+			elif(DistanceToEnemy < 0.35*gui.h):
 				self.moveBackwards()
 			else:
 				changeDirection = self.turnTimer.stopWatch(self.turnPeriod,'hind turning', 'hind turning', game,silence=True)
@@ -188,7 +191,12 @@ class hind(parent):
 
 	def drawSelf(self,gui,game,lv):
 		x,y = self.x - gui.camX,self.y  - gui.camY
-		
+
+		shadow_x = x + 15
+		shadow_y = y + 15
+		self.shadow.animate(gui,'hind shadow',[shadow_x,shadow_y],game,rotation=self.facing-90)
+
+
 		if(self.hit):
 			self.damageAnimation(gui,lv,game)
 		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) ):

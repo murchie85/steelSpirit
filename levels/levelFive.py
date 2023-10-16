@@ -28,6 +28,7 @@ class levelFive():
 		self.defaultEnemyList  = [] # This contains a backup
 		self.deadList          = []
 		self.fids              = [1]
+		self.enemyComponentList = [] # THINGS LIKE TURRETS ETC
 
 		self.enemyDestroyed = False
 

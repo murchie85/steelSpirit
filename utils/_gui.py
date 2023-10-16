@@ -28,6 +28,7 @@ class gui():
         self.KEYDOWN         = False
         self.scrollUp        = False
         self.scrollDown      = False
+        self.scrollEnabled   = True
         self.input           = None # Assigned during main
 
         self.screen          = screen
@@ -141,6 +142,47 @@ class gui():
                 return(True)
         return(False)
 
+
+
+    def moveCamera(self,game):
+
+        # skip if scroll disabled 
+        if(self.scrollEnabled==False):
+            return
+        
+        drift = 0.3
+
+        scroll     = 15
+        softscroll = 8
+
+
+        horizontal,vertical = 0,0
+
+        if(self.mx< 0.1*self.w):
+            horizontal -= scroll
+        elif(self.mx< 0.2*self.w):
+            horizontal -= softscroll
+
+        if(self.mx> 0.9*self.w):
+            horizontal += scroll
+        elif(self.mx> 0.8*self.w):
+            horizontal += softscroll
+
+
+        if(self.my< 0.1*self.h):
+            vertical -= scroll
+        elif(self.my< 0.2*self.h):
+            vertical -= softscroll
+
+        if(self.my> 0.9*self.h):
+            vertical += scroll
+        elif(self.my> 0.8*self.h):
+            vertical += softscroll
+
+
+
+        self.camX += horizontal
+        self.camY += vertical
 
 
 

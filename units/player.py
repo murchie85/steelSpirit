@@ -148,9 +148,12 @@ class player():
 
 		# BULLETS 
 		self.shotType			= 'hotTripple'
-		self.availableWeapons   = ['hotRound','hotDouble','hotTripple','pellet','doublePellet' ,'slitherShot','doubleSlither','triBlast']
-		self.bulletAttrs        = {'hotRound':{'speed':20,'damage':6}, 'hotDouble':{'speed':20,'damage':5}, 'hotTripple':{'speed':20,'damage':4},  'pellet':{'speed':15,'damage':7}, 'doublePellet':{'speed':15,'damage':7},  'slitherShot':{'speed':3,'damage':20}, 'doubleSlither':{'speed':3,'damage':20} , 'triBlast':{'speed':12,'damage':30} }
-		
+		self.availableWeapons   = ['hotRound','hotDouble','hotTripple','beam','pellet','doublePellet' ,'slitherShot','doubleSlither','triBlast']
+		self.bulletAttrs        = {'hotRound':{'speed':20,'damage':6}, 'hotDouble':{'speed':20,'damage':5}, 'hotTripple':{'speed':20,'damage':4},  'pellet':{'speed':15,'damage':7}, 'doublePellet':{'speed':15,'damage':7},  'slitherShot':{'speed':3,'damage':20}, 'doubleSlither':{'speed':3,'damage':20} , 'triBlast':{'speed':12,'damage':30}, 'beam':{'speed':12,'damage':30}}
+		self.beamImage          = imageAnimateAdvanced(gui.beamPart,0.2)
+		self.beamHead           = imageAnimateAdvanced(gui.beamHead,0.2)
+
+
 		self.bulletTimer        = stopTimer()           # BUFF
 		self.shootDelay         = 0.1                   # BUFF
 		self.bulletsFired       = 0
@@ -254,7 +257,8 @@ class player():
 		cone_rect = pygame.Rect(min([p[0] for p in cone_points]), min([p[1] for p in cone_points]), max([p[0] for p in cone_points]) - min([p[0] for p in cone_points]), max([p[1] for p in cone_points]) - min([p[1] for p in cone_points]))
 
 		detectEnemies = []
-		for enemy in lv.enemyList:
+		targetList = lv.enemyList + lv.enemyComponentList
+		for enemy in targetList:
 			if(onScreen(enemy.x,enemy.y,enemy.w,enemy.h,gui)):
 				if cone_rect.collidepoint((enemy.x, enemy.y)):
 					distance = getDistance(self.x,self.y,enemy.x,enemy.y)
@@ -443,8 +447,46 @@ class player():
 				lv.bulletList.append(bullet(gui,self.blitPos['midTop'][0]+ gui.camX,self.blitPos['midTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
 				lv.bulletList.append(bullet(gui,self.blitPos['centerL'][0]+ gui.camX,self.blitPos['centerL'][1]+ gui.camY,bid+1,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
 				lv.bulletList.append(bullet(gui,self.blitPos['centerR'][0]+ gui.camX,self.blitPos['centerR'][1]+ gui.camY,bid+2,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+			elif(self.shotType=='beam'):
+				ox,oy = self.x - gui.camX,self.y  - gui.camY
+				
+				# CENTER POINT
+				cx, cy =self.x-gui.camX - 0.5*gui.beamHead[0].get_width(),self.y-gui.camY- 0.5*gui.beamHead[0].get_height()
+				cx,cy  = cx + 50,cy+50
+				fx,fy  = cx + 50*math.cos(math.radians(360-self.facing)),cy + 50*math.sin(math.radians(360-self.facing))
+				
+				cx, cy = self.x-gui.camX - 0.5*gui.beamPart[0].get_width(),self.y-gui.camY- 0.5*gui.beamPart[0].get_height()
+				cx,cy  = cx + 50,cy+50
+				x,y  = cx + 50*math.cos(math.radians(360-self.facing)),cy + 50*math.sin(math.radians(360-self.facing))
+
+				blitBeam  = True
+				for i in range(70):
+					if(blitBeam):
+						self.beamImage.animate(gui,'beamshot',[x,y],game,rotation=self.facing-90)
+						vel_x = 14 * math.cos(math.radians(360-self.facing))
+						vel_y = 14 * math.sin(math.radians(360-self.facing))
+
+						x += vel_x 
+						y += vel_y
+						enemyBullets = [x for x in lv.bulletList if (x.classification=='enemy' and x.name=='missile')]
+						enemyList = lv.enemyList + lv.enemyComponentList + enemyBullets
+						for e in enemyList:
+							if(collidesObjectless(x+gui.camX,y+gui.camY,15,15,e.x,e.y,e.w,e.h)):
+								self.beamHead.animate(gui,'beamHead',[x-10*math.cos(math.radians(360-self.facing+90)),y-10*math.cos(math.radians(360-self.facing+90))],game,rotation=self.facing-90)
+								
+								if(e.name=='missile'):
+									e.killSelf(lv,killMessage='missile destroyed by beam')
+								else:
+									blitBeam=False
+									e.hp -= 3
+									e.hit = True
+									if(e.hp<1):
+										e.alive = False
+										killme(e,lv)
+								break
 
 
+				self.beamHead.animate(gui,'beamHead',[fx,fy],game,rotation=self.facing-90)
 
 			else:
 				self.bulletsFired +=1
@@ -927,6 +969,7 @@ class player():
 			if(self.debris<=12):
 				self.debris +=1
 				# ADDS DEBRIS TO TO LIST
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
 				lv.bulletList.append(bullet(gui,self.x + 0.5* self.chosenExplosionImg[0].get_width(),self.y+ 0.5* self.chosenExplosionImg[0].get_height(),bid,'debris',random.randrange(0,360),'debris',speed=10, w=0.05*self.w,h=0.05*self.h,colour=(192,192,192)))
 			if(complete):
 				self.destructionComplete = True

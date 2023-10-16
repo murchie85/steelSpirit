@@ -81,7 +81,7 @@ class barrelRed(parent):
 			if(self.deathBarrelCheck==False):
 				distanceToEnemy = getDistance(self.x,self.y,enemy.x,enemy.y)
 				if(distanceToEnemy<self.chainEffectDistance):
-					enemy.hp -= 120
+					enemy.hp -= 220
 
 		self.deathBarrelCheck = True
 

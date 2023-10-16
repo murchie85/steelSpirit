@@ -18,14 +18,29 @@ SHOW
 Main focus
 ----
 
-- create spawn point placer, drag/drop perimeter (toggle box one more-  it should show a number)
+https://twitter.com/DonPachi003/status/1615725706918469634 baddy example
 
+Level ideas https://twitter.com/dantemendes/status/1625699195289042945
+https://twitter.com/HTProject073/status/1603999213138116609
+
+****OPTIMIZE WITH BLITS***
+
+
+
+
+3. Add loader
+- Smoke, and progressive enemy damage
+- TURRET COOKOFF
+- Make no go zones on map
+
+
+- Medium sized ships
 - SNOW ( a weeks work)
+	- DRAW Carrier jets come at you
 	-  Draw trees, muddy paths, mountains
 	- AA in shell, 
 	- small copters 10 attack if in area (raiden AI), 
 	- Big copter volley of 4
-	- snow tank, 
 	- tribarreled tanks (for later stages)
 	- 4 Loaders, 
 	- Guard towers
@@ -33,6 +48,7 @@ Main focus
 	- toggle lockon view
 	- units chase you a bit
 	- groups of enemies (tanks roll out, copters group attack...etc)
+	- Carrier must have jets that come attack you and fly back
 
 
  - gui
@@ -43,9 +59,11 @@ Main focus
 	 - **KEY** XP/Points tick up on the Gui
 
 
+LEVEL DESIGN TRICK: FOR CONCRETE BASE, BREAK THINGS UP SO ITS NOT CONTINUOUS, HAVE HOLES IN THE FLOOR
 
 ## ART ADDITION
 
+- Redo unit art, better colour, look at tank from shmup
 - Billowing black smoke
 - Shockwave for barell, include shrapnell
 - Backgrounds, cram more stuff into a 100/100 tile 
@@ -95,6 +113,7 @@ H - shoot in lockon J - strafe mode JJ - clockwise mode  J hold - break off K - 
 - APC
 - Procedural level generator (start with enemy)
 - raidal lockon speed is unlockable boost
+- Delta time to keep speed constant
 
 
 
@@ -169,12 +188,30 @@ SHIPS IN PORTS
 
 
 
+## FEEDBACK FROM PEOPLE 
+
+```
+Looking good! Some improvements if I may: Tile variants in the grass, it would break up the repetition, you can see a grid.
+Shadows for everything.
+The player movement seems a little stiff, could be a little slower to stop when the player stops moving.
+```
 
 
 
+```
 
 
+User avatar
+level 1
+Adventurous_Jacket64
+·
+14 hr. ago
+The way I solved this was by splitting the tiles into chunks, then pre render the chunks and blit the ones that are shown to the screen right now. This will make the tile rendering time so insignificant you won't notice it.
 
+Also, you probably don't want to use a dictionary, a list (or an array) is much more suitable for such cases, especially if the keys are ints anyways.
+
+In your case, since the map doesn't even change, the chunks can be arbitrarily large so just try different sizes and see what works best
+```
 
 
 
@@ -188,6 +225,7 @@ KEEP: Currently, tank battles feel shmupy, lots of damage, carnage.
 2. Must have MULTIPLE LAYERS
 3. MUST BE differentiable from the 10000 other Shmups (RPG element, Summon attack, Gameplay mechanics???). Joint teams.Shmup/Open pivot
 4. Dodging huge boss like bullet hell stream
+5. Review videos
 
 
 
@@ -321,6 +359,14 @@ Use UDM names, Turov etc, make a big tutorial
 go here shoot this use chaff repeat
 
 
+
+## 3  - protecting carrier group
+
+- China, USA ships destroyed, carriers retreating from shielded mothership
+- You blast in, using FLASH to break its shields
+- Short dialogue before Red and Blue jets join behind you
+- Big fight to take it apart, it fleets
+- Chase it about the map
 
 ## OTHER 
 
@@ -473,3 +519,9 @@ ISOMETRIC MISSILE BASE  - PLACE ME ANYWHERE LAYER
  	- Bomb
 - bomb
 - change selection criteria to be simply a square  
+- create spawn point placer, drag/drop perimeter (toggle box one more-  it should show a number)
+- Make select enemy objective
+Consider making units smaller
+- snow tank, 
+- Fix frigate
+2. Add blue laser

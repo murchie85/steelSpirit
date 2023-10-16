@@ -35,6 +35,8 @@ guiTheme       = 'main'
 
 gui                = gui(screen,width,height,guiTheme, IMAGEASSETPATH=IMAGEASSETPATH)
 
+
+gui.tilePath       = ASSETSPATH + 'tilesets/'
 #------------FONTS 
 
 gui.nokiaFont      = pygame.font.Font(FONTPATH + '/nokiafc22.ttf', 25)
@@ -84,13 +86,29 @@ gui.titleFontB        = pygame.font.Font(FONTPATH + 'squids.ttf', 90)
 # ------ IMAGES   
 
 
-# -----MENU/STARTUP
+# -----MAP EDITOR
+
+gui.saveIcon          = pygame.image.load(IMAGEASSETPATH + 'gui/save1.png')
+gui.saveIcon2          = pygame.image.load(IMAGEASSETPATH + 'gui/save2.png')
+gui.loadIcon           = pygame.image.load(IMAGEASSETPATH + 'gui/load1.png')
+gui.loadIcon2          = pygame.image.load(IMAGEASSETPATH + 'gui/load2.png')
+gui.openTileWindow     = pygame.image.load(IMAGEASSETPATH + 'gui/tileWindow1.png')
+gui.openTileWindow2    = pygame.image.load(IMAGEASSETPATH + 'gui/tileWindow2.png')
+gui.L1_1               = pygame.image.load(IMAGEASSETPATH + 'gui/L1_1.png')
+gui.L1_2		       = pygame.image.load(IMAGEASSETPATH + 'gui/L1_2.png')
+gui.L2_1               = pygame.image.load(IMAGEASSETPATH + 'gui/L2_1.png')
+gui.L2_2		       = pygame.image.load(IMAGEASSETPATH + 'gui/L2_2.png')
+gui.E_1                = pygame.image.load(IMAGEASSETPATH + 'gui/E_1.png')
+gui.E_2		           = pygame.image.load(IMAGEASSETPATH + 'gui/E_2.png')
+gui.Q_1                = pygame.image.load(IMAGEASSETPATH + 'gui/Q_1.png')
+gui.Q_2		           = pygame.image.load(IMAGEASSETPATH + 'gui/Q_2.png')
+gui.openTileWindow     = pygame.image.load(IMAGEASSETPATH + 'gui/tileWindow1.png')
+gui.openTileWindow2    = pygame.image.load(IMAGEASSETPATH + 'gui/tileWindow2.png')
+gui.next               = pygame.image.load(IMAGEASSETPATH + 'tilesets/50/template/base100_5.png')
+gui.next2              = pygame.image.load(IMAGEASSETPATH + 'tilesets/50/template/base100_6.png')
+
 
 # -----MENU/STARTUP
-gui.titleLogo        = pygame.image.load(IMAGEASSETPATH + '/scenes/title/titleLogo.png')
-gui.blueFire         = [pygame.image.load(IMAGEASSETPATH + 'scenes/title/bluefire1.png'),pygame.image.load(IMAGEASSETPATH + 'scenes/title/bluefire2.png') ,pygame.image.load(IMAGEASSETPATH + 'scenes/title/bluefire3.png') ,pygame.image.load(IMAGEASSETPATH + 'scenes/title/bluefire4.png')]
-gui.bluefireEntry    = loadImageFiles('blueFireEntry1.png',IMAGEASSETPATH + 'scenes/title/',convert=False)
-gui.planet           = pygame.image.load(IMAGEASSETPATH + 'scenes/title/planet.png')
 gui.coverLogo         = pygame.image.load(IMAGEASSETPATH + 'cover/logo.png')
 gui.cover1            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover.png')
 gui.cover2            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover2.png')
@@ -127,36 +145,40 @@ gui.playerHit         = loadImageFiles('g12_Hit1.png',IMAGEASSETPATH + 'units/fi
 
 gui.scoutRed          = loadImageFiles('crabRed1.png',IMAGEASSETPATH + 'units/crab/',convert=False)
 gui.scoutRedHit       = loadImageFiles('crabRedhit1.png',IMAGEASSETPATH + 'units/crab/',convert=False)
-
+gui.scoutShadow       = [pygame.image.load(IMAGEASSETPATH + 'units/crab/crabShadow.png')]
 
 
 gui.hind              = loadImageFiles('hind1.png',IMAGEASSETPATH + 'units/hind/',convert=False)
 gui.hindHit           = loadImageFiles('hindHit1.png',IMAGEASSETPATH + 'units/hind/',convert=False)
+gui.hindShadow        = loadImageFiles('hindShadow1.png',IMAGEASSETPATH + 'units/hind/',convert=False)
 
 
 
-
-gui.tank              = loadImageFiles('sandTank1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
-gui.tankHit           = loadImageFiles('sandTankHit1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
-gui.turret            = [pygame.image.load(IMAGEASSETPATH + 'units/tank/turret.png')]
-gui.turretHit         = loadImageFiles('sandTankTurretHit1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
-gui.tankStatic        = pygame.image.load(IMAGEASSETPATH + 'units/tank/sandTankStatic.png')
+gui.tank              = loadImageFiles('sandTank1.png',IMAGEASSETPATH + 'units/tank/sandTank/',convert=False)
+gui.tankHit           = loadImageFiles('sandTankHit1.png',IMAGEASSETPATH + 'units/tank/sandTank/',convert=False)
+gui.turret            = [pygame.image.load(IMAGEASSETPATH + 'units/tank/sandTank/turret.png')]
+gui.turretHit         = loadImageFiles('sandTankTurretHit1.png',IMAGEASSETPATH + 'units/tank/sandTank/',convert=False)
+gui.tankStatic        = pygame.image.load(IMAGEASSETPATH + 'units/tank/sandTank/sandTankStatic.png')
 gui.tankRemains       = loadImageFiles('tankCarcass1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
+gui.tankShadow        = [pygame.image.load(IMAGEASSETPATH + 'units/tank/sandTank/sandTankShadow.png')]
+
+gui.greenTank              = loadImageFiles('greenTank1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
+gui.greenTankHit           = loadImageFiles('greenTankhit1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
+gui.greenTurret            = [pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTank/greenTurret.png')]
+gui.greenTurretHit         = loadImageFiles('greenTankTurretHit1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
+gui.greenTankStatic        = pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTank/greenTankStatic.png')
+gui.greenTankRemains       = loadImageFiles('greenTankCarcass1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
+gui.greenTankShadow        = [pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTank/greenTankShadow.png')]
 
 
-gui.greenTank              = loadImageFiles('greenTank1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
-gui.greenTankHit           = loadImageFiles('greenTankhit1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
-gui.greenTurret            = [pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTurret.png')]
-gui.greenTurretHit         = loadImageFiles('greenTankTurretHit1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
-gui.greenTankStatic        = pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTankStatic.png')
-gui.greenTankRemains       = loadImageFiles('greenTankCarcass1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
 
-gui.snowTank               = loadImageFiles('snowTank1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
-gui.snowTankHit            = loadImageFiles('snowTankhit1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
-gui.snowTurret             = [pygame.image.load(IMAGEASSETPATH + 'units/tank/snowTurret.png')]
-gui.snowTurretHit          = loadImageFiles('snowTurretHit1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
-gui.snowTankStatic         = pygame.image.load(IMAGEASSETPATH + 'units/tank/snowTankStatic.png')
+gui.snowTank               = loadImageFiles('snowTank1.png',IMAGEASSETPATH + 'units/tank/snowTank/',convert=False)
+gui.snowTankHit            = loadImageFiles('snowTankhit1.png',IMAGEASSETPATH + 'units/tank/snowTank/',convert=False)
+gui.snowTurret             = [pygame.image.load(IMAGEASSETPATH + 'units/tank/snowTank/snowTurret.png')]
+gui.snowTurretHit          = loadImageFiles('snowTurretHit1.png',IMAGEASSETPATH + 'units/tank/snowTank/',convert=False)
+gui.snowTankStatic         = pygame.image.load(IMAGEASSETPATH + 'units/tank/snowTank/snowTankStatic.png')
 gui.snowTurretRemains      = loadImageFiles('tankCarcass1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
+gui.snowTankShadow         = [pygame.image.load(IMAGEASSETPATH + 'units/tank/snowTank/snowTankShadow.png')]
 
 
 gui.attackBoat              = loadImageFiles('attackBoat1.png',IMAGEASSETPATH + 'units/attackBoat/',convert=False)
@@ -172,6 +194,7 @@ gui.aaSmallTurret     = [pygame.image.load(IMAGEASSETPATH + 'units/AA_burst/aaSm
 gui.aaSmallTurretHit  = loadImageFiles('aaSmallTurretHit1.png',IMAGEASSETPATH + 'units/AA_burst/',convert=False)
 gui.aaSmallStatic     = pygame.image.load(IMAGEASSETPATH + 'units/AA_burst/aaSmall.png')
 gui.aaSmallRemains    = loadImageFiles('aaSmallCarcass1.png',IMAGEASSETPATH + 'units/AA_burst/',convert=False)
+gui.aaShadow          = [pygame.image.load(IMAGEASSETPATH + 'units/AA_burst/aaShadow.png')]
 
 gui.mlrs              = loadImageFiles('mlrs1.png',IMAGEASSETPATH + 'units/MLRS/',convert=False)
 gui.mlrsHit           = loadImageFiles('mlrsHit1.png',IMAGEASSETPATH + 'units/MLRS/',convert=False)
@@ -179,20 +202,38 @@ gui.mlrsTurret        = [pygame.image.load(IMAGEASSETPATH + 'units/MLRS/mlrsTurr
 gui.mlrsTurretHit     = loadImageFiles('mlrsTurretHit1.png',IMAGEASSETPATH + 'units/MLRS/',convert=False)
 gui.mlrsStatic        = pygame.image.load(IMAGEASSETPATH + 'units/MLRS/mlrsStatic.png')
 gui.mlrsRemains       = loadImageFiles('mlrsRemains1.png',IMAGEASSETPATH + 'units/MLRS/',convert=False)
+gui.mlrsShadow        = [pygame.image.load(IMAGEASSETPATH + 'units/MLRS/mlrsShadow.png')]
 
 
+gui.frigate           = [pygame.image.load(IMAGEASSETPATH + 'units/navalFrigate/frigate1.png')]
+gui.frigateRemains    = [pygame.image.load(IMAGEASSETPATH + 'units/navalFrigate/frigateRemains.png')]
+gui.frigateHit        = loadImageFiles('frigateHit1.png',IMAGEASSETPATH + 'units/navalFrigate/',convert=False)
+gui.frigateTurret     = [pygame.image.load(IMAGEASSETPATH + 'units/navalFrigate/turret.png')]
+gui.frigateTurretRemains     = [pygame.image.load(IMAGEASSETPATH + 'units/navalFrigate/turretRemains.png')]
+gui.frigateTurretHit  = loadImageFiles('turretHit1.png',IMAGEASSETPATH + 'units/navalFrigate/',convert=False)
+gui.frigateMulti      = [pygame.image.load(IMAGEASSETPATH + 'units/navalFrigate/multiTurret.png')]
+gui.frigatMultiHit    = loadImageFiles('multiTurretHit1.png',IMAGEASSETPATH + 'units/navalFrigate/',convert=False)
+gui.frigateMultiRemains = [pygame.image.load(IMAGEASSETPATH + 'units/navalFrigate/multiTurretRemains.png')]
 
 # ---------BUILDINGS INTERACTABLE
 
 
-gui.bioLab                    = [pygame.image.load(IMAGEASSETPATH + 'buildings_interactable/biolab/bioLab.png')]
-gui.bioLabHit                 = loadImageFiles('bioLabHit1.png',IMAGEASSETPATH + 'buildings_interactable/biolab/',convert=False)
-gui.bioLabRemains             = loadImageFiles('bioLabRemains1.png',IMAGEASSETPATH + 'buildings_interactable/biolab/',convert=False)
+gui.bioLab                    = [pygame.image.load(IMAGEASSETPATH + 'tilesets/L2/interactable/biolab/bioLab.png')]
+gui.bioLabHit                 = loadImageFiles('bioLabHit1.png',IMAGEASSETPATH + 'tilesets/L2/interactable/biolab/',convert=False)
+gui.bioLabRemains             = loadImageFiles('bioLabRemains1.png',IMAGEASSETPATH + 'tilesets/L2/interactable/biolab/',convert=False)
 
 
-gui.barrelGroupRed            = [pygame.image.load(IMAGEASSETPATH + 'buildings_interactable/barrel/barrelGroupRed.png')]
-gui.barrelGroupRedHit         = loadImageFiles('barrelGroupRedHit1.png',IMAGEASSETPATH + 'buildings_interactable/barrel/',convert=False)
-gui.barrelGroupRedRemains     = loadImageFiles('barellGroupRedRemains1.png',IMAGEASSETPATH + 'buildings_interactable/barrel/',convert=False)
+gui.barrelGroupRed            = [pygame.image.load(IMAGEASSETPATH + 'tilesets/L2/interactable/barrel/barrelGroupRed.png')]
+gui.barrelGroupRedHit         = loadImageFiles('barrelGroupRedHit1.png',IMAGEASSETPATH + 'tilesets/L2/interactable/barrel/',convert=False)
+gui.barrelGroupRedRemains     = loadImageFiles('barellGroupRedRemains1.png',IMAGEASSETPATH + 'tilesets/L2/interactable/barrel/',convert=False)
+
+
+#----TERRAIN TILELESS
+
+gui.volcano					  = [pygame.image.load(IMAGEASSETPATH + 'tilesets/L2/unfinished/terrain/volcano.png')]
+gui.snowTrees  				  = [pygame.image.load(IMAGEASSETPATH + 'tilesets/L2/unfinished/trees/snowTrees.png')]
+gui.snowTreesLeft  			  = [pygame.image.load(IMAGEASSETPATH + 'tilesets/L2/unfinished/trees/snowTreesLeft.png')]
+gui.snowTreesRight  		  = [pygame.image.load(IMAGEASSETPATH + 'tilesets/L2/unfinished/trees/snowTreesRight.png')]
 
 
 
@@ -202,7 +243,13 @@ gui.slitherShot            = loadImageFiles('slither1.png',IMAGEASSETPATH + 'ord
 gui.triBlast               = loadImageFiles('triBlast1.png',IMAGEASSETPATH + 'ordinance/',convert=False)
 gui.yellowPlasma           = loadImageFiles('yellowPlasmaBall1.png',IMAGEASSETPATH + 'ordinance/plasma/yellowPlasma/',convert=False)
 gui.redPlasma              = loadImageFiles('redPlasmaBall1.png',IMAGEASSETPATH + 'ordinance/plasma/redPlasma/',convert=False)
+gui.lightRedPlasma         = loadImageFiles('lightRedPlasmaBall1.png',IMAGEASSETPATH + 'ordinance/plasma/lightRedPlasma/',convert=False)
 gui.hotRound               = loadImageFiles('hotRound1.png',IMAGEASSETPATH + 'ordinance/hotRound/',convert=False)
+gui.beamPart               = loadImageFiles('beamPart1.png',IMAGEASSETPATH + 'ordinance/beam/',convert=False)
+gui.beamHead               = loadImageFiles('beamHead1.png',IMAGEASSETPATH + 'ordinance/beam/',convert=False)
+
+
+
 
 gui.streakerMissile        = loadImageFiles('missile1.png',IMAGEASSETPATH + 'ordinance/missiles/',convert=False)
 gui.streakerGray           = loadImageFiles('grayMissile1.png',IMAGEASSETPATH + 'ordinance/missiles/',convert=False)
@@ -230,29 +277,38 @@ gui.chaffHead              = loadImageFiles('chaffHead1.png',IMAGEASSETPATH + 'o
 gui.lockOn                 = loadImageFiles('lockon1.png',IMAGEASSETPATH + 'gui/',convert=False)
 gui.lockOnStill            = pygame.image.load(IMAGEASSETPATH + '/gui/stillLockedOn.png')
 
-# ---------TILE SETS
-gui.grassTiles         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/grass/grassV1/',convert=True)
-gui.grassLight         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/grass/grassLight/',convert=True)
-gui.concreteTiles      = loadImageFiles('concrete1.png',IMAGEASSETPATH + 'tilesets/concrete/',convert=True)
-gui.sandTiles          = loadImageFiles('sand1.png',IMAGEASSETPATH + 'tilesets/sand/sandv1/',convert=True)
-gui.base100            = loadImageFiles('base100_1.png',IMAGEASSETPATH + 'tilesets/template/',convert=True)
-gui.water              = loadImageFiles('water1.png',IMAGEASSETPATH + 'tilesets/water/',convert=True)
-gui.snow               = loadImageFiles('snow1.png',IMAGEASSETPATH + 'tilesets/snowlv/snow/',convert=True)
-gui.snowLake           = loadImageFiles('snowlake1.png',IMAGEASSETPATH + 'tilesets/snowlv/snowLake/',convert=True)
+#-----------BIG 
+
+gui.grassTiles         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/100/grass/grassV1/',convert=True)
+gui.grassLight         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/100/grass/grassLight/',convert=True)
+gui.concreteTiles      = loadImageFiles('concrete1.png',IMAGEASSETPATH + 'tilesets/100/concrete/',convert=True)
+gui.sandTiles          = loadImageFiles('sand1.png',IMAGEASSETPATH + 'tilesets/100/sand/sandv1/',convert=True)
+gui.base100            = loadImageFiles('base100_1.png',IMAGEASSETPATH + 'tilesets/100/template/',convert=True)
+gui.water              = loadImageFiles('water1.png',IMAGEASSETPATH + 'tilesets/100/water/',convert=True)
+gui.snow               = loadImageFiles('snow1.png',IMAGEASSETPATH + 'tilesets/100/snowlv/snow/',convert=True)
+gui.snowLake           = loadImageFiles('snowlake1.png',IMAGEASSETPATH + 'tilesets/100/snowlv/snowLake/',convert=True)
+
+#-----------SMALL 
 
 gui.smallGrassTiles         = loadImageFiles('grass1.png',IMAGEASSETPATH + 'tilesets/50/grass/grassV1/',convert=True)
 gui.smallConcreteTiles      = loadImageFiles('concrete1.png',IMAGEASSETPATH + 'tilesets/50/concrete/',convert=True)
 gui.smallSandTiles          = loadImageFiles('sand1.png',IMAGEASSETPATH + 'tilesets/50/sand/sandv1/',convert=True)
 gui.smallBase100            = loadImageFiles('base100_1.png',IMAGEASSETPATH + 'tilesets/50/template/',convert=True)
 gui.smallWater              = loadImageFiles('water1.png',IMAGEASSETPATH + 'tilesets/50/water/',convert=True)
-gui.smallSnow               = loadImageFiles('snow1.png',IMAGEASSETPATH + 'tilesets/50/snowlv/snow/',convert=True)
-gui.smallSnowLake           = loadImageFiles('snowlake1.png',IMAGEASSETPATH + 'tilesets/50/snowlv/snowLake/',convert=True)
+gui.smallSnow               = loadImageFiles('snow1.png',IMAGEASSETPATH + 'tilesets/50/snow/',convert=True)
+gui.smallSnowLake           = loadImageFiles('snowlake1.png',IMAGEASSETPATH + 'tilesets/50/snowLake/',convert=True)
+gui.pier 					= loadImageFiles('pier1.png',IMAGEASSETPATH + 'tilesets/50/port/',convert=True)
+
+# TILELESS
+gui.pilonDR            = loadImageFiles('pilon1.png',IMAGEASSETPATH + 'tilesets/L2/objects/pilonDiagonalRight/',convert=False)
+gui.pilonDL            = loadImageFiles('pilon1.png',IMAGEASSETPATH + 'tilesets/L2/objects/pilonDiagonalLeft/',convert=False)
+gui.backObjects        = loadImageFiles('obj1.png',IMAGEASSETPATH + 'tilesets/L2/objects/',convert=False)
+gui.barracks           = loadImageFiles('barracks1.png',IMAGEASSETPATH + 'tilesets/L2/buildings/barracks/',convert=False)
+gui.conveyorV          = loadImageFiles('vBelt1.png',IMAGEASSETPATH + 'tilesets/L2/buildings/conveyor/',convert=False)
+gui.conveyorH          = loadImageFiles('hBelt1.png',IMAGEASSETPATH + 'tilesets/L2/buildings/conveyor/',convert=False)
+gui.space              = [pygame.image.load(IMAGEASSETPATH + 'tilesets/50/space/spaceBack.png').convert()]
 
 
-# LAYER 2 
-gui.pilonDR            = loadImageFiles('pilon1.png',IMAGEASSETPATH + 'tilesets/pilons/pilonDiagonalRight/',convert=False)
-gui.pilonDL            = loadImageFiles('pilon1.png',IMAGEASSETPATH + 'tilesets/pilons/pilonDiagonalLeft/',convert=False)
-gui.backObjects        = loadImageFiles('obj1.png',IMAGEASSETPATH + 'tilesets/objects/',convert=False)
 
 # TILELESS LAYER 
 #gui.missileBase        =loadImageFiles('missileBase1.png',IMAGEASSETPATH + 'tilesets/missileBase/',convert=False,alphaConvert=True)
@@ -272,28 +328,54 @@ gui.tileDict           = {'Grass': gui.grassTiles,
 						  'water': gui.water,
 						  'snow': gui.snow,
 						  'snowLake':gui.snowLake,
-
+						  
 						  'smallGrass': gui.smallGrassTiles,
 						  'smallConcrete': gui.smallConcreteTiles,
 						  'smallsand': gui.smallSandTiles,
 						  'smallbase': gui.smallBase100,
 						  'smallwater': gui.smallWater,
 						  'smallsnow': gui.smallSnow,
-						  'smallsnowLake':gui.smallSnowLake
+						  'smallsnowLake':gui.smallSnowLake,
+						  'snowPier': gui.pier
 
 
 						  }
 
-gui.layer2Dict           = {'base': gui.base100,
+gui.smallTileDict        = {
+						  'smallGrass': gui.smallGrassTiles,
+						  'smallConcrete': gui.smallConcreteTiles,
+						  'smallsand': gui.smallSandTiles,
+						  'base': gui.smallBase100,
+						  'smallwater': gui.smallWater,
+						  'smallsnow': gui.smallSnow,
+						  'smallsnowLake':gui.smallSnowLake,
+						  'snowPier': gui.pier
+						  }
+
+gui.layer2Dict           = {
+						  'base': gui.base100,
 						  'pilonDR': gui.pilonDR,
 						  'pilonDL:': gui.pilonDL,
-						  'objects': gui.backObjects
+						  'objects': gui.backObjects,
+						  'smallbase': gui.smallBase100
 						  }
 
+
+# IF THE WORD HAS ANIMATED
+# IT WILL BE ADDED TO TERRAIN LIST AND RENDERED AS AN OBJECT
 gui.tilelessL1Dict      = {
 						  'pilonDR': gui.pilonDR,
 						  'pilonDL': gui.pilonDL,
 						  'objects': gui.backObjects,
+						  'barracks': gui.barracks,
+						  'conveyor_animated_v': gui.conveyorV,
+						  'conveyor_animated_h': gui.conveyorH,
+						  'volcano': gui.volcano,
+						  'snowTrees': gui.snowTrees,
+						  'snowTreesLeft':gui.snowTreesLeft,
+						  'snowTreesRight':gui.snowTreesRight,
+						  'space':gui.space
+
 						  }
 
 """
@@ -302,16 +384,17 @@ gui.tilelessL1Dict      = {
 						  'snowBase': gui.snowBase
 """
 
-gui.enemyDict          = {'scout':{'special':['command1','command2'],'image': gui.scoutRed[0]}, 
-						  'tank':{'special':['command1','command2'],'image': gui.tankStatic},
-						  'greenTank':{'special':['command1','command2'],'image': gui.greenTankStatic},
-						  'snowTank':{'special':['command1','command2'],'image': gui.snowTankStatic},
-						  'attackBoat':{'special':['command1','command2'],'image': gui.attackBoatStatic},
-						  'mlrs':{'special':['command1','command2'],'image': gui.mlrsStatic},
-						  'aaSmall':{'special':['command1','command2'],'image': gui.aaSmallStatic}, 
-						  'bioLab':{'special':['command1','command2'],'image': gui.bioLab[0]},
-						  'barrelRed':{'special':['command1','command2'],'image': gui.barrelGroupRed[0]}, 
-						  'hind':{'special':['command1','command2'],'image': gui.hind[0]}, 
+gui.enemyDict          = {'scout':{'image': gui.scoutRed[0]}, 
+						  'tank':{'image': gui.tankStatic},
+						  'greenTank':{'image': gui.greenTankStatic},
+						  'snowTank':{'image': gui.snowTankStatic},
+						  'attackBoat':{'image': gui.attackBoatStatic},
+						  'mlrs':{'image': gui.mlrsStatic},
+						  'aaSmall':{'image': gui.aaSmallStatic}, 
+						  'bioLab':{'image': gui.bioLab[0]},
+						  'barrelRed':{'image': gui.barrelGroupRed[0]}, 
+						  'hind':{'image': gui.hind[0]}, 
+						  'frigate':{'image': gui.frigate[0]}
 
 							}
 
@@ -324,6 +407,8 @@ gui.bigCloudyExplosion     = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'o
 gui.smallCloudyExplosion   = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'ordinance/explosions/cloudExplosion/')
 gui.smallYellowExplosion   = loadImageFiles('explosion1.png',IMAGEASSETPATH + 'ordinance/explosions/explosionParticle/')
 
+gui.smallSmoke             = loadImageFiles('smallTrail1.png',IMAGEASSETPATH + 'SFX/smoke/')
+gui.medSmoke               = loadImageFiles('belching1.png',IMAGEASSETPATH + 'SFX/smoke/')
 
 gui.shrapnellA             =  loadImageFiles('shrapnell1.png',IMAGEASSETPATH + 'SFX/shrapnell/')      
 gui.shrapnellPlume         =  loadImageFiles('plume1.png',IMAGEASSETPATH + 'SFX/shrapnellPlume/')      
@@ -362,10 +447,9 @@ gui.talkScreenH       = gui.claireTalk[0].get_height()
 
 
 # ------ CLASS ATTRS
-
-gui.animate = imageAnimate(0,10,10,name='guiAnimationObj')
-game        = gameObject(ASSETSPATH,gui)
-user_input  = userInputObject("","", gui)
-game.input  = user_input
+game          = gameObject(ASSETSPATH,gui)
+game.mapPaths = 'state/txtMaps/'
+user_input    = userInputObject("","", gui)
+game.input    = user_input
 
 #gui.statusButton  = button(0.15*width,0.05*height,width/17,height/13,'ST',(0,128,0),gui.bigNokiaFont,textColour=(97,165,93))

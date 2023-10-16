@@ -25,10 +25,11 @@ import math
 """
 DEFINE VIEPORT HERE (JUST DO OVERLAY, NOT RESTRICT)
 """
-def onScreen(xOrign,yOrign,w,h,gui):
+def onScreen(x,y,w,h,gui):
 	onScreen = False
-	if((xOrign+w > gui.camX) and (xOrign<gui.camX+gui.camW)):
-		if((yOrign+h > gui.camY) and (yOrign<gui.camY+gui.camH)):
+	# IF RIGHT SIDE ON SCREEN
+	if((x+w > gui.camX) and (x<gui.camX+gui.camW)):
+		if((y+h > gui.camY) and (y<gui.camY+gui.camH)):
 			onScreen = True
 
 	# NEED TO CHECK CAMERA
@@ -221,22 +222,35 @@ def collidesWith(self,enemy,spacing=1):
 
 # LATER ADD MODIFIER SPECIFIC TO OBJECT THAT PASES HITBOX %
 
-def collidesWithHitBox(self,enemy):
+def collidesWithHitBox(self,target):
 
-	# Check if the self's x-coordinate is within the enemy's x-coordinate range
-	if self.x >= enemy.x and self.x <= enemy.x + enemy.w:
-		# Check if the self's y-coordinate is within the enemy's y-coordinate range
-		if self.y >= enemy.y and self.y <= enemy.y + enemy.h:
-			return (True)
- 
-	# Check if the enemy's x-coordinate is within the self's x-coordinate range
-	if enemy.x >= self.x and enemy.x <= self.x + self.w:
-		# Check if the enemy's y-coordinate is within the self's y-coordinate range
-		if enemy.y >= self.y and enemy.y <= self.y + self.h:
-			return (True)
-	return (False)
-
-
+	if(not hasattr(target,'hitBox')):
+		# Check if the self's x-coordinate is within the target's x-coordinate range
+		if self.x >= target.x and self.x <= target.x + target.w:
+			# Check if the self's y-coordinate is within the target's y-coordinate range
+			if self.y >= target.y and self.y <= target.y + target.h:
+				return (True)
+	 
+		# Check if the target's x-coordinate is within the self's x-coordinate range
+		if target.x >= self.x and target.x <= self.x + self.w:
+			# Check if the target's y-coordinate is within the self's y-coordinate range
+			if target.y >= self.y and target.y <= self.y + self.h:
+				return (True)
+		return (False)
+	else:
+		hitboxX,hitboxY,hitboxW,hitboxH = target.hitBox[0],target.hitBox[1],target.hitBox[2],target.hitBox[3]
+		# Check if the self's x-coordinate is within the target's x-coordinate range
+		if self.x >= hitboxX and self.x <= hitboxX + hitboxW:
+			# Check if the self's y-coordinate is within the target's y-coordinate range
+			if self.y >= hitboxY and self.y <= hitboxY + hitboxH:
+				return (True)
+	 
+		# Check if the target's x-coordinate is within the self's x-coordinate range
+		if hitboxX >= self.x and hitboxX <= self.x + self.w:
+			# Check if the target's y-coordinate is within the self's y-coordinate range
+			if hitboxY >= self.y and hitboxY <= self.y + self.h:
+				return (True)
+		return (False)
 
 def collidesWithObjectLess(x,y,w,h,vehicle):
 

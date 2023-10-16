@@ -12,6 +12,7 @@ class tank(parent):
 		self.kind           = 'vechicle'
 		self.images         = imageAnimateAdvanced(gui.tank,0.2)
 		self.turretImage    = imageAnimateAdvanced(gui.turret,0.2)
+		self.shadow         = imageAnimateAdvanced(gui.tankShadow,0.2)
 		self.x,self.y       = 500,500
 		if(x!=None): self.x = x
 		if(y!=None): self.y = y
@@ -168,13 +169,16 @@ class tank(parent):
 	def drawSelf(self,gui,game,lv):
 		x,y = self.x - gui.camX,self.y  - gui.camY
 		
+		shadow_x = x + 15
+		shadow_y = y + 15
+		self.shadow.animate(gui,'aa shadow',[shadow_x,shadow_y],game,rotation=self.facing-90)
 
 
 		if(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) and not self.hit):
 			animate,self.blitPos     = self.images.animate(gui,'tank' + str(self.id),[x,y],game,rotation=self.facing-90)
 			turretAnimage,self.turretPos  = self.turretImage.animate(gui,'turret' + str(self.id),[x,y],game,rotation=self.turretFacing-90)
+			
 
-			#pygame.draw.circle(gui.screen, (244,0,0), (self.patrolLocations[self.currentLocIndex][0]- gui.camX ,self.patrolLocations[self.currentLocIndex][1]- gui.camY) , 15, 0)
 
 		if(self.hit):
 

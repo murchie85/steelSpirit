@@ -5,7 +5,11 @@ from utils.gameUtils import *
 def editMap(self,gui,game):
 	# GET MAPTILE LIST
 	mapTiles = self.gameMap['metaTiles']
-	
+	if(self.gameMap['tileDims']==50):
+		gui.tileDict      = gui.smallTileDict
+		self.tileOptions  = list(gui.tileDict.keys())
+
+
 	# USES THE type and index as keys to gui.tileDict
 
 	# MANAGES STATE
@@ -51,49 +55,101 @@ def editMap(self,gui,game):
 def tileSelector(self,gui,game,mapTiles):
 	x = 0
 	y = 0
-	for r in range(len(mapTiles)):
-		row = mapTiles[r]
+
+	if('converted' not in self.gameMap.keys()):
+		print('converting')
+		self.gameMap['listTiles'] = []
 		
-		for c in range(len(row)):
-			col = row[c]
+		for r in range(len(self.gameMap['metaTiles'])): self.gameMap['listTiles'].append([])
 
-			if(col['animated']==False ):
-				image = gui.tileDict[col['type']][col['index']]
-
-
-				# -----------IF HOVER MULTI-SELECT 
-
-				if(gui.mouseCollides(x-gui.camX,y-gui.camY,image.get_width(),image.get_height())):
-					self.tileHovered = True
-					if(self.tileSelecting):
-						# ADD TO EDIT LIST
-						selectedCoords = [r,c]
-						if(selectedCoords not in self.tileSelectionList): 
-							self.tileSelectionList.append(selectedCoords)
-
-				#  -----------IF SELECTED, SHOW BASE SELECTING TILE
-
-				if([r,c] in self.tileSelectionList and self.tileSelecting):
-					drawImage(gui.screen,gui.base100[2],(x-gui.camX,y-gui.camY))
+		for row in range(len(self.gameMap['metaTiles'])):
+			currentRow = self.gameMap['metaTiles'][r]
 			
-				#  -----------IF EDITING, SHOW THE CURRENT BROWSED IMAGE
+			for col in currentRow:
+				image = gui.tileDict[col['type']][col['index']]
+				self.gameMap['listTiles'][row].append( [ col['placed'], col['animated'], col['type'],col['index'] ])
+				x += image.get_width()
+			y+= image.get_height()
+			x = 0
+		
+		self.gameMap['converted'] = True
+		print(self.gameMap['listTiles'])
 
-				elif([r,c] in self.tileSelectionList and self.editingTile):
-					drawImage(gui.screen, gui.tileDict[self.tileOptions[self.tileOptionsIndex]][self.tileOptionsSubIndex],(x-gui.camX,y-gui.camY))
 
 
-			x += image.get_width()
 
-		y+= image.get_height()
-		x = 0
+
+	mapTiles    = self.gameMap['listTiles'] # 2,3 = type index
+	sampleImage = gui.tileDict[self.gameMap['listTiles'][0][0][2]][mapTiles[0][0][3]]
+	yIndexOne = math.floor((gui.camY)/sampleImage.get_height())
+	yIndexTwo = math.ceil((gui.camY+gui.camH)/sampleImage.get_height())
+	xIndexOne = math.floor((gui.camX)/sampleImage.get_width())
+	xIndexTwo = math.ceil((gui.camX+gui.camW)/sampleImage.get_width())
+
+	x = 0
+	y = 0
+	for r in range(yIndexOne,yIndexTwo):
+		if(r < len(mapTiles)):
+			row = mapTiles[r]
+			y = r *sampleImage.get_height()
+			
+			for c in range(xIndexOne,xIndexTwo):
+				x = c *sampleImage.get_width()
+				if(c <len(row)):
+					col = row[c]
+					# 1 INDEX = 'IS ANIMATED?'
+					if(col[1]==False ):
+						# type,index = keys 
+						image = gui.tileDict[col[2]][col[3]]
+
+
+						# -----------IF HOVER MULTI-SELECT 
+
+						if(gui.mouseCollides(x-gui.camX,y-gui.camY,image.get_width(),image.get_height())):
+							self.tileHovered = True
+							if(self.tileSelecting):
+								# ADD TO EDIT LIST
+								selectedCoords = [r,c]
+								if(selectedCoords not in self.tileSelectionList): 
+									self.tileSelectionList.append(selectedCoords)
+
+						#  -----------IF SELECTED, SHOW BASE SELECTING TILE
+
+						if([r,c] in self.tileSelectionList and self.tileSelecting):
+
+							drawImage(gui.screen,gui.tileDict['base'][2],(x-gui.camX,y-gui.camY))
+					
+						#  -----------IF EDITING, SHOW THE CURRENT BROWSED IMAGE
+
+						elif([r,c] in self.tileSelectionList and self.editingTile):
+							drawImage(gui.screen, gui.tileDict[self.tileOptions[self.tileOptionsIndex]][self.tileOptionsSubIndex],(x-gui.camX,y-gui.camY))
+
 
 def boxSelector(self,gui,game,mapTiles):
 
-	# SELECTING UNITS 
-	selectedArea = self.dragSelect.dragSelect(gui,gui.camX,gui.camY)
 	
+	if(gui.rightClicked):
+		self.boxCoords = []
+	if(gui.clicked):
+		if(len(self.boxCoords)<4):
+			self.boxCoords.append((gui.mx+gui.camX,gui.my+gui.camY))
+			gui.clicked=False
+
+
+
 	# if CURSOR AREA SELECTION
-	if(selectedArea!=None):
+	if(len(self.boxCoords)<4):
+		for bc in self.boxCoords:
+			drawTextWithBackground(gui.screen,gui.bigFont,str(self.boxCoords.index(bc)),bc[0]-gui.camX,bc[1]-gui.camY ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+		
+	if(len(self.boxCoords)==4):
+		selectedCoords = self.boxCoords
+		x_min = min(x for x, y in selectedCoords)
+		y_min = min(y for x, y in selectedCoords)
+		x_max = max(x for x, y in selectedCoords)
+		y_max = max(y for x, y in selectedCoords)
+		selectedArea = [x_min, y_min, x_max - x_min, y_max - y_min]
+
 
 		mapTiles = self.gameMap['metaTiles']
 		x,y = 0,0
@@ -117,7 +173,8 @@ def boxSelector(self,gui,game,mapTiles):
 
 		self.editingTile   = True
 		self.tileSelecting = False
-		self.selectMode    ='tile'  
+		self.selectMode    = 'tile'
+		self.boxCoords     = []
 
 
 
@@ -152,15 +209,24 @@ def selectTile(self,gui):
 	if(decrementPage):  self.pagedIndex = self.previousIndex
 	if(self.pagedIndex<0): self.pagedIndex = 0
 	
+	# DRAW THE TILE MENU  
+	
 	if(self.pagedIndex>len(currentTiles)-1): self.pagedIndex = len(currentTiles)-1
+	
 	for i in range(self.pagedIndex,len(currentTiles)):
 		x = currentTiles[i]
-		drawImage(gui.screen,x,(tx,ty))
-		if(gui.mouseCollides(tx,ty,100,100)):
-			pygame.draw.rect(gui.screen,(200,200,200),(tx,ty,100,100),5)
+		pygame.draw.rect(gui.screen,(5,9,20),(tx,ty,x.get_width(),x.get_height()))
+		currentImage = x
+		if(x.get_width()==50): currentImage = pygame.transform.scale(x, (100, 100))
+
+		drawImage(gui.screen,currentImage,(tx,ty))
+		
+		# Draw bounding box
+		if(gui.mouseCollides(tx,ty,currentImage.get_width(),currentImage.get_height())):
+			pygame.draw.rect(gui.screen,(200,200,200),(tx,ty,currentImage.get_width(),currentImage.get_height()),2)
 			hoverSelectedTileSubIndex = i
 		else:
-			pygame.draw.rect(gui.screen,(5,9,20),(tx,ty,100,100),5)
+			pygame.draw.rect(gui.screen,(5,9,20),(tx,ty,currentImage.get_width(),currentImage.get_height()),2)
 		tx+= 95
 		colCounter+=1
 		if(colCounter>=12):
@@ -244,25 +310,29 @@ def selectTile(self,gui):
 
 def showUnderLayer(self,gui):
 	mapTiles = self.gameMap['metaTiles']
-
-	#gui.screen.fill((255,0,0 ))
-	x = 0
-	y = 0
-	# USES THE type and index as keys to gui.layer2Dict
-	counter = 0
-	for row in mapTiles:
-		for c in row:
-			if(c['animated']==False ):
-				image = gui.tileDict[c['type']][c['index']]
-				#image.set_alpha(200)
-				if(onScreen(x,y,image.get_width(),image.get_height(),gui)):
-
-
-					drawImage(gui.screen,image,(x- gui.camX,y-gui.camY))
-					counter +=1
-			
-
-			x += image.get_width()
-		y+= image.get_height()
-		x = 0
-
+	# USES THE type and index as keys to gui.tileDict
+	sampleImage = gui.tileDict[mapTiles[0][0]['type']][mapTiles[0][0]['index']]
+	# *** SETTING THE INDEX'S GREATLY SPEEDS UP AND REDUCES LAG
+	yIndexOne = math.floor((gui.camY)/sampleImage.get_height())
+	yIndexTwo = math.ceil((gui.camY+gui.camH)/sampleImage.get_height())
+	#
+	xIndexOne = math.floor((gui.camX)/sampleImage.get_width())
+	xIndexTwo = math.ceil((gui.camX+gui.camW)/sampleImage.get_width())
+	if(xIndexOne<0):
+		return()
+	#print(' number of rows {}'.format(str(len(mapTiles))))
+	for r in range(yIndexOne,yIndexTwo):
+		if(r < len(mapTiles)):
+			row = mapTiles[r]
+			y = r *sampleImage.get_height()
+			for c in range(xIndexOne,xIndexTwo):
+				if(c <len(row)):
+					col = row[c]
+					x = c *sampleImage.get_width()
+					
+					if(col['animated']==False ):
+						image = gui.tileDict[col['type']][col['index']]
+						#image.set_alpha(200)
+						if(onScreen(x,y,image.get_width(),image.get_height(),gui)):
+							drawImage(gui.screen,image,(x- gui.camX,y-gui.camY))
+					

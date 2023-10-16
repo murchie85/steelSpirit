@@ -10,6 +10,7 @@ class scout(parent):
 		self.name           = 'scout'
 		self.kind           = 'air'
 		self.images         = imageAnimateAdvanced(gui.scoutRed,0.2)
+		self.shadow         = imageAnimateAdvanced(gui.scoutShadow,0.2)
 		self.x,self.y       = 500,500
 		if(x!=None): self.x = x
 		if(y!=None): self.y = y
@@ -145,7 +146,11 @@ class scout(parent):
 
 	def drawSelf(self,gui,game,lv):
 		x,y = self.x - gui.camX,self.y  - gui.camY
-		
+
+		shadow_x = x + 15
+		shadow_y = y + 15
+		self.shadow.animate(gui,'scout shadow',[shadow_x,shadow_y],game,rotation=self.facing-90)
+
 		if(self.hit):
 			self.damageAnimation(gui,lv,game)
 		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) ):

@@ -24,7 +24,6 @@ def editLayer2(self,gui,game):
 		self.gameMap['layer2'] = layer2
 
 
-
 	# SET MAPTILES VAR
 
 	mapTiles = self.gameMap['layer2']
@@ -55,10 +54,10 @@ def editLayer2(self,gui,game):
 			col = row[c]
 
 			if(col['animated']==False ):
+				# IF EXISTS IN DICT
 				if(col['type'] in gui.layer2Dict.keys()):
 					image = gui.layer2Dict[col['type']][col['index']]
 				else:
-					# IMAGE NO LONGER EXISTS IN REF DICT - SO REPLACE
 					image = gui.layer2Dict['base'][0]
 
 
@@ -230,26 +229,5 @@ def selectL2Tile(self,gui):
 
 
 def showUnderLayer(self,gui):
-	mapTiles = self.gameMap['metaTiles']
-
-	#gui.screen.fill((255,0,0 ))
-	x = 0
-	y = 0
-	# USES THE type and index as keys to gui.layer2Dict
-	counter = 0
-	for row in mapTiles:
-		for c in row:
-			if(c['animated']==False ):
-				image = gui.tileDict[c['type']][c['index']]
-				#image.set_alpha(200)
-				if(onScreen(x,y,image.get_width(),image.get_height(),gui)):
-
-
-					drawImage(gui.screen,image,(x- gui.camX,y-gui.camY))
-					counter +=1
-			
-
-			x += image.get_width()
-		y+= image.get_height()
-		x = 0
+	pass
 

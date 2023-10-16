@@ -1,0 +1,10 @@
+TO DO 
+
+- L1, L2(groundblocking)
+- Enemies (include objects)
+- Spawn/target Zones
+
+
+
+- Add weapons powerups
+- Add more intense weapons

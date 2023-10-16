@@ -2,13 +2,16 @@ from utils._utils import *
 from utils.gameUtils import *
 
 def mapMakerOptions(self,gui):
+	
 	# DRAW BACKGROUND PIC
+
 	drawImage(gui.screen,gui.cherry,[0,0])
 	self.levelScreenMask.set_alpha(self.alphaI)
 	self.levelScreenMask.fill((0,0,0))
 	gui.screen.blit(self.levelScreenMask,(0,0))
 
 	# GET TEXT VALUES
+
 	chosenFont = gui.largeFont
 	borderColour=(60,60,200)
 	
@@ -29,6 +32,10 @@ def mapMakerOptions(self,gui):
 	newMap,tex,tey      = simpleButton(0.15*(gui.w-tw),0.4*gui.h,'New Map',gui,chosenFont,setTw=tw,backColour=backColour[0],borderColour=borderColour, textColour=(255,255,255))
 
 	loadMap,tex,tey    = simpleButton(0.15*(gui.w-tw),tey + 0.8*th,'Load Map',gui,chosenFont,setTw=tw,backColour=backColour[1],borderColour=borderColour, textColour=(255,255,255))
+
+
+
+
 
 	# KEY SELECTION 
 	if(gui.input.returnedKey=='return'):

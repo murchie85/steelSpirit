@@ -9,6 +9,7 @@ class bullet():
 		self.ox,self.oy           = x,y
 		self.id                   = bid
 		self.ordType              = 'bullet'
+		self.name                 = 'bullet'
 		self.classification       = classification
 		self.facing               = facing
 		self.speed                = speed
@@ -19,7 +20,7 @@ class bullet():
 		self.debrisTimer          = stopTimer()
 		self.debrisDelay          = 0.3
 		self.shrapnellAnimation   = imageAnimateAdvanced(gui.shrapnellA,0.2)
-		self.shrapnellPlume       = imageAnimateAdvanced(gui.shrapnellPlume,0.2)
+		self.shrapnellPlume       = imageAnimateAdvanced(gui.shrapnellPlume,0.1)
 		self.shrapnellType        = shrapnellType
 
 
@@ -27,11 +28,13 @@ class bullet():
 
 		self.bulletType     = bulletType
 
-		self.slitherTypes   = ['slitherShot','doubleSlither']
-		self.triTypes       = ['triBlast']
-		self.yellowPlasma   = ['smallAA']
-		self.redPlasmaBall  = ['redPlasmaBall']
-		self.hotRoundTypes  = ['hotRound','hotDouble','hotTripple']
+		self.slitherTypes       = ['slitherShot','doubleSlither']
+		self.triTypes           = ['triBlast']
+		self.yellowPlasma       = ['smallAA','yellowPlasma']
+		self.redPlasmaBall      = ['redPlasmaBall']
+		self.lightRedPlasmaBall = ['lightRedPlasmaBall']
+		self.hotRoundTypes      = ['hotRound','hotDouble','hotTripple']
+		
 		if(self.bulletType in self.slitherTypes):
 			self.bulletImage   = imageAnimateAdvanced(gui.slitherShot,0.1)
 		if(self.bulletType in self.triTypes):
@@ -40,6 +43,8 @@ class bullet():
 			self.bulletImage   = imageAnimateAdvanced(gui.yellowPlasma,0.1)
 		if(self.bulletType in self.redPlasmaBall):
 			self.bulletImage   = imageAnimateAdvanced(gui.redPlasma,0.1)
+		if(self.bulletType in self.lightRedPlasmaBall):
+			self.bulletImage   = imageAnimateAdvanced(gui.lightRedPlasma,0.1)
 		if(self.bulletType in self.hotRoundTypes):
 			self.bulletImage   = imageAnimateAdvanced(gui.hotRound,0.1)
 
@@ -52,17 +57,18 @@ class bullet():
 		self.x += vel_x 
 		self.y += vel_y
 
-
+		# KILL IF OUT OF BOUNDS
 		self.checkBoundary(gui,lv)
 
+		# KILL IF OFF SCREEN
 		if(not onScreen(self.x,self.y,self.w,self.h,gui)):
-			self.killBullet(lv,killBulletsssage='bullet out of screen')
+			self.killSelf(lv,killMessage='bullet out of screen')
 
 		if(self.classification=='debris'):
 			removeMe = self.debrisTimer.stopWatch(self.debrisDelay,'debris', str(self.id) + str(self.classification) + 'debris', game,silence=True)
 			self.colour = darken(self.colour,darkenAmount=1)
 			if(removeMe):
-				self.killBullet(lv,killBulletsssage='debris Fadeout')
+				self.killSelf(lv,killMessage='debris Fadeout')
 
 		# APPEND A PLUME EVERY 30 pixels
 		if(self.shrapnellType=='A'):
@@ -80,7 +86,7 @@ class bullet():
 		   (self.y < self.oy-self.range) or 
 		   (self.y > self.oy + self.range)
 		   ):
-			self.killBullet(lv,killBulletsssage=' BULLET OUT OF BOUNDS')
+			self.killSelf(lv,killMessage=' BULLET OUT OF BOUNDS')
 			#print('killed :' + str(self.id))
 
 	# ONLY DRAW IF IN BOUNDARY
@@ -102,6 +108,9 @@ class bullet():
 		# ------RED PLASMA 
 		elif(self.bulletType in self.redPlasmaBall):
 			self.bulletImage.animate(gui,'redplasma fire',[x-0.5*gui.yellowPlasma[0].get_width(),y-0.5*gui.yellowPlasma[0].get_height()],game,rotation=self.facing-90)
+		# ------LIGHT RED PLASMA 
+		elif(self.bulletType in self.lightRedPlasmaBall):
+			self.bulletImage.animate(gui,'light redplasma fire',[x-0.5*gui.yellowPlasma[0].get_width(),y-0.5*gui.yellowPlasma[0].get_height()],game,rotation=self.facing-90)
 		# ------HOT ROUNDS
 		elif(self.bulletType in self.hotRoundTypes):
 			self.bulletImage.animate(gui,'hotRound fire',[x-0.5*gui.hotRound[0].get_width(),y-0.5*gui.hotRound[0].get_height()],game,rotation=self.facing-90)
@@ -113,11 +122,11 @@ class bullet():
 		if(self.shrapnellType=='A'):
 			sc, sb = self.shrapnellAnimation.animate(gui,'shrapnell',[x,y],game,rotation=self.facing-90)
 			if(sc):
-				self.killBullet(lv,killBulletsssage='shrapnell complete')
+				self.killSelf(lv,killMessage='shrapnell complete')
 		if(self.shrapnellType=='A_plume'):
 			spc, spb = self.shrapnellPlume.animate(gui,'shrapnellPlume',[x,y],game,rotation=self.facing-90)
 			if(spc):
-				self.killBullet(lv,killBulletsssage='shrapnell complete')
+				self.killSelf(lv,killMessage='shrapnell complete')
 
 
 
@@ -131,21 +140,21 @@ class bullet():
 			if(not target.invincible):
 				target.hp -= self.damage
 				target.hit = True
-				self.killBullet(lv,killBulletsssage='struck enemy')
+				self.killSelf(lv,killMessage='struck enemy')
 
 			# ----KILL THE ENEMY 
 			if(target.hp<=0):
 				target.alive = False
-				killme(target,lv,killMesssage=' struck by enemy fire.',printme=True)
+				killme(target,lv,killMesssage= str(target.name) + ' struck by enemy fire.',printme=True)
 
 	# ENSURE BULLET DIES. 
 
-	def killBullet(self,lv,killBulletsssage=None,printme=False):
+	def killSelf(self,lv,killMessage=None,printme=False):
 		for i in lv.bulletList:
 			if(self.id==i.id):
 				lv.bulletList.remove(self)
 				if(printme):
-					print("Bullett destroyed : " + killBulletsssage + ' ' + str(self.classification))
+					print("Bullett destroyed : " + killMessage + ' ' + str(self.classification))
 
 
 

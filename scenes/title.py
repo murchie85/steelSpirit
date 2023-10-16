@@ -18,11 +18,7 @@ class introScreen():
 		#self.menuImage  = gui.bunnyGirlYCover
 
 		self.dynamicBorder = dynamicBorder(borderColour=(60,60,200),noShadeShifts=10)
-		self.reels         = []
-		for x in range(7):
-			self.reels.append({'cometReel':imageAnimateAdvanced(gui.blueFire,0.3),'x':random.randrange(0,1500),'y':random.randrange(-500,0),'skip':False} )
 		
-		self.bfReel        = imageAnimateAdvanced(gui.blueFire,0.3)
 
 		# alpha overlay
 		self.alphaI         = 100      # used on fade out (goes up to 255)
@@ -134,7 +130,7 @@ class introScreen():
 
 			
 			# MANAGE DPAD CONTROL OF BUTTONS 
-			buttonColourList = [(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0)]
+			buttonColourList = [(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0),(0,0,0)]
 			if(gui.input.returnedKey.upper()=='S'): self.buttonIndex  +=1
 			if(gui.input.returnedKey.upper()=='W'): self.buttonIndex  -=1
 			if(self.buttonIndex<0): self.buttonIndex = len(buttonColourList) -1
@@ -145,22 +141,25 @@ class introScreen():
 
 
 
-			startGame,tex,tey    = simpleButton(0.8*(gui.w-tw),0.3*gui.h,'Start Game',gui,chosenFont,setTw=tw,backColour=backColour[0],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
+			startGame,tex,tey       = simpleButton(0.8*(gui.w-tw),0.3*gui.h,'Start Game',gui,chosenFont,setTw=tw,backColour=backColour[0],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
-			profile,tex,tey      = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Profile',gui,chosenFont,setTw=tw,backColour=backColour[1],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
+			profile,tex,tey         = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Profile',gui,chosenFont,setTw=tw,backColour=backColour[1],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
-			loadGame,tex,tey     = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Load Game',gui,chosenFont,setTw=tw,backColour=backColour[2],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
+			loadGame,tex,tey        = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Load Game',gui,chosenFont,setTw=tw,backColour=backColour[2],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
-			mapEditor,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Map Editor',gui,chosenFont,setTw=tw,backColour=backColour[3],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
+			newMapEditor,tex,tey    = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'New Map Editor',gui,chosenFont,setTw=tw,backColour=backColour[3],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
-			settings,tex,tey     = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Settings',gui,chosenFont,setTw=tw,backColour=backColour[4],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
+			mapEditor,tex,tey       = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Map Editor',gui,chosenFont,setTw=tw,backColour=backColour[4],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
+
+			settings,tex,tey        = simpleButton(0.8*(gui.w-tw),tey + 0.8*th,'Settings',gui,chosenFont,setTw=tw,backColour=backColour[5],borderColour=borderColour, textColour=(255,255,255),hoveredColour=(0,0,0))
 
 			
 			# IF ENTER PRESSED - SELECT THE CHOSEN BUTTON
 			if(gui.input.returnedKey=='return'):
-				startGame = 0==self.buttonIndex
-				profile   = 1==self.buttonIndex
-				mapEditor = 3==self.buttonIndex
+				startGame    = 0==self.buttonIndex
+				profile      = 1==self.buttonIndex
+				newMapEditor = 3==self.buttonIndex
+				mapEditor    = 4==self.buttonIndex
 				gui.input.returnedKey       = ''
 
 
@@ -171,6 +170,10 @@ class introScreen():
 
 			if(profile  ):
 				self.state = 'profile'
+
+			if(newMapEditor):
+				game.state = 'newMapEditor'
+				self.state = 'title'
 
 			if(mapEditor):
 				game.state = 'editor'

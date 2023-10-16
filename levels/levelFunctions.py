@@ -8,8 +8,10 @@ from units.greenTank import *
 from units.attackBoat import *
 from units.aaSmall import *
 from units.mlrs import *
+from units.frigate import *
 from buildings.bioLab import *
 from buildings.barrelRed import *
+from buildings.nonInteractable import *
 import math as math
 
 
@@ -26,6 +28,11 @@ def drawMap(self,gui):
 	yIndexTwo = math.ceil((gui.camY+gui.camH)/sampleImage.get_height())
 	xIndexOne = math.floor((gui.camX)/sampleImage.get_width())
 	xIndexTwo = math.ceil((gui.camX+gui.camW)/sampleImage.get_width())
+
+
+	yIndexTwo = clamp(yIndexTwo,len(mapTiles))
+	xIndexTwo = clamp(xIndexTwo,len(mapTiles[0]))
+
 	for r in range(yIndexOne,yIndexTwo):
 		row = mapTiles[r]
 		y = r *sampleImage.get_height()
@@ -33,7 +40,6 @@ def drawMap(self,gui):
 			col = row[c]
 			x = c *sampleImage.get_width()
 			
-
 			if(col['animated']==False ):
 				image = gui.tileDict[col['type']][col['index']]
 				#image.set_alpha(200)
@@ -42,38 +48,55 @@ def drawMap(self,gui):
 			
 
 
-	# LAYER 2 
+	# LAYER 2 ----THIS HAS A BUG AND SLOWS DOWN
+	
 	if('layer2' in self.gameMap.keys()):
 		layer2 = self.gameMap['layer2']
-
-		#gui.screen.fill((255,0,0 ))
-		x = 0
-		y = 0
 		# USES THE type and index as keys to gui.tileDict
-		for row in layer2:
-			for c in row:
-				if(c['animated']==False ):
-					if(c['type'] in gui.layer2Dict.keys()):
-						image = gui.layer2Dict[c['type']][c['index']]
+		sampleImage = gui.layer2Dict[layer2[0][0]['type']][layer2[0][0]['index']]
+		
+		# *** SETTING THE INDEX'S GREATLY SPEEDS UP AND REDUCES LAG
+		yIndexOne = math.floor((gui.camY)/sampleImage.get_height())
+		yIndexTwo = math.ceil((gui.camY+gui.camH)/sampleImage.get_height())
+		xIndexOne = math.floor((gui.camX)/sampleImage.get_width())
+		xIndexTwo = math.ceil((gui.camX+gui.camW)/sampleImage.get_width())
+
+		yIndexTwo = clamp(yIndexTwo,len(layer2))
+		xIndexTwo = clamp(xIndexTwo,len(layer2[0]))
+
+		for r in range(yIndexOne,yIndexTwo):
+			row = layer2[r]
+			y = r *sampleImage.get_height()
+			for c in range(xIndexOne,xIndexTwo):
+				#print(' number of cols {}'.format(str(len(row))))
+				col = row[c]
+				x = c *sampleImage.get_width()
+				
+
+				if(col['animated']==False ):
+					if(col['type'] in gui.layer2Dict.keys()):
+						image = gui.layer2Dict[col['type']][col['index']]
 					else:
 						image = gui.layer2Dict['base'][8]
-					
-					if(c['type']!='base'):
+
+					#image.set_alpha(200)
+					if(col['type']!='base'):
 						if(onScreen(x,y,image.get_width(),image.get_height(),gui)):
 							drawImage(gui.screen,image,(x- gui.camX,y-gui.camY))
-					
+				
 
-				x += image.get_width()
-			y+= image.get_height()
-			x = 0
+
 
 
 	# SHOW ANYTHING THAT MIGHT BE ON THIS LAYER
 	if('tilelessL1' in self.gameMap.keys()):
 		for item in self.gameMap['tilelessL1']:
-			image = gui.tilelessL1Dict[item['dictKey']][item['index']]
-			if(onScreen(item['x'],item['y'],image.get_width(),image.get_height(),gui)):
-				drawImage(gui.screen,image,(item['x']- gui.camX,item['y']-gui.camY))
+
+			# IGNORE ANIMATED OBJECTS
+			if('animated' not in item['dictKey']):
+				image = gui.tilelessL1Dict[item['dictKey']][item['index']]
+				if(onScreen(item['x'],item['y'],image.get_width(),image.get_height(),gui)):
+					drawImage(gui.screen,image,(item['x']- gui.camX,item['y']-gui.camY))
 
 
 def levelGui(self,gui,game):
@@ -140,8 +163,13 @@ def init(self,gui,game):
 		y+= image.get_height()
 		x = 0
 
-
-
+	tileLess = self.gameMap['tilelessL1']
+	for i in tileLess:
+		if('animated' in i['dictKey']):
+			images = gui.tilelessL1Dict[i['dictKey']]
+			terrain = nonInteractable(i['x'],i['y'],images,imageAnimateAdvanced(images,0.2),gui)
+			self.terrainList.append(terrain)
+	
 	self.allyList.append(self.player)
 	self.player.x = 0.5*self.mapw
 	self.player.y = 0.5*self.maph
@@ -154,7 +182,7 @@ def manageCollisions(self,enemy,gui,game):
 	
 
 	# GET PLAYER OUT OF SELF SPACE
-	if(collidesWith(self.player,enemy) and self.player.invincible==False and enemy.kind not in ['structure','vechicle','boat']):
+	if(collidesWith(self.player,enemy) and self.player.invincible==False and enemy.kind in ['air']):
 		self.player.hp         -= int(0.1*self.player.defaultHp)
 		self.player.hit        = True
 		self.player.invincible = True
@@ -180,7 +208,8 @@ def manageCollisions(self,enemy,gui,game):
 				if((enemy.kind =='air' and otherEnemy.kind =='air') or 
 					# if bump into me
 				   (enemy.kind in ['structure','vechicle']  and otherEnemy.kind in['vechicle','boat']) or 
-				   (enemy.kind =='boat' and otherEnemy.kind =='boat')):
+				   (enemy.kind =='boat' and otherEnemy.kind =='boat') or 
+				   (enemy.kind =='bigBoat' and otherEnemy.kind =='boat')):
 					# MOVE OUT WAY
 					if otherEnemy.x < enemy.x:
 					    # Player is to the left of enemy, move player to the right
@@ -217,13 +246,23 @@ def addEnemy(self,x,y,enemy,gui):
 		enemyObject = aaSmall(createFid(self),gui,x=x,y=y)
 	elif(enemy['kind']=='mlrs'):
 		enemyObject = mlrs(createFid(self),gui,x=x,y=y)
+	elif(enemy['kind']=='frigate'):
+		enemyObject = frigate(createFid(self),gui,self,x=x,y=y)
+	
 	elif(enemy['kind']=='bioLab'):
 		enemyObject = bioLab(createFid(self),gui,x=x,y=y)
 	elif(enemy['kind']=='barrelRed'):
 		enemyObject = barrelRed(createFid(self),gui,x=x,y=y)
 	
+	if('rotation' in enemy.keys()):
+		enemyObject.facing = wrapAngle(enemy['rotation'])
+	
 	if('patrolCoords' in enemy.keys()):
 		enemyObject.patrolLocations = [x['coords'] for x in enemy['patrolCoords']]
+	
+	if('objectiveNumber' in enemy.keys()):
+		enemyObject.objectiveNumber = enemy['objectiveNumber']
+
 	if('seekAndStrafe' in enemy.keys()):
 		enemyObject.seekStrafe = enemy['seekAndStrafe']
 

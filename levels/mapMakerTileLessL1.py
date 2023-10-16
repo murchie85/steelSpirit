@@ -32,61 +32,64 @@ def tilelessL1(self,gui,game):
 	# INIT LAYER 2 IF NOT EXIST
 
 	if('tilelessL1' not in self.gameMap.keys()):
-		messagex, messagey  = 500,300
-		drawTextWithBackground(gui.screen,gui.font,'Create TileLess Layer 1?',messagex,messagey,textColour=(80, 120, 255),backColour= (0,0,0),borderColour=(50,50,200))
-		tw,th                        = getTextWidth(gui.bigFont,'A menu item.'),getTextHeight(gui.bigFont,'A menu item yep sure.')
-		yes,tex,tey,saveHovered      = simpleButtonHovered(messagex,messagey + 3*th,'yes',gui,gui.font,setTw=tw,backColour=(0,0,0),borderColour=(50,50,200), textColour=(255,255,255))
-		no,ttx,tty,backHovered       = simpleButtonHovered(tex + 0.1*tw,messagey +3*th,'No',gui,gui.font,setTw=tw,backColour=(0,0,0),borderColour=(50,50,200), textColour=(255,255,255))
-
-
-		# ------- INITIALISE TILEMAP WITH DEFAULT DICT FOR EVERY COL AND ROW
-		if(yes):
-			tilelessL1 = []
-			#tilelessL1 examples ... [ {'dictKey': keyTotilelessL1Dict, 'x':0,'y':0, 'animated':False}]
-			self.gameMap['tilelessL1'] = tilelessL1
-		if(no):
-			self.tileMode ='Enemies'
-			self.state    ='enemyPlacement'
+		self.gameMap['tilelessL1'] = []
 
 	else:
 
 		# SHOW BOTTOM LAYER
 		showUnderLayer(self,gui)
+		
+
+
+
+
 		if(self.buttonsHovered!=True):
 
 
 			# --- TILE ALREADY EXISTS
-			if(not self.editingTile and self.tl1SelectionState == None):
-				
-				for t in range(0,len(self.gameMap['tilelessL1'])):
-					tile = self.gameMap['tilelessL1'][t]
-					image = gui.tilelessL1Dict[tile['dictKey']][tile['index']]
-					if(gui.mouseCollides(tile['x']-gui.camX,tile['y']-gui.camY,image.get_width(),image.get_height())):
-						drawImage(gui.screen,gui.base100[3],(gui.mx,gui.my))
-						if(gui.clicked):
-							del self.gameMap['tilelessL1'][t]
-							gui.clicked=False
-							return()
+
+			if(self.tl1SelectionState == None):
+
+				if(not self.editingTile):
+					
+					# REMOVE EXISTING TILE 
+					for t in range(0,len(self.gameMap['tilelessL1'])):
+						tile = self.gameMap['tilelessL1'][t]
+						image = gui.tilelessL1Dict[tile['dictKey']][tile['index']]
+						if(gui.mouseCollides(tile['x']-gui.camX,tile['y']-gui.camY,image.get_width(),image.get_height())):
+							drawImage(gui.screen,gui.base100[3],(gui.mx,gui.my))
+							if(gui.clicked):
+								del self.gameMap['tilelessL1'][t]
+								gui.clicked=False
+								return()
 
 
+				# ---- GO TO SELECT ITEM 
 
-			# ---- GO TO SELECT ITEM 
-			if(gui.clicked and not self.editingTile and self.tl1SelectionState == None):
-				self.editingTile = True
-				gui.clicked = False
+				if(gui.clicked and not self.editingTile):
+					self.editingTile = True
+					gui.clicked = False
 
 			
 
 			# DRAW THE ITEM AT THE CURSOR 
-			if(not self.editingTile and self.tl1SelectionState == 'placingItem'):
+
+			if(self.tl1SelectionState == 'placingItem' and not self.editingTile):
 				image = gui.tilelessL1Dict[self.t1Options[self.t1OptionsIndex]][self.t1OptionsSubIndex]
 				drawImage(gui.screen,image,((gui.mx+gui.camX)-gui.camX, (gui.my+gui.camY)-gui.camY))
 
+
 			# --- COMPLETE ITEM PLACEMENT
+
 			if(gui.clicked and not self.editingTile and self.tl1SelectionState == 'placingItem'):
 				self.tl1SelectedCoords = gui.mx + gui.camX, gui.my + gui.camY
 				gui.clicked = False
-				self.gameMap['tilelessL1'].append({'dictKey':self.t1Options[self.t1OptionsIndex],'index':self.t1OptionsSubIndex,'animated':False,'x':self.tl1SelectedCoords[0], 'y':self.tl1SelectedCoords[1]} )
+				
+				if('animated' in self.t1Options[self.t1OptionsIndex]):
+					self.gameMap['tilelessL1'].append({'dictKey':self.t1Options[self.t1OptionsIndex],'index':self.t1OptionsSubIndex,'animated':True,'x':self.tl1SelectedCoords[0], 'y':self.tl1SelectedCoords[1]} )
+				else:
+					self.gameMap['tilelessL1'].append({'dictKey':self.t1Options[self.t1OptionsIndex],'index':self.t1OptionsSubIndex,'animated':False,'x':self.tl1SelectedCoords[0], 'y':self.tl1SelectedCoords[1]} )
+				
 				self.editingTile         = False
 				gui.clicked              = False
 				self.tl1SelectedCoords   = []
@@ -95,6 +98,7 @@ def tilelessL1(self,gui,game):
 				self.t1OptionsSubIndex   = 0
 
 			# RESET SELECTION WITH RIGHT CLICK
+
 			if(gui.rightClicked and self.tl1SelectionState == 'placingItem'):
 				self.editingTile        = False
 				gui.clicked              = False
@@ -228,28 +232,38 @@ def selectL2Tile(self,gui):
 def showUnderLayer(self,gui):
 	mapTiles = self.gameMap['metaTiles']
 
-	# SHOW FIRST LAYER 
-	x = 0
-	y = 0
-	# USES THE type and index as keys to gui.tilelessL1Dict
-	counter = 0
-	for row in mapTiles:
-		for c in row:
-			if(c['animated']==False ):
-				image = gui.tileDict[c['type']][c['index']]
-				#image.set_alpha(200)
-				if(onScreen(x,y,image.get_width(),image.get_height(),gui)):
+	# -----SHOW LAYER ONE TILES 
+
+	# USES THE type and index as keys to gui.tileDict
+	sampleImage = gui.tileDict[mapTiles[0][0]['type']][mapTiles[0][0]['index']]
+	# *** SETTING THE INDEX'S GREATLY SPEEDS UP AND REDUCES LAG
+	yIndexOne = math.floor((gui.camY)/sampleImage.get_height())
+	yIndexTwo = math.ceil((gui.camY+gui.camH)/sampleImage.get_height())
+	#
+	xIndexOne = math.floor((gui.camX)/sampleImage.get_width())
+	xIndexTwo = math.ceil((gui.camX+gui.camW)/sampleImage.get_width())
+	if(xIndexOne<0):
+		return()
+	#print(' number of rows {}'.format(str(len(mapTiles))))
+	for r in range(yIndexOne,yIndexTwo):
+		if(r < len(mapTiles)):
+			row = mapTiles[r]
+			y = r *sampleImage.get_height()
+			for c in range(xIndexOne,xIndexTwo):
+				if(c <len(row)):
+					col = row[c]
+					x = c *sampleImage.get_width()
+					
+					if(col['animated']==False ):
+						image = gui.tileDict[col['type']][col['index']]
+						#image.set_alpha(200)
+						if(onScreen(x,y,image.get_width(),image.get_height(),gui)):
+							drawImage(gui.screen,image,(x- gui.camX,y-gui.camY))
 
 
-					drawImage(gui.screen,image,(x- gui.camX,y-gui.camY))
-					counter +=1
-			
+	# -----SHOW ANYTHING THAT MIGHT BE ON THIS LAYER
 
-			x += image.get_width()
-		y+= image.get_height()
-		x = 0
-
-	# SHOW ANYTHING THAT MIGHT BE ON THIS LAYER
+	
 	for item in self.gameMap['tilelessL1']:
 		image = gui.tilelessL1Dict[item['dictKey']][item['index']]
 		if(onScreen(item['x'],item['y'],image.get_width(),image.get_height(),gui)):

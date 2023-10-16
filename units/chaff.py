@@ -55,7 +55,7 @@ class chaff():
 		# --------LAUNCHED BY PLAYER 
 		flaresComplete = self.destructTimer.stopWatch(self.destructTime,'flare lifecycle', 'flaresEjected ', game,silence=True)
 		if(flaresComplete):
-			self.killSelf(lv,killMissilesssage=' self destructed')
+			self.killSelf(lv,killMessage=' self destructed')
 
 
 		# -----PLUME DESIGN 
@@ -89,7 +89,7 @@ class chaff():
 		
 		# CHECK IF DISTANCE EXCEEDS RANGE
 		if(abs(self.cumulatedDistance)> self.range):
-			self.killSelf(lv,killMissilesssage=' chaff fuel burnout OUT OF RANGE')
+			self.killSelf(lv,killMessage=' chaff fuel burnout OUT OF RANGE')
 
 
 
@@ -101,11 +101,11 @@ class chaff():
 		# IF BULLET CLASSIFICATION IS NOT THE SAME AS TARGETS 
 		if(self.classification!=target.classification):
 			if(target.name=='missile'):
-				target.killMissile(lv,killMissilesssage='missile disabled by chaff')
+				target.killSelf(lv,killMessage='missile disabled by chaff')
 
 	# ENSURE MISSILE DIES. 
 
-	def killSelf(self,lv,killMissilesssage=None,printme=False):
+	def killSelf(self,lv,killMessage=None,printme=False):
 		for i in lv.bulletList:
 			if(self.id==i.id):
 				self.alive = False

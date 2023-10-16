@@ -1106,7 +1106,7 @@ def loadImageFiles(firstFile,path,convert=False,log=False,alphaConvert=False):
     except:
         print('*Error* image file does not end with a numer' + str(firstFile))
     affix  = '.' + firstFile.split('.')[-1]
-    for i in range(index,index+80):
+    for i in range(index,index+98):
         cf = prefix + str(index)
         tfile = path + cf + affix
         if(os.path.isfile(tfile)):
@@ -1129,7 +1129,7 @@ def loadImageFiles(firstFile,path,convert=False,log=False,alphaConvert=False):
 
 
     if(len(imgFiles)<1):
-        print("Image file for " + str(path) + ' not loaded') 
+        print("Image file for " + str(path) + ' not loaded for ' + str(firstFile) ) 
         exit()
 
     return(imgFiles)
@@ -1829,7 +1829,7 @@ class imageAnimateAdvanced():
         self.reelComplete    = False
         self.changeCount     = 0
 
-    def animate(self,gui,trackedName,blitPos,game,rotation=None,centerOfRotation=(0.5,0.5),repeat=True, noseAdjust=False,skipBlit=False):
+    def animate(self,gui,trackedName,blitPos,game,rotation=None,centerOfRotation=(0.5,0.5),repeat=True,skipBlit=False):
         # TIMER THAT ITERATES THROUGH A FRAME EACH GIVEN INTERVAL
         changeFrame = self.frameTimer.stopWatch(self.changeDuration,trackedName, str(self.changeCount) + trackedName, game,silence=True)
         
@@ -1858,16 +1858,7 @@ class imageAnimateAdvanced():
 
         # GET MUTATED COORDINATES
         blitx,blity         = blitPos[0]+centerOfRotation[0]*(imgW-rotatedWidth),blitPos[1]+centerOfRotation[1]*(imgH-rotatedHeight)
-        
-
-        
-        if(noseAdjust):
-            noseX,noseY = (blitPos[0]+0.5*imgW + imgW * 0.5*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH  -imgH*0.5*math.sin(wrapAngle(rotation+90)*math.pi/180))
-            bx,by = blitPos[0],blitPos[1]
-
-            gui.screen.blit(rotated_image, (bx,by ))
-        else:
-            gui.screen.blit(rotated_image, (blitx,blity))
+        gui.screen.blit(rotated_image, (blitx,blity))
 
 
 
@@ -1888,7 +1879,7 @@ class imageAnimateAdvanced():
         behindX,behindY   = (blitPos[0]+0.5*imgW - imgW*1.3*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH +imgH*1.3*math.sin(wrapAngle(rotation+90)*math.pi/180))
         
 
-        #pygame.draw.circle(gui.screen, (220,100,100), (behindX,behindY), 10, 0)
+        #pygame.draw.circle(gui.screen, (220,100,100), (blitPos[0],blitPos[1]), 10, 0)
 
 
         return(self.reelComplete,{'center':(centerX,centerY ), 'centerL':(centerLx,CenterLy ),'centerR':(centerRx,CenterRy ), 'midTop':(midTopX,midTopY),'leftTop':(leftTopX, leftTopY),'rightTop':(rightTopX, rightTopY),'behind':(behindX,behindY) , 'rotatedDims': (rotatedWidth,rotatedHeight)})
