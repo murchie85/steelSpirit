@@ -3,6 +3,7 @@ TO DO
 - L1, L2(groundblocking)
 - Enemies (include objects)
 - Spawn/target Zones
+- change l1 to be dict in active object so it  has terrain info
 
 
 

@@ -2482,6 +2482,51 @@ class dragSelector():
 
 
 
+class dragSelectorScrollable():
+    def __init__(self):
+        self.selecting       = False
+        self.selectedX       = None
+        self.selectedY       = None
+        self.selectedW       = None
+        self.selectedH       = None
+        self.set             = False
+
+        self.borderC         = (20,20,120)
+        self.borderThickness = 3
+
+
+    def dragSelect(self, gui, camx, camy):
+        if not self.selecting:
+            if gui.pressed and not self.set:
+                self.selecting = True
+                self.selectedX = gui.mx + camx
+                self.selectedY = gui.my + camy
+                self.set = True
+
+        if self.selecting:
+            self.selectedW = (gui.mx + camx) - self.selectedX
+            self.selectedH = (gui.my + camy) - self.selectedY
+            
+            screenX = self.selectedX - camx
+            screenY = self.selectedY - camy
+
+            if self.selectedW < 0 and self.selectedH < 0:
+                pygame.draw.rect(gui.screen, self.borderC, [gui.mx + camx, gui.my + camy, -self.selectedW, -self.selectedH], self.borderThickness)
+            elif self.selectedW < 0:
+                pygame.draw.rect(gui.screen, self.borderC, [gui.mx + camx, screenY, -self.selectedW, self.selectedH], self.borderThickness)
+            elif self.selectedH < 0:
+                pygame.draw.rect(gui.screen, self.borderC, [screenX, gui.my + camy, self.selectedW, -self.selectedH], self.borderThickness)
+            else:
+                pygame.draw.rect(gui.screen, self.borderC, [screenX, screenY, self.selectedW, self.selectedH], self.borderThickness)
+
+            if not gui.pressed:
+                self.selecting = False
+                self.set = False
+                return [self.selectedX, self.selectedY, self.selectedW, self.selectedH]
+
+        return None
+
+
 
 
 

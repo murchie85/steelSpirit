@@ -34,7 +34,7 @@ def loadUnconverted(mapPath):
             elif section == "L2":
                 map_l2_data += data
             elif section == "ENEMY":
-                map_enemy_data.append(data)
+                map_enemy_data += data
 
 
 
@@ -174,8 +174,8 @@ def loadLayer2RefData(gui,game):
 def loadEnemyRefData(gui,game):
     """
 
-    X,Y, ENEMY_NAME, ROTATION, PATROL_ROUTE, POWERLEVEL
-    200/300/tank/30/200-250:400-320:200-250:500-220/3
+    X,Y, enemyKeyName,enemySubKeyName, ROTATION, PATROL_ROUTE, POWERLEVEL
+    200/300/ground/tank/30/200-300:400-320:200-250:500-220/3,400/700/air/scout/30/400-700:400-320/3
 
     """
 
@@ -205,27 +205,33 @@ def loadEnemyRefData(gui,game):
     game.activeEnemyData = []
     for item in game.rawEnemyData:
         # objectTiles/obj1/200/420
-        if(item.count('/')==3):
-            xpos         = item.split('/')[0].strip()
-            ypos         = item.split('/')[1].strip()
-            enemyKeyName = item.split('/')[2].strip()
-            rotation     = item.split('/')[3].strip()
-            patrol       = item.split('/')[4].strip()
-            patrolU      = patrol.split(':')
-            patrolRoute  = []
+        if(item.count('/')==6):
+            xpos            = item.split('/')[0].strip()
+            ypos            = item.split('/')[1].strip()
+            enemyKeyName    = item.split('/')[2].strip()
+            enemySubKeyName = item.split('/')[3].strip()
+            rotation        = item.split('/')[4].strip()
+            patrol          = item.split('/')[5].strip()
+            patrolU         = patrol.split(':')
+            patrolRoute     = []
+            print(patrol)
+            print(patrolU)
             for r in patrolU:
                 patrolRoute.append([r.split('-')[0],r.split('-')[1]])
-            lv           = item.split('/')[5].strip()
+            lv           = item.split('/')[6].strip()
 
             # x,y, image, rotation, patrol,powerlevel
-            game.activeEnemyData.append([int(xpos),int(ypos),enemyDict[enemyDict],int(rotation),patrolRoute,lv])
+            # 200/300/ground/tank/30/200-300:400-320:200-250:500-220/3,400/700/air/scout/30/400-700:400-320/3
+            #{'x':200,'y':300,'enemyKeyName':'ground','enemySubKeyName':'tank','patrolRoute':[(200,300),(400-320),(200-250),(500-220)],'lv':3}
+            rotatedImage = pygame.transform.rotate(enemyDict[enemyKeyName][enemySubKeyName]['image'],int(rotation))
+            game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'lv':lv})
 
     # Create a new dict with the images scaled
     for category, items in enemyDict.items():
         for key, value in items.items():
             original_image = value['image']
             scaled_image = pygame.transform.scale(original_image, (70, 70))
-            enemyDict[category][key]['image'] = scaled_image
+            enemyDict[category][key]['scaled_image'] = scaled_image
 
 
     return(enemyDict,game.activeEnemyData)
