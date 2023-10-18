@@ -5,9 +5,10 @@ import os
 
 def loadUnconverted(mapPath):
 
-    map_data = []
-    map_l2_data = []
+    map_data       = []
+    map_l2_data    = []
     map_enemy_data = []
+    spawn_zones    = []
 
     with open(mapPath, 'r') as file:
         section = None  # This will keep track of which section we're in
@@ -22,6 +23,9 @@ def loadUnconverted(mapPath):
             elif line == "*ENEMY":
                 section = "ENEMY"
                 continue
+            elif line == "*SPAWN":
+                section = "SPAWN"
+                continue
             elif not line:  # If the line is empty, skip it
                 continue
 
@@ -35,6 +39,8 @@ def loadUnconverted(mapPath):
                 map_l2_data += data
             elif section == "ENEMY":
                 map_enemy_data += data
+            elif section == "SPAWN":
+                spawn_zones += data
 
 
 
@@ -51,7 +57,7 @@ def loadUnconverted(mapPath):
     print('----------------------------------------------------------------')
     print('\n\n\n\n\n\n\n\n\n')
 
-    return(map_data,map_l2_data,map_enemy_data)
+    return(map_data,map_l2_data,map_enemy_data,spawn_zones)
 
 
 def loadMapRefData(gui,game):
@@ -236,6 +242,23 @@ def loadEnemyRefData(gui,game):
 
     return(enemyDict,game.activeEnemyData)
 
+
+def loadSpawnZones(gui,game):
+    game.activeSpawnZones = []
+    """
+    [[588, 157, 353, 213], [336, 514, 710, 246]]
+    588/157/353/213,
+    """
+    for item in game.rawSpawnData:
+        # []
+        if(item.count('/')==3):
+            x            = item.split('/')[0].strip()
+            y            = item.split('/')[1].strip()
+            w            = item.split('/')[2].strip()
+            h            = item.split('/')[3].strip()
+            quad         = [int(x),int(y),int(w),int(h)]
+            game.activeSpawnZones.append(quad)
+    return(game.activeSpawnZones)
 
 
 

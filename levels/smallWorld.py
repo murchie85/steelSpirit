@@ -28,6 +28,7 @@ class smallWorld():
 		self.defaultEnemyList  = [] # This contains a backup
 		self.deadList          = []
 		self.fids              = [1]
+		self.enemyComponentList = []
 
 		self.enemyDestroyed = False
 

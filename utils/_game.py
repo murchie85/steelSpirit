@@ -352,9 +352,10 @@ class gameObject():
             
             if(chosenFile):
 
-                raw_map_data,map_l2_data,map_enemy_data = loadUnconverted(loadPath+f)
+                raw_map_data,map_l2_data,map_enemy_data,spawn_zones = loadUnconverted(loadPath+f)
                 game.rawL1Data         = raw_map_data
                 game.rawL2Data         = map_l2_data
+                game.rawSpawnData      = spawn_zones
                 
                 self.chosenMapName = f.replace('.txt','')
                 self.chosenMapPath = game.mapPaths + self.chosenMapName + '.txt'

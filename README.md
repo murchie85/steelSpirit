@@ -3,96 +3,78 @@
 ![steel spirit cover](scenes/cover.png)  
 
 
-# TRAILER RELEASE WHEN..
-SHOW
+# SCENE MECHANICS 
+
+It's a FAST DESERT STRIKE like shooter.
+
+With SHMUP TRANSITION scenes
+
+Heavily PLOT DRIVEN with ingame VIDEO GUI (and talk audio)
+
+
+STRETCH: Possible chronotrigger like Magic abilities
+STRETCH: Possible merged turnbase background objectives whilst you fight
+
+
+- QUALITY CONTROL - Does it still have slug throwing SHmup feel?
+- CLEARLY SIGNPOST: FREE MODE <-->LOCKON MODE
+- CLEARLY SIGNPOST: Boosting, side dodge etc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## FEATURES UNSORTED 
+
+
+NOTES: Use a single frame pic (ace combat style) to speed up dev
+GUI: display panel slides up
+GUI: gui must include current objective (can show on pause menu)
+GUI: Game timer
+GUI: full sidebar might be best
+GUI: **KEY** XP/Points tick up on the Gui
+GUI: Minimap bottom right?
+GUI: GUI LAYOUT: HEALTH, INFO PANEL like DC
+GUI: GUI LAYOUT: RIGHT VIDEO SCREEN FOR FAST, INGAME POPUP SCREEN FOR BLUR
+GUI: Video phase in animation - telegraph it
+
+CODE: Enemy Respawn
+CODE:Third layer with paralax canv Speed (possibly cloud cover) - canvas transparent. MOD to pick layer size
+CODE: PROPER SCREEN PANNING so north,south gets more coverage in facing dir
+CODE: ANIMATED TILES
+H - shoot in lockon J - strafe mode JJ - clockwise mode  J hold - break off K - missile
+
+ART: Redo unit art, better colour, look at tank from shmup
+ART: Billowing black smoke
+ART: Shockwave for barell, include shrapnell
+ART: Backgrounds, cram more stuff into a 100/100 tile 
+ART: More raiden explosions (check stuff falling, lv 1)
+ART: Draw a bunch of stuff (Candc3 sprites long laser sect)
+ART: INCINERY FLARE EXPLOSIONS https://youtu.be/zXjBS382P2k?t=224
+ART: Special, Nuke Mussile
+ART: Use contrast for background
+
+SHOW:
 - More colourful weapons (missiles,shields), dodge move
 - A boss to show, objectives, allies, levels, and GUI scenes
 - Tech Tree, flirt scene, weapons loadout
-
-
-# FEATURES
-
-## PRIMARY 
-
-
-Main focus
-----
-
-https://twitter.com/DonPachi003/status/1615725706918469634 baddy example
-
-Level ideas https://twitter.com/dantemendes/status/1625699195289042945
-https://twitter.com/HTProject073/status/1603999213138116609
-
-****OPTIMIZE WITH BLITS***
-
-
-
-
-3. Add loader
 - Smoke, and progressive enemy damage
 - TURRET COOKOFF
 - Make no go zones on map
-
-
-- Medium sized ships
-- SNOW ( a weeks work)
-	- DRAW Carrier jets come at you
-	-  Draw trees, muddy paths, mountains
-	- AA in shell, 
-	- small copters 10 attack if in area (raiden AI), 
-	- Big copter volley of 4
-	- tribarreled tanks (for later stages)
-	- 4 Loaders, 
-	- Guard towers
-	- blizzard effect
-	- toggle lockon view
-	- units chase you a bit
-	- groups of enemies (tanks roll out, copters group attack...etc)
-	- Carrier must have jets that come attack you and fly back
-
-
- - gui
-	 - display panel slides up
-	 - gui must include current objective (can show on pause menu)
-	 - Game timer
-	 - full sidebar might be best
-	 - **KEY** XP/Points tick up on the Gui
-
-
-LEVEL DESIGN TRICK: FOR CONCRETE BASE, BREAK THINGS UP SO ITS NOT CONTINUOUS, HAVE HOLES IN THE FLOOR
-
-## ART ADDITION
-
-- Redo unit art, better colour, look at tank from shmup
-- Billowing black smoke
-- Shockwave for barell, include shrapnell
-- Backgrounds, cram more stuff into a 100/100 tile 
-- More raiden explosions (check stuff falling, lv 1)
-- Draw a bunch of stuff (Candc3 sprites long laser sect)
-- INCINERY FLARE EXPLOSIONS https://youtu.be/zXjBS382P2k?t=224
-- Special, Nuke Mussile
-- Use contrast for background
-Pixel geep https://www.youtube.com/watch?v=uX9r5J1WYko
-Look for concrete samples
-- Terrain should be smaller...maybe...think about it (small view like raiden or big like under attack)
-
-
-## UNITS TO ADD
-
-- DOUBLE BARREL 2 SHOTS SAME TIME
-- Shrapnell flying out should land and puff
-- Surfacing sub
-
-## CODE CHANGES
-
-- Enemy Respawn
-- Third layer with paralax canv Speed (possibly cloud cover) - canvas transparent. MOD to pick layer size
-- PROPER SCREEN PANNING so north,south gets more coverage in facing dir
-- ANIMATED TILES
-H - shoot in lockon J - strafe mode JJ - clockwise mode  J hold - break off K - missile
-
-## FEATURES 
-
 - GUI TEXT SCROLL TIMER
 - When flying ships get hit, they crash and leave a crater
 - Big cannons you destroy and black smoke pours out
@@ -114,26 +96,15 @@ H - shoot in lockon J - strafe mode JJ - clockwise mode  J hold - break off K - 
 - Procedural level generator (start with enemy)
 - raidal lockon speed is unlockable boost
 - Delta time to keep speed constant
-
-
-
-- QUALITY CONTROL - Does it still have slug throwing SHmup feel? Are graphics isometric a bit
-- CLEARLY SIGNPOST: FREE MODE <-->LOCKON MODE
-- CLEARLY SIGNPOST: Boosting, side dodge etc
-
-## CONSIDER ONLY
-
-Tanks can only move in 12 directions maybe 18 making animations look more 3d
+- DOUBLE BARREL 2 SHOTS SAME TIME
+- Shrapnell flying out should land and puff
+- Surfacing submarine
+UNIT: Tanks can only move in 12 directions maybe 18 making animations look more 3d
 bomb self frag
 
-## CONTROLLER 
-
-- Hold button to lock on and turn otherwise free roam
-- Facing south when shooting inverts u/d
-- Probably want lockon/lockoff buttons all to be the same - controll still feels offf, storyboard
-
-## SECONDARY TO BE GROOMED 
-
+CONTROLER: Hold button to lock on and turn otherwise free roam
+CONTROLER: Facing south when shooting inverts u/d
+CONTROLER: Probably want lockon/lockoff buttons all to be the same - controll still feels offf, storyboard
 
 - Tank bumping over - gives realistic feel, with dust thrown up by treds
 BETA TESTING
@@ -146,8 +117,6 @@ ENEMIES TO ADD:
 GIGA TANK - COME FROM UNDER GROUND
 GIGA TURRET / CANNON 
 SHIPS IN PORTS
-
-
 
 - BOSS Slog it battles, that is slugfest and boss chases you about screen
 - BOSS all aim for his core at the same time
@@ -176,19 +145,79 @@ SHIPS IN PORTS
 - movement wind/streak effect
 - More ground damagable structs
 - NAVI ALLY, include story etc
+UNIT: JEEP (https://www.youtube.com/watch?v=uX9r5J1WYko)
+ART: IMPROVE CONCRETE
+UNSURE: Terrain should be smaller...maybe...think about it (small view like raiden or big like under attack)
 
 
-## GUI IDEAS
+# FEATURES: NAVAL BASE LEVEL 
 
-	- Minimap bottom right?
-	- GUI LAYOUT: HEALTH, INFO PANEL like DC
-	- GUI LAYOUT: RIGHT VIDEO SCREEN FOR FAST, INGAME POPUP SCREEN FOR BLUR
+- Medium sized ships
+- SNOW ( a weeks work)
+	- DRAW Carrier jets come at you
+	-  Draw trees, muddy paths, mountains
+	- AA in shell, 
+	- small copters 10 attack if in area (raiden AI), 
+	- Big copter volley of 4
+	- tribarreled tanks (for later stages)
+	- 4 Loaders, 
+	- Guard towers
+	- blizzard effect
+	- toggle lockon view
+	- units chase you a bit
+	- groups of enemies (tanks roll out, copters group attack...etc)
+	- Carrier must have jets that come attack you and fly back
+
+
+
+
+
+# INSPIRATION
+
+
+https://twitter.com/DonPachi003/status/1615725706918469634 baddy example
+
+Level ideas https://twitter.com/dantemendes/status/1625699195289042945
+https://twitter.com/HTProject073/status/1603999213138116609
+
+
+https://www.youtube.com/watch?v=cD_n6TA2VXw
+
+https://youtu.be/e6RqIcdMlPc
+
+power of 10 artwork ideas https://store.steampowered.com/app/1319550/Power_of_Ten/ 
+
+Unity game https://www.reddit.com/user/KrahsteertS/
+
+saturn game https://twitter.com/dantemendes/status/1605888637534707717
+
+shmup maker https://twitter.com/bulostudio/status/1606030117133815808
+
+Gyro Blade
+https://twitter.com/HTProject073/status/1600464060428222464
+
+https://twitter.com/HTProject073/status/1601422278054449153
+
+music making https://www.youtube.com/watch?v=l61EBjVd9tw
+
+https://www.youtube.com/watch?v=-10qqJ_f8ak
+
+
+
+
+
+
+
+
 
 
 
 
 
 ## FEEDBACK FROM PEOPLE 
+
+
+LEVEL DESIGN TRICK: FOR CONCRETE BASE, BREAK THINGS UP SO ITS NOT CONTINUOUS, HAVE HOLES IN THE FLOOR
 
 ```
 Looking good! Some improvements if I may: Tile variants in the grass, it would break up the repetition, you can see a grid.
@@ -226,6 +255,13 @@ KEEP: Currently, tank battles feel shmupy, lots of damage, carnage.
 3. MUST BE differentiable from the 10000 other Shmups (RPG element, Summon attack, Gameplay mechanics???). Joint teams.Shmup/Open pivot
 4. Dodging huge boss like bullet hell stream
 5. Review videos
+- QUALITY CONTROL - Does it still have slug throwing Shmup feel? Are graphics isometric a bit
+- Keep it different from Gyro blade, it should be fast, manic and fun. Not desert strike
+- Lots of variety on screen, AA, planes, ATB, etc
+- Good Map Detail 
+- FLOW FUGE MODE: Zoom to area with dog fight tailers...jump into lockon mode..clean up
+- Visuals still FAR below par - have they been improved to look nice? Think is a boss fight got that proboctor feel?
+
 
 
 
@@ -238,19 +274,6 @@ KEEP: Currently, tank battles feel shmupy, lots of damage, carnage.
 [`JOINT SPECIAL ATTACK`, `Shmup intro`, `slow Underdefeat shmup levels`,   ]
 
 
-
-
-# ACCEPTANCE CRITERIA GLOBAL
-
-- QUALITY CONTROL - Does it still have slug throwing Shmup feel? Are graphics isometric a bit
-- Keep it different from Gyro blade, it should be fast, manic and fun. Not desert strike
-- Lots of variety on screen, AA, planes, ATB, etc
-- Good Map Detail 
-- FLOW FUGE MODE: Zoom to area with dog fight tailers...jump into lockon mode..clean up
-- Visuals still FAR below par - have they been improved to look nice? Think is a boss fight got that proboctor feel?
-
-
-
  
 
 # REFS 
@@ -259,27 +282,6 @@ KEEP: Currently, tank battles feel shmupy, lots of damage, carnage.
 
 
 
-AWESOME IDEA  
-https://www.youtube.com/watch?v=cD_n6TA2VXw
-
-https://youtu.be/e6RqIcdMlPc
-
-power of 10 artwork ideas https://store.steampowered.com/app/1319550/Power_of_Ten/ 
-
-Unity game https://www.reddit.com/user/KrahsteertS/
-
-saturn game https://twitter.com/dantemendes/status/1605888637534707717
-
-shmup maker https://twitter.com/bulostudio/status/1606030117133815808
-
-Gyro Blade
-https://twitter.com/HTProject073/status/1600464060428222464
-
-https://twitter.com/HTProject073/status/1601422278054449153
-
-music making https://www.youtube.com/watch?v=l61EBjVd9tw
-
-https://www.youtube.com/watch?v=-10qqJ_f8ak
 
 
 ================================
@@ -298,11 +300,7 @@ https://www.youtube.com/watch?v=-10qqJ_f8ak
 
 
 
-# SCENE MECHANICS 
 
-- simple ace combat pics for quick pass in game talk
-- Scene accepance criteria.. slow blur then pop up or in game side bar scene
-- Both.. side/bott/top for fast alert slow blur for story scene
 
 ## BIG SCENES
 
@@ -313,6 +311,9 @@ BUNNIES, FOX, CATS on Mars, Venus and outposts
 Parallel world where we gen altered ourselves. Solar system has 40 billion peeps
  - "Your earth isnt the same as ours"
  - "Ssw the solar system wars"
+
+
+ AMU A ROGUE FROM THE AI PERIMETER
 
 ## MUST 
 - LV 1 TUTORIAL, SHOWING EACH MOVE WITH SLOWDOWN...TAP C FOR CHAFF, TO MUSIC RYTHM REALLY MATTERS
@@ -338,6 +339,46 @@ Parallel world where we gen altered ourselves. Solar system has 40 billion peeps
 
 
 ## 2 - DREADNOUGHT
+
+
+THE DREADNOUGHT IS COMING TO DESTROY THE SUN
+
+THE DRONE QUEEN DOES ALL SHE CAN TO STOP THEM AT THE OUTER SOLAR SYSTEM
+
+FIGHT BEGINS, YOU APPROACH FROM REAR
+
+TIMER STARTS; TICK DOWN TOP RIGHT + SHIP HEALTH BAR
+
+PERIMETER 5: THE AI RING
+
+DESTROY PART OF SHIP WITH THEIR HELP
+
+PERIMETER 4: ASTEROID 
+
+SAME
+
+PERIMETER 3: MARS
+
+GIANT PULSE CANNONS DESTROY ANOTHER SEGMENT
+(Multiple allies with you now)
+
+PERIMETER 2: EARTH
+
+MULTIPLE SMALLER PERIMETERS, USA, CHINA, UK ETC
+
+NUKES
+
+PERIMETER 1: VENUS
+
+THE FOXES AND THEIR SWARM FLEETS 
+
+PERIMETER 0: MERCURY
+
+FINAL STAND THE ROGUE ALLIANCE OF ALL THE OTHERS
+
+
+
+
 
 
 implementation 
@@ -398,44 +439,12 @@ Snippets: https://youtu.be/H6kvP0h0g9M?t=5
 - [MAIN] - [GAME] - [LEVEL] - [PLAYER OBJ, ENEMY OBJ, BULLET OBJ, TILEMAPS]
 
 
-## FULL FLOW 
-
-
-- main 
-	
-	- setup ---- (importing images and setting up the main gui, game and other classes)
-	
-	- Coordinator [GAME CLASS] (managing the main scenes/phase of the game)
-
-		- Intro 
-
-		- Title screen
-
-		- Start Menu
-
-		-  Game Logic [LEVEL CLASS]
-
-			- Two main states: 
-
-				- Init
-					- Setup background, add enemies to the field
-				- Run
-					- Runs the bullets, map, enemies, players functions
-
-		- Map editor ***(Complete)***
-
-			- Create new map
-
-			- Load Map
-
-				- Edit map
 
 		- (settings, profile...)
 
 
 
 ## STORY BOARDING
-
 
 
 

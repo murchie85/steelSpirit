@@ -76,7 +76,7 @@ class mapCreator():
 
         self.tileCursor         = 0
         self.updateTileEnabled   = True
-        self.currentLayer        = 'l1'
+        self.currentLayer        = 'Q'
 
 
         self.tileReferenceData   = None
@@ -91,6 +91,9 @@ class mapCreator():
         self.enemyRefData        = None
         self.selectedEnemyKey    = 'air' 
         self.selectedEnemySubKey = 'scout'
+        self.enemySelectionState = 'notSelected'
+        self.enemyToPlace        = {}
+        self.patrolCoords        = []
 
         self.currentEnemyRotation = 90
 
@@ -207,10 +210,11 @@ class mapCreator():
         if(self.mapLoaded==False):
             print("LOADING MAP")
             
-            raw_map_data,map_l2_data,map_enemy_data = loadUnconverted(game.chosenMapPath)
+            raw_map_data,map_l2_data,map_enemy_data,spawn_zones = loadUnconverted(game.chosenMapPath)
             game.rawL1Data    = raw_map_data
             game.rawL2Data    = map_l2_data
             game.rawEnemyData = map_enemy_data
+            game.rawSpawnData = spawn_zones
 
             # This is the data that matters
             self.tileReferenceData,game.activeL1Data                          = loadMapRefData(gui,game)
@@ -312,6 +316,17 @@ class mapCreator():
 
 
 
+
+        if(gui.input.returnedKey=='space'):
+            self.tileCursor = 0
+            if(self.currentLayer=='l1'):
+                self.currentLayer = 'l2'
+            elif(self.currentLayer=='l2'):
+                self.currentLayer = 'E'
+            elif(self.currentLayer=='E'):
+                self.currentLayer = 'Q'
+            elif(self.currentLayer=='Q'):
+                self.currentLayer = 'l1'
 
 
         if(gui.input.returnedKey.upper()=='H'):
@@ -701,7 +716,7 @@ class mapCreator():
 
         # RENDER AND MANAGE LAYER 2
 
-        if(self.currentLayer in ['l2','E']):
+        if(self.currentLayer in ['l2','E','Q']):
 
             if(self.currentLayer in ['l2']):
                 # DISPLAY CURRENT SELECTED TILE
@@ -736,17 +751,19 @@ class mapCreator():
         if(self.currentLayer in ['l1','l2']):
             return()
 
-        # RENDER AND MANAGE ENEMY LAER
+        # RENDER AND MANAGE ENEMY LAYER
 
         
-        if(self.currentLayer in ['E']):
+        if(self.currentLayer in ['E', 'Q']):
 
             # DISPLAY CURRENT SELECTED TILE
-            selectedTile = self.enemyRefData[self.selectedEnemyKey][self.selectedEnemySubKey]['image']
+            if(self.currentLayer in ['E']):
+                selectedTile = self.enemyRefData[self.selectedEnemyKey][self.selectedEnemySubKey]['image']
             
-            selectedTile = pygame.transform.rotate(selectedTile,self.currentEnemyRotation)
+                selectedTile = pygame.transform.rotate(selectedTile,self.currentEnemyRotation)
 
-            drawImage(gui.screen, selectedTile, (gui.mx,gui.my))
+                if(self.enemySelectionState=='notSelected'):
+                    drawImage(gui.screen, selectedTile, (gui.mx,gui.my))
 
             deleteHover= False
 
@@ -755,25 +772,63 @@ class mapCreator():
                 item = game.activeEnemyData[i]
                 drawImage(gui.screen, item['image'], (item['x']-gui.camX,item['y']-gui.camY))
                 
-                # DELETE
-                if(gui.mouseCollides(item['x']-gui.camX,item['y']-gui.camY,item['image'].get_width(),item['image'].get_height())):
-                    pygame.draw.rect(gui.screen, (180,180,120), [item['x']-gui.camX,item['y']-gui.camY,item['image'].get_width(),item['image'].get_height()],4)
-                    deleteHover = True
-                    if(gui.clicked):    
-                        game.activeEnemyData.pop(i)
+                # -------------DELETE
 
-            # ADD TILE TO LIST
-            nothingSelected = True
-            if(gui.clicked and nothingSelected and not deleteHover and self.updateTileEnabled):
-                game.activeEnemyData.append({'x':gui.mx+gui.camX ,'y':gui.my+gui.camY ,'image':selectedTile ,'enemyKeyName':self.selectedEnemyKey ,'enemySubKeyName':self.selectedEnemySubKey ,'rotation':self.currentEnemyRotation ,'patrolRoute':[(200,300),(442,1231),(33,55),(600,20)] ,'lv':3})
-                self.currentEnemyRotation = 0
+                if(self.currentLayer in ['E']):
+                    if(gui.mouseCollides(item['x']-gui.camX,item['y']-gui.camY,item['image'].get_width(),item['image'].get_height())):
+                        pygame.draw.rect(gui.screen, (180,180,120), [item['x']-gui.camX,item['y']-gui.camY,item['image'].get_width(),item['image'].get_height()],4)
+                        deleteHover = True
+                        if(gui.clicked):    
+                            game.activeEnemyData.pop(i)
+
+            
+            if(self.currentLayer in ['E']):
+
+                  
+
+                # --------PLACE ENEMY 
+
+                nothingSelected = True
+                if(gui.clicked and nothingSelected and not deleteHover and self.updateTileEnabled):
+                    if(self.enemySelectionState=='notSelected'):
+                        self.enemyToPlace = {'x':gui.mx+gui.camX ,'y':gui.my+gui.camY ,'image':selectedTile ,'enemyKeyName':self.selectedEnemyKey ,'enemySubKeyName':self.selectedEnemySubKey ,'rotation':self.currentEnemyRotation ,'patrolRoute':[] ,'lv':3}
+                        self.enemySelectionState='setPatrolCoords'
+
+                # --------WAYPOINTS
+
+                # DRAW WAYPOINT INDEXES
+                if(self.enemySelectionState=='setPatrolCoords'):
+                    drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+
+                    for coords in self.patrolCoords:
+                        coordIndex = str(self.patrolCoords.index(coords))
+                        drawTextWithBackground(gui.screen,gui.hugeFont,coordIndex,coords[0]-gui.camX,coords[1]-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+
+                # SET WAYPOINTS
+                if(self.enemySelectionState=='setPatrolCoords'):
+                    patrolIndex = str(len(self.patrolCoords))
+                    #drawTextWithBackground(gui.screen,gui.hugeFont,patrolIndex,x-gui.camX,y-gui.camY,textColour=(20, 50, 200),backColour= (0,0,0),borderColour=(50,50,200))
+                    if(gui.clicked):
+                        self.patrolCoords.append((gui.mx +gui.camX,gui.my+gui.camY))
+            
+                    if(len(self.patrolCoords)>3):
+                        
+                        self.enemySelectionState = 'notSelected'
+                        self.enemyToPlace['patrolRoute'] = self.patrolCoords
+                        game.activeEnemyData.append(self.enemyToPlace) 
+                        self.enemyToPlace = {}
+                        self.patrolCoords = []
+                        self.currentEnemyRotation = 0
+                        
 
 
-            #------REPLACE ALL TILES
-            if(gui.input.returnedKey.upper()=='R'):
-                self.currentEnemyRotation += 90
-                if(self.currentEnemyRotation>270):
-                    self.currentEnemyRotation = 0
+
+                #------ROTATE ENEMY
+
+                if(gui.input.returnedKey.upper()=='R'):
+                    self.currentEnemyRotation += 90
+                    if(self.currentEnemyRotation>270):
+                        self.currentEnemyRotation = 0
 
 
 
@@ -847,6 +902,28 @@ class mapCreator():
             with open(game.chosenMapPath, 'w') as file:
                 file.write(new_content)
 
+            # ----------S
+
+            with open(game.chosenMapPath, 'r') as file:
+                content = file.read()
+
+            spawn_data_str = ""
+            for s in game.activeSpawnZones:
+
+                spawn_data_str += str(s[0]) + '/' + str(s[1]) + '/' + str(s[2]) + '/' + str(s[3]) + ','
+
+
+            # Split the content into sections
+            before_spawn, spawn_data, after_spawn = content.split('*SPAWN', 2)
+
+            # Combine the sections back together with the updated enemy data
+            new_content = before_spawn + '*SPAWN\n' + spawn_data_str + '\n*SPAWN' + after_spawn
+
+
+
+            # Write the updated content back to the file
+            with open(game.chosenMapPath, 'w') as file:
+                file.write(new_content)
 
             self.saving = True
             self.savegame = False
@@ -992,7 +1069,6 @@ class mapCreator():
         if(selectedArea!=None):
             if(selectedArea[2] > 1 and selectedArea[3] > 1):
                 game.activeSpawnZones.append(selectedArea)
-        print(game.activeSpawnZones)
 
 
     def nav(self,gui,game):
