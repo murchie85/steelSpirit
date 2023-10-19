@@ -1,24 +1,33 @@
 from utils._utils import drawImage,load_pickle
 from utils.gameUtils import *
-from levels.levelFunctions import *
+from oldLevels.levelFunctions import *
 from scenes.cutSceneGui import * 
 from units.player import *
 
-class levelFour():
+
+
+class ruralAssault():
+
 	def __init__(self,gui,game):
-		self.state = 'init'
-		self.mapx  = 0
-		self.mapy  = 0
-
+		self.name          = 'ruralAssault'
+		self.player        = player(gui)
+		game.chosenMapName = 'rural Assault'
+		game.chosenMapPath = game.mapPaths + game.chosenMapName + '.txt'
+		game.loadMapData(game,gui,self)
+		"""
+		GIVES; GAME .activeL1Data, activeL2Data,activeAnimatedData,activeEnemyData,activeSpawnZones
+		self. tileReferenceData, layer2RefData, layer2RefDataScaled,animatedRefData, enemyRefData
+		"""
+		self.gameMap = {}
 		
-		self.player    = player(gui)
-		self.gameMap   = load_pickle('state/' + 'lv4.pkl')
-		self.mapw      = self.gameMap['width']
-		self.maph      = self.gameMap['height']
+		self.gameMap['l1']         = game.activeL1Data
+		self.gameMap['l2']         = game.activeL2Data
+		self.gameMap['animated']   = game.activeAnimatedData
+		self.gameMap['enemies']    = game.activeEnemyData
+		self.gameMap['spawnZones'] = game.activeSpawnZones
 
-
-
-		# in game objects
+		self.mapx,self.mapy = 0,0
+		self.playerStartPosition = [0.01*self.mapWidth,0.99*self.mapHeight]
 
 		self.bulletList         = []
 		self.plumeList          = []
@@ -31,35 +40,42 @@ class levelFour():
 		self.terrainList        = []
 		self.fids               = [1]
 
-		self.enemyDestroyed = False
-
-
 		self.log              = []
 		self.remainingEnemies = None
-		self.holdGame        = False
-		self.gamePaused 		  = False
+		self.holdGame         = False
+		self.gamePaused       = False
+
+		self.enemyDestroyed = False
 
 		# -------GUI STUFF
 
 		self.healthBar             = loadingBarClass(100,20,(80,220,80),(220,220,220),(0,0,200))
 		self.objectiveArrow        = imageAnimateAdvanced(gui.objectiveArrow,0.2)
 		self.displayObjectiveArrow = False 
-		self.showObjectiveTimer  = stopTimer()
-		self.arrowCount			 = 0
-		
+		self.showObjectiveTimer    = stopTimer()
+		self.arrowCount			   = 0
 
-		# --------- OBJECTIVES
-		# each spawn sequentially called 
-		self.spawn_1           = {'spawnCount': 1,'spawnIndex':0, 'spawn' : [{'type': 'hind','count':3, 'direction': 'front','spawnLocation':self.gameMap['spawnZones'][0]}]}
-		self.spawn_2           = {'spawnCount': 2,'spawnIndex':0, 'spawn' : [{'type': 'hind','count':4, 'direction': 'front','spawnLocation': self.gameMap['spawnZones'][1]}, {'type': 'hind','count':7, 'direction': 'front','spawnLocation': self.gameMap['spawnZones'][2]}]}
+		# -------SPAWN ZONES
+		self.spawn_1           = {'spawnCount': 1,
+								  'spawnIndex':0, 
+								  'spawn' : [{'type': 'hind','count':3, 'direction': 'front','spawnLocation':self.gameMap['spawnZones'][0]}]}
+		self.spawn_2           = {'spawnCount': 2,
+								  'spawnIndex':0, 
+								  'spawn' : [{'type': 'hind','count':4, 'direction': 'front','spawnLocation': self.gameMap['spawnZones'][1]}, 
+								  			 {'type': 'hind','count':7, 'direction': 'front','spawnLocation': self.gameMap['spawnZones'][2]}]}
 
-		
-		self.objectives        = {'firstWave': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyBarracks','holdGame':False, 'startMessage':'Rookie, clear a path into the base, good luck!', 'completionMessage': 'skipme','activeQuandrant': {'x':self.mapw-3000 ,'w':3000 ,'y':self.maph-6000 ,'h':6000},'enemySpawn':self.spawn_1},
-								  'destroyBarracks': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'sinkNavalYard','holdGame':False,  'startMessage':'Push on to those heavy armoured tanks!.', 'completionMessage': 'Nicely done!','activeQuandrant': {'x':0 ,'w':self.mapw ,'y':self.maph-8000 ,'h':8000},'enemySpawn':self.spawn_2 },
-								  'sinkNavalYard': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'complete', 'holdGame':True, 'startMessage':'Im calling in our guys to mop up, but I need you to push on to sink the naval base for us, it wont be easy but you got this!', 'completionMessage': "Wow, I don't think I can call you rookie any more.",'activeQuandrant': {'x':0 ,'w':self.mapw ,'y':self.maph-8000 ,'h':8000} },
-								  'destroyBioLab': {'objective':'wait','targetObjects':[], 'status': 'notStarted', 'nextObjective':'complete', 'holdGame':True, 'startMessage':'You are doing great, now comes the real reason we brought you here. There is a Bio weapons lab to the north, take it out before they can get those cannisters into trucks. Good hunting!', 'completionMessage': "Damn! If this wasn't VR training i'd have to promote you or something.",'activeQuandrant': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph} }
+		self.objectives        = {'firstWave': {'objective':'eliminate',
+												'targetObjects':[], 
+												'status': 'notStarted', 
+												'nextObjective':'destroyBarracks',
+												'holdGame':False, 
+												'startMessage':'Rookie, clear a path into the base, good luck!', 
+												'completionMessage': 'skipme',
+												'activeQuandrant': {'x':0,'w':self.mapWidth/2  ,'y':self.mapHeight-4000 ,'h':4000},
+												'enemySpawn':self.spawn_1}
 								  }
-		self.objectivesMap       = list(self.objectives.keys())
+		self.objectiveKeyNames       = list(self.objectives.keys())
+		
 		self.currentObjective    = 'firstWave'
 		self.objectiveIntroState = 'notIntroduced'
 		self.objectiveTimer      = countUpTimer()
@@ -77,6 +93,27 @@ class levelFour():
 		# CUTSCENE STUFF
 
 		self.scene = 'debug'
+		self.state ='NOT_STARTED'
+
+	def run(self,gui,game):
+		print("Running")
+
+		# ----- 
+		if(self.state=='NOT_STARTED'):
+			#self.initMe(gui,game)
+
+			return()
+		pass
+
+
+
+
+class levelBlah():
+	def __init__(self,gui,game):
+		pass
+
+
+
 
 
 
@@ -503,12 +540,31 @@ class levelFour():
 	# INIT LEVEL DESIGN 
 
 	def initMe(self,gui,game):
-		init(self,gui,game)
+
 
 		# SET PLAYER INIT POSITION 
 
-		self.player.x = 0.99*self.mapw
-		self.player.y = 0.99*self.maph
+		self.player.x = self.playerStartPosition[0]
+		self.player.y = self.playerStartPosition[1]
+
+		
+		#--------------ADD ENEMIES
+		addEnemies(self,x,y,self.gameMap['enemies'],gui)
+
+		tileLess = self.gameMap['tilelessL1']
+		for i in tileLess:
+			if('animated' in i['dictKey']):
+				images = gui.tilelessL1Dict[i['dictKey']]
+				terrain = nonInteractable(i['x'],i['y'],images,imageAnimateAdvanced(images,0.2),gui)
+				self.terrainList.append(terrain)
+		
+		self.allyList.append(self.player)
+		self.player.x = 0.5*self.mapw
+		self.player.y = 0.5*self.maph
+		self.state= ' start'
+
+
+
 
 		# DON'T INIT IF COMPLETE/NONE
 		if(self.currentObjective=='complete' or self.currentObjective==None):
@@ -516,8 +572,9 @@ class levelFour():
 
 		# ASSIGN ENEMIES TO TARGET OBJECTS BASED ON THEIR OBJECTIVE NUMBER
 
-		for o in range(len(self.objectivesMap)):
-			objectiveKey = self.objectivesMap[o]
+		for o in range(len(self.objectiveKeyNames)):
+			objectiveKey = self.objectiveKeyNames[o]
+			
 			for enemy in self.enemyList:
 				if(hasattr(enemy,'objectiveNumber')):
 					if(o ==enemy.objectiveNumber):
@@ -562,6 +619,60 @@ class levelFour():
 
 
 
+
+	def addEnemies(self,x,y,enemies,gui):
+
+		#game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'objectiveNumber':2, 'lv':lv})
+
+
+		for e in enemies:
+
+			x,y = e['x'], e['y']
+			if(e['enemySubKeyName']=='scout'):
+				enemyObject = scout(createFid(self),gui,x=x,y=y)
+			if(e['enemySubKeyName']=='scout'):
+				enemyObject = scout(createFid(self),gui,x=x,y=y)
+			if(e['enemySubKeyName']=='hind'):
+				enemyObject = hind(createFid(self),gui,x=x,y=y)
+			elif(e['enemySubKeyName']=='tank'):
+				enemyObject = tank(createFid(self),gui,x=x,y=y)
+			elif(e['enemySubKeyName']=='snowTank'):
+				enemyObject = snowTank(createFid(self),gui,x=x,y=y)
+			elif(e['enemySubKeyName']=='attackBoat'):
+				enemyObject = attackBoat(createFid(self),gui,x=x,y=y)
+			elif(e['enemySubKeyName']=='greenTank'):
+				enemyObject = greenTank(createFid(self),gui,x=x,y=y)
+			elif(e['enemySubKeyName']=='aaSmall'):
+				enemyObject = aaSmall(createFid(self),gui,x=x,y=y)
+			elif(e['enemySubKeyName']=='mlrs'):
+				enemyObject = mlrs(createFid(self),gui,x=x,y=y)
+			elif(e['enemySubKeyName']=='frigate'):
+				enemyObject = frigate(createFid(self),gui,self,x=x,y=y)
+			
+			elif(e['enemySubKeyName']=='bioLab'):
+				enemyObject = bioLab(createFid(self),gui,x=x,y=y)
+			elif(e['enemySubKeyName']=='barrelRed'):
+				enemyObject = barrelRed(createFid(self),gui,x=x,y=y)
+			
+			enemyObject.facing = wrapAngle(e['rotation'])
+			
+			enemyObject.patrolLocations = e['patrolRoute']
+			
+			enemyObject.objectiveNumber = e['objectiveNumber']
+
+			if('seekAndStrafe' in enemy.keys()):
+				enemyObject.seekStrafe = enemy['seekAndStrafe']
+
+			self.enemyList.append(enemyObject)
+
+
+
+
+#------STAND ALONE FUNCTION 
+
+
+
+
 def inQuandrant(unit, quandrant):
 	if((unit.x > quandrant['x']) and (unit.x) < (quandrant['x'] + quandrant['w']) ):
 		if(unit.y > quandrant['y'] and (unit.y+unit.h) < (quandrant['y'] + quandrant['h']) ):
@@ -569,5 +680,4 @@ def inQuandrant(unit, quandrant):
 
 	#print('{} {} {} failed '.format(str(unit.x),str(unit.y),str(unit.name)))
 	return(False)
-
 

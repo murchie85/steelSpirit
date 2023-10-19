@@ -1,12 +1,12 @@
 from utils._utils import *
 from utils.gameUtils import *
-from levels.mapMakerOptions import *
-from levels.mapMakerLoadMap import *
-from levels.mapMakerEdit import *
-from levels.mapMakerLayer2 import *
-from levels.mapMakerUnits import *
-from levels.mapMakerTileLessL1 import * 
-from levels.mapMakerSpawnZones import *
+from oldLevels.mapMakerOptions import *
+from oldLevels.mapMakerLoadMap import *
+from oldLevels.mapMakerEdit import *
+from oldLevels.mapMakerLayer2 import *
+from oldLevels.mapMakerUnits import *
+from oldLevels.mapMakerTileLessL1 import * 
+from oldLevels.mapMakerSpawnZones import *
 
 import os
 

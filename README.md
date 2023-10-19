@@ -16,21 +16,7 @@ STRETCH: Possible chronotrigger like Magic abilities
 STRETCH: Possible merged turnbase background objectives whilst you fight
 
 
-- QUALITY CONTROL - Does it still have slug throwing SHmup feel?
-- CLEARLY SIGNPOST: FREE MODE <-->LOCKON MODE
-- CLEARLY SIGNPOST: Boosting, side dodge etc
-
-
-
-
-
-
-
-
-
-
-
-
+QUALITY CONTROL - Does it still have slug throwing SHmup feel?
 
 
 
@@ -40,7 +26,19 @@ STRETCH: Possible merged turnbase background objectives whilst you fight
 
 ## FEATURES UNSORTED 
 
+SORTED
 
+1. POWER UPs 
+2. SQUARE SAMS
+3. SCORE SYSTEM - Extra life at 1k
+4. WIREFRAME GUI
+
+
+
+
+
+CLEARLY SIGNPOST: FREE MODE <-->LOCKON MODE
+CLEARLY SIGNPOST: Boosting, side dodge etc
 NOTES: Use a single frame pic (ace combat style) to speed up dev
 GUI: display panel slides up
 GUI: gui must include current objective (can show on pause menu)

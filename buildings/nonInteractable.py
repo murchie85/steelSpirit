@@ -20,7 +20,7 @@ class nonInteractable():
 		self.w               = images[0].get_width()
 		self.h               = images[0].get_height()
 
-	def drawSelf(self,gui,game,lv):
+	def drawSelf(self,gui,game,lv=None):
 		x,y = self.x - gui.camX,self.y  - gui.camY
 		
 		if(onScreen(self.x,self.y,self.w,self.h,gui)):

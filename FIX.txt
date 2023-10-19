@@ -9,3 +9,14 @@ TO DO
 
 - Add weapons powerups
 - Add more intense weapons
+
+
+FLOW
+
+GAME coordinateGame
+
+if start: instantiateLevels so that all level classes are instantiated to game class
+
+SELECT LEVEL
+
+then that level is run within the same method....

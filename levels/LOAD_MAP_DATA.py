@@ -1,14 +1,16 @@
 import pygame
 import os
-
+from buildings.nonInteractable import *
 
 
 def loadUnconverted(mapPath):
 
     map_data       = []
     map_l2_data    = []
+    animated_data  = []
     map_enemy_data = []
     spawn_zones    = []
+    quadrants      = []
 
     with open(mapPath, 'r') as file:
         section = None  # This will keep track of which section we're in
@@ -20,11 +22,17 @@ def loadUnconverted(mapPath):
             elif line == "*L2":
                 section = "L2"
                 continue
+            elif line == "*ANIMATED":
+                section = "ANIMATED"
+                continue
             elif line == "*ENEMY":
                 section = "ENEMY"
                 continue
             elif line == "*SPAWN":
                 section = "SPAWN"
+                continue
+            elif line == "*QUADRANT":
+                section = "QUADRANT"
                 continue
             elif not line:  # If the line is empty, skip it
                 continue
@@ -37,10 +45,14 @@ def loadUnconverted(mapPath):
                 map_data.append(data)
             elif section == "L2":
                 map_l2_data += data
+            elif section == "ANIMATED":
+                animated_data += data
             elif section == "ENEMY":
                 map_enemy_data += data
             elif section == "SPAWN":
                 spawn_zones += data
+            elif section == "QUADRANT":
+                quadrants += data
 
 
 
@@ -57,7 +69,7 @@ def loadUnconverted(mapPath):
     print('----------------------------------------------------------------')
     print('\n\n\n\n\n\n\n\n\n')
 
-    return(map_data,map_l2_data,map_enemy_data,spawn_zones)
+    return(map_data,map_l2_data,animated_data,map_enemy_data,spawn_zones,quadrants)
 
 
 def loadMapRefData(gui,game):
@@ -139,6 +151,7 @@ def loadLayer2RefData(gui,game):
     pilonLeft   = get_png_files(gui,'/L2/objects/pilonDiagonalLeft/') 
     pilonRight  = get_png_files(gui,'/L2/objects/pilonDiagonalRight/')
     barracks    = get_png_files(gui,'/L2/buildings/barracks/')
+    lv1         = get_png_files(gui,'/L2/lv1/')
 
     
     for k in objectTiles:
@@ -149,6 +162,8 @@ def loadLayer2RefData(gui,game):
         pilonRight[k] = pygame.Surface.convert_alpha(pilonRight[k])
     for k in barracks:
         barracks[k] = pygame.Surface.convert_alpha(barracks[k])
+    for k in lv1:
+        lv1[k] = pygame.Surface.convert_alpha(lv1[k])
 
 
 
@@ -157,6 +172,7 @@ def loadLayer2RefData(gui,game):
     l2Dict['pilonLeft']    = pilonLeft
     l2Dict['pilonRight']   = pilonRight
     l2Dict['barracks']     = barracks
+    l2Dict['lv1']          = lv1
 
 
     game.activeL2Data = []
@@ -175,6 +191,47 @@ def loadLayer2RefData(gui,game):
                           for sub_key, image in value.items()} 
                     for key, value in l2Dict.items()}
     return(l2Dict,game.activeL2Data,l2DictScaled)
+
+
+def loadAnimatedData(gui,game):
+    """
+    populates activeL2Data and returns ref dict
+    """
+    animatedDict = {}
+    changeDurationDict   = {"fast": 0.2,"medium": 0.4,"slow":0.6}
+
+
+    conveyor = get_png_files_list(gui,'/L3_Animated/conveyor/') 
+    for k in range(len(conveyor)):
+        conveyor[k] = pygame.Surface.convert_alpha(conveyor[k])
+
+
+    animatedDict['conveyor']     = {"images": conveyor, "thumbnail":  pygame.transform.scale(conveyor[0], (70, 70)), 'cursorImage':conveyor[0]}
+    
+
+
+    game.activeAnimatedData = []
+    for item in game.rawAnimData:
+        # conveyor/90/200/420/fast
+        if(item.count('/')==4):
+            libraryKey          = item.split('/')[0].strip()
+            rotation            = item.split('/')[1].strip()
+            xpos                = item.split('/')[2].strip()
+            ypos                = item.split('/')[3].strip()
+            changeDuration      = item.split('/')[4].strip()
+
+
+            images      = animatedDict[libraryKey]['images']
+            terrainObj  = nonInteractable(int(xpos),int(ypos),images,imageAnimateAdvanced(images,changeDurationDict[changeDuration]),gui)
+            terrainObj.facing = int(rotation)
+
+
+            # ACTIVEANIMATEDDATA MUST HAVE Lib key, rotation, x,y, animationClass
+            # x,y, image, key,subkey
+            game.activeAnimatedData.append({"x":int(xpos) ,"y": int(ypos),"libraryKey": libraryKey,"speed":changeDuration, "classObject": terrainObj})
+
+    return(animatedDict,game.activeAnimatedData)
+
 
 
 def loadEnemyRefData(gui,game):
@@ -220,8 +277,6 @@ def loadEnemyRefData(gui,game):
             patrol          = item.split('/')[5].strip()
             patrolU         = patrol.split(':')
             patrolRoute     = []
-            print(patrol)
-            print(patrolU)
             for r in patrolU:
                 patrolRoute.append([r.split('-')[0],r.split('-')[1]])
             lv           = item.split('/')[6].strip()
@@ -230,7 +285,7 @@ def loadEnemyRefData(gui,game):
             # 200/300/ground/tank/30/200-300:400-320:200-250:500-220/3,400/700/air/scout/30/400-700:400-320/3
             #{'x':200,'y':300,'enemyKeyName':'ground','enemySubKeyName':'tank','patrolRoute':[(200,300),(400-320),(200-250),(500-220)],'lv':3}
             rotatedImage = pygame.transform.rotate(enemyDict[enemyKeyName][enemySubKeyName]['image'],int(rotation))
-            game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'lv':lv})
+            game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'objectiveNumber':'none', 'lv':lv})
 
     # Create a new dict with the images scaled
     for category, items in enemyDict.items():
@@ -260,6 +315,24 @@ def loadSpawnZones(gui,game):
             game.activeSpawnZones.append(quad)
     return(game.activeSpawnZones)
 
+def loadQuadrants(gui,game):
+    game.activeQuadrants= []
+    """
+    [[588, 157, 353, 213], [336, 514, 710, 246]]
+    588/157/353/213,
+    """
+    for item in game.rawQuadrantData:
+        # []
+        if(item.count('/')==3):
+            x            = item.split('/')[0].strip()
+            y            = item.split('/')[1].strip()
+            w            = item.split('/')[2].strip()
+            h            = item.split('/')[3].strip()
+            quad         = [int(x),int(y),int(w),int(h)]
+            game.activeQuadrants.append(quad)
+    return(game.activeQuadrants)
+
+
 
 
 
@@ -276,7 +349,23 @@ def get_png_files(gui,subdir):
     for pngFile in pngFiles:
         tilesDict[pngFile.replace('.png','')] = pygame.image.load(path + pngFile)
 
+    print("Getting images for " + str(path))
     print(tilesDict)
     return(tilesDict)
+
+def get_png_files_list(gui, subdir):
+    path = gui.tilePath + subdir
+    pngFiles = []
+    with os.scandir(path) as entries:
+        pngFiles = [entry.name for entry in entries if entry.is_file() and entry.name.endswith('.png')]
+
+    tilesList = []
+
+    for pngFile in pngFiles:
+        tilesList.append(pygame.image.load(path + pngFile))
+
+    print("Getting images for " + str(path))
+    print(tilesList)
+    return tilesList
 
 

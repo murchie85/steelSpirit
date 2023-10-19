@@ -203,6 +203,8 @@ concrete/concrete2,concrete/concrete2,concrete/concrete2,concrete/concrete2,conc
 *L2
 458/254/objectTiles/obj1,853/98/objectTiles/obj1,615/529/objectTiles/obj3,286/720/objectTiles/obj4,285/720/pilonLeft/pilon2,285/720/pilonRight/pilon2,1043/402/barracks/barracks3,812/402/barracks/barracks2
 *L2
+*ANIMATED
+*ANIMATED
 *ENEMY
 539/1171/air/scout/90/200-300:442-1231:33-55:600-20/3,2713/775/buildings/bioLab/0/200-300:442-1231:33-55:600-20/3,777/861/buildings/bioLab/0/200-300:442-1231:33-55:600-20/3,777/864/sea/attackBoat/0/200-300:442-1231:33-55:600-20/3,1102/717/ground/snowTank/180/200-300:442-1231:33-55:600-20/3,881/705/ground/tank/180/200-300:442-1231:33-55:600-20/3,1378/190/ground/greenTank/180/200-300:442-1231:33-55:600-20/3,1378/404/ground/greenTank/0/200-300:442-1231:33-55:600-20/3,1385/702/ground/greenTank/0/200-300:442-1231:33-55:600-20/3
 *ENEMY

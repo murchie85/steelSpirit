@@ -3,6 +3,7 @@ from utils._utils import stopTimer
 from utils.gameUtils import *
 from levels.LOAD_MAP_DATA import *
 import random
+import math
 
 """
 TODO:
@@ -76,7 +77,7 @@ class mapCreator():
 
         self.tileCursor         = 0
         self.updateTileEnabled   = True
-        self.currentLayer        = 'Q'
+        self.currentLayer        = 'S'
 
 
         self.tileReferenceData   = None
@@ -87,6 +88,10 @@ class mapCreator():
         self.selectedL2Key      = 'objectTiles'
         self.selectedL2SubKey   = 'obj1'
         self.layer2RefDataScaled = None
+
+        self.animatedRefData        = None
+        self.selectedAnimKey        = 'conveyor'
+        self.currentAnimRotation    = 0
         
         self.enemyRefData        = None
         self.selectedEnemyKey    = 'air' 
@@ -98,13 +103,15 @@ class mapCreator():
         self.currentEnemyRotation = 90
 
 
+
+
     def createMap(self,gui,game):
         
         self.dynamicBorder.animateBorder('menu border',game,gui)
 
 
         # ASK QUESTIONS ABOUT NEW MAP 
-        questionList = ['Name of Map file', 'Tiles per Row', 'Number of Rows', 'Tile Size']
+        questionList = ['Name of Map file', 'Map Width', 'Map Height', 'Tile Size']
         sampleAnsers = ['rumble map','30','50','69']
         if(self.initMapQuestions):
             game.input.enteredString = sampleAnsers[self.questionCursor]
@@ -132,8 +139,8 @@ class mapCreator():
 
         if(self.questionsComplete and self.chosenGameMap==None):
             gameMap = {"name": self.answerList[0],
-                       "cols": int(self.answerList[1]),
-                       "rows":int(self.answerList[2]),
+                       "cols": math.floor(int(self.answerList[1])/50),
+                       "rows":math.floor(int(self.answerList[2])/50),
                        "tileDims": int(self.answerList[3])
                        }
 
@@ -162,6 +169,10 @@ class mapCreator():
             mapfile += '*L2\n'
             mapfile += '*L2\n'
 
+            print("ADDING ANIMATION placeholder ....")
+            mapfile += '*ANIMATED\n'
+            mapfile += '*ANIMATED\n'
+
             print("ADDING ENEMY placeholder ....")
             mapfile += '*ENEMY\n'
             mapfile += '*ENEMY\n'
@@ -169,6 +180,10 @@ class mapCreator():
             print("ADDING SPAWN placeholder ....")
             mapfile += '*SPAWN\n'
             mapfile += '*SPAWN\n'
+
+            print("ADDING QUADRANT placeholder ....")
+            mapfile += '*QUADRANT\n'
+            mapfile += '*QUADRANT\n'
 
             print("Mapfile looks like this")
             print(mapfile)
@@ -209,28 +224,11 @@ class mapCreator():
 
         if(self.mapLoaded==False):
             print("LOADING MAP")
-            
-            raw_map_data,map_l2_data,map_enemy_data,spawn_zones = loadUnconverted(game.chosenMapPath)
-            game.rawL1Data    = raw_map_data
-            game.rawL2Data    = map_l2_data
-            game.rawEnemyData = map_enemy_data
-            game.rawSpawnData = spawn_zones
-
-            # This is the data that matters
-            self.tileReferenceData,game.activeL1Data                          = loadMapRefData(gui,game)
-            self.layer2RefData, game.activeL2Data,self.layer2RefDataScaled    = loadLayer2RefData(gui,game)
-            self.enemyRefData,game.activeEnemyData                            = loadEnemyRefData(gui,game)
-            game.activeSpawnZones                                             = loadSpawnZones(gui,game)
-            
+            game.loadMapData(game,gui,self)
 
             self.mapLoaded = True
 
         #---------------------------CAMERA AND SIZING
-
-        sampleTile = game.activeL1Data[1][2] # A tile representative of the height/width
-        self.tileWidth  = sampleTile.get_width()
-        self.tileHeight = sampleTile.get_height()
-        game.mapWidth, game.mapHeight = len(game.activeL1Data[0])  * self.tileWidth ,len(game.activeL1Data) * self.tileHeight
 
         hoveredTile = self.tileReferenceData[self.selectedTileKey][self.selectedTileSubKey]
 
@@ -242,17 +240,21 @@ class mapCreator():
 
         # These get overriden by any layer below
         gui.scrollEnabled      = True
+        sampleTile             = self.sampleTile
 
         #----------------------------MAP RENDERING
 
         self.renderLayer1Map(gui,game,hoveredTile)
+        self.setQuadrants(gui,game)
         self.spawnZones(gui,game)
         self.renderLayer2Map(gui,game,startX,startY)
+        self.renderAnimatedObjects(gui,game,startX,startY)
         self.renderEnemyMap(gui,game,startX,startY)
 
         self.updateTileEnabled = True
         self.showTileListL1(gui,sampleTile)
         self.showTileListL2(gui,sampleTile)
+        self.showAnimatedList(gui,game)
         self.showEnemyList(gui,sampleTile)
 
         self.sideMenu(gui,game,sampleTile)
@@ -322,8 +324,12 @@ class mapCreator():
             if(self.currentLayer=='l1'):
                 self.currentLayer = 'l2'
             elif(self.currentLayer=='l2'):
+                self.currentLayer = 'A'
+            elif(self.currentLayer=='A'):
                 self.currentLayer = 'E'
             elif(self.currentLayer=='E'):
+                self.currentLayer = 'S'
+            elif(self.currentLayer=='S'):
                 self.currentLayer = 'Q'
             elif(self.currentLayer=='Q'):
                 self.currentLayer = 'l1'
@@ -339,7 +345,16 @@ class mapCreator():
     def sideMenu(self,gui,game,sampleTile):
 
 
-        
+        # --------------------------Text Info
+        if(self.boxSelect):
+            sentence = "Box Selection Enabled"
+            setWidth=getTextWidth(gui.font,sentence)
+            drawTextWithBackground(gui.screen,gui.font,sentence,0.8*gui.w,0.14*gui.h,setWidth=setWidth ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+        else:
+            layerInfoRef = {"l1":"Layer 1" ,"l2":"Objects","A":"Animated Objects","E": "Enemy Placement" ,"S":"Set Spawn Zones","Q":"Set Quadrant Zones"}
+            sentence = layerInfoRef[self.currentLayer]
+            setWidth=getTextWidth(gui.font,sentence)
+            drawTextWithBackground(gui.screen,gui.font,sentence,0.8*gui.w,0.14*gui.h,setWidth=setWidth ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
 
         # --------------------------bounding box
 
@@ -374,20 +389,29 @@ class mapCreator():
         
         if(self.currentLayer=='l1'):
             tile1,tile2 = gui.L1_1,gui.L1_2 
-        if(self.currentLayer=='l2'):
+        elif(self.currentLayer=='l2'):
             tile1,tile2 = gui.L2_1,gui.L2_2 
-        if(self.currentLayer=='E'):
+        elif(self.currentLayer=='A'):
+            tile1,tile2 = gui.Anim_1,gui.Anim_2 
+        elif(self.currentLayer=='E'):
             tile1,tile2 = gui.E_1,gui.E_2 
-        if(self.currentLayer=='Q'):
+        elif(self.currentLayer=='S'):
+            tile1,tile2 = gui.S_1,gui.S_2
+        elif(self.currentLayer=='Q'):
             tile1,tile2 = gui.Q_1,gui.Q_2 
+
         toggleLayer = drawSelectableImage(tile1,tile2,[toggleX,toggleY],gui)
         if(toggleLayer):
             self.tileCursor = 0
             if(self.currentLayer=='l1'):
                 self.currentLayer = 'l2'
             elif(self.currentLayer=='l2'):
+                self.currentLayer = 'A'
+            elif(self.currentLayer=='A'):
                 self.currentLayer = 'E'
             elif(self.currentLayer=='E'):
+                self.currentLayer = 'S'
+            elif(self.currentLayer=='S'):
                 self.currentLayer = 'Q'
             elif(self.currentLayer=='Q'):
                 self.currentLayer = 'l1'
@@ -401,7 +425,7 @@ class mapCreator():
         
 
         setWidth=getTextWidth(gui.font,'A menu item yep sure correct.')
-        sentence = "Map Size: [" + str(game.mapWidth) + ':' + str(game.mapHeight) +']'
+        sentence = "Map Size: [" + str(self.mapWidth) + ':' + str(self.mapHeight) +']'
         drawTextWithBackground(gui.screen,gui.font,sentence,50,20,setWidth=setWidth ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
         sentence = '(' +str(gui.mx+gui.camX) + ',' + str(gui.my+gui.camY) +')'
         drawTextWithBackground(gui.screen,gui.font,sentence,50,800,setWidth=setWidth ,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
@@ -548,6 +572,79 @@ class mapCreator():
                     self.tileCursor = 0
                 else:
                     self.tileCursor = 0
+
+
+    def showAnimatedList(self,gui,game):
+
+        # TILE/OBJECT WINDOW
+        if(self.toggleWindow and self.currentLayer=='A'):
+            windowItemLen = 30
+            rows = 3
+            cols = int(windowItemLen/rows)
+            startX,startY = 0.2*gui.w,0.8*gui.h
+            originX,originY  = startX,startY
+            tileLen,tileHeight = 70,70
+            tileIndex = self.tileCursor
+            mainKeys = list(self.animatedRefData.keys())
+            mainKeys.reverse()
+
+            
+            for i in range(rows):
+
+                for j in range(cols):
+
+                    # don't draw any more boxes
+                    if(tileIndex>=len(mainKeys)):
+                        break
+
+                    pygame.draw.rect(gui.screen, (80,80,40), [startX, startY,tileLen, tileHeight])
+                    
+                    if(tileIndex<len(mainKeys)):
+                        drawImage(gui.screen, self.animatedRefData[self.selectedAnimKey]['thumbnail'], (startX, startY))
+
+                    # HIGHLIGHT / SELECTED
+                    if(gui.mouseCollides(startX,startY,tileLen,tileHeight)):
+                        self.updateTileEnabled = False
+                        gui.scrollEnabled = False
+                        pygame.draw.rect(gui.screen, (180,180,200), [startX, startY,tileLen, tileHeight],4)
+                        if(gui.clicked):
+                            self.selectedAnimKey = mainKeys[tileIndex]
+                    else:
+                        pygame.draw.rect(gui.screen, (30,30,200) , [startX, startY,tileLen, tileHeight],4)
+
+
+
+                    
+                    tileIndex +=1
+                    startX+=tileLen-4
+                startX = originX
+                startY += tileHeight -4
+
+            # -----NEXT TILE TYPE
+            # nextGroup = drawSelectableImage(gui.smallBase100[4],gui.smallBase100[5],[originX-50,originY],gui)
+            # if(gui.mouseCollides(originX-50,originY,50,50)):
+            #     gui.scrollEnabled = False
+            # if(nextGroup):
+            #     self.selectedEnemyKey      = get_next_tile_key(self.enemyRefData, self.selectedEnemyKey)
+            #     self.selectedEnemySubKey   = list(self.enemyRefData[self.selectedEnemyKey].keys())[0]
+            #     self.tileCursor =0
+
+            # -----SCROLL TILES 
+
+            nextTile = drawSelectableImage(gui.smallBase100[11],gui.smallBase100[12],[originX-50,originY+50],gui)
+            if(gui.mouseCollides(originX-50,originY+50,50,50)):
+                gui.scrollEnabled = False
+            if(nextTile):
+                if(len(mainKeys)>tileIndex):
+                    self.tileCursor = tileIndex
+                elif(self.tileCursor==len(mainKeys)-1):
+                    self.tileCursor = 0
+                else:
+                    self.tileCursor = 0
+
+
+
+
 
     def showEnemyList(self,gui,sampleTile):
 
@@ -716,7 +813,7 @@ class mapCreator():
 
         # RENDER AND MANAGE LAYER 2
 
-        if(self.currentLayer in ['l2','E','Q']):
+        if(self.currentLayer in ['l2','E','S','Q']):
 
             if(self.currentLayer in ['l2']):
                 # DISPLAY CURRENT SELECTED TILE
@@ -746,7 +843,7 @@ class mapCreator():
                     print("Added: " + str([selectedTile,gui.mx-gui.camX,gui.my-gui.camY,self.selectedL2Key,self.selectedL2SubKey ]))
 
 
-    def renderEnemyMap(self,gui,game,startX,startY):
+    def renderAnimatedObjects(self,gui,game,startX,startY):
 
         if(self.currentLayer in ['l1','l2']):
             return()
@@ -754,7 +851,74 @@ class mapCreator():
         # RENDER AND MANAGE ENEMY LAYER
 
         
-        if(self.currentLayer in ['E', 'Q']):
+        if(self.currentLayer in ['A','E', 'S','Q']):
+
+            # DISPLAY CURRENT SELECTED TILE AT CURSOR
+            if(self.currentLayer in ['A']):
+                selectedTile = self.animatedRefData[self.selectedAnimKey]['cursorImage']
+            
+                selectedTile = pygame.transform.rotate(selectedTile,self.currentAnimRotation)
+
+                drawImage(gui.screen, selectedTile, (gui.mx,gui.my))
+
+            deleteHover= False
+
+            # DISPLAY FULL MAP
+            for i in range(len(game.activeAnimatedData)-1,-1,-1):
+                currentAnimatedObject = game.activeAnimatedData[i]
+                objClass = currentAnimatedObject['classObject']
+                objClass.drawSelf(gui,game,self)
+                
+                # -------------DELETE
+
+                if(self.currentLayer in ['A']):
+                    if(gui.mouseCollides(currentAnimatedObject['x']-gui.camX,currentAnimatedObject['y']-gui.camY,objClass.w,objClass.h)):
+                        pygame.draw.rect(gui.screen, (180,180,120), [currentAnimatedObject['x']-gui.camX,currentAnimatedObject['y']-gui.camY,objClass.w,objClass.h],4)
+                        deleteHover = True
+                        if(gui.clicked):    
+                            game.activeAnimatedData.pop(i)
+
+        if(self.currentLayer in ['A']):
+
+            #------ROTATE ENEMY
+
+            if(gui.input.returnedKey.upper()=='R'):
+                self.currentAnimRotation += 90
+                if(self.currentAnimRotation>270):
+                    self.currentAnimRotation = 0
+
+            # ADD TILE TO LIST
+            nothingSelected = True
+            if(gui.clicked and nothingSelected and not deleteHover and self.updateTileEnabled):
+                xpos,ypos   = gui.mx+gui.camX, gui.my+gui.camY
+                images      = self.animatedRefData[self.selectedAnimKey]['images']
+                speed          = 'fast'
+                changeDuration = 0.2
+                terrainObj  = nonInteractable(int(xpos),int(ypos),images,imageAnimateAdvanced(images,changeDuration),gui)
+                if(self.currentAnimRotation in [0,180]):
+                    pass
+                else:
+                    w,h = terrainObj.h,terrainObj.w
+                    terrainObj.w = w
+                    terrainObj.h = h
+
+
+                terrainObj.facing = self.currentAnimRotation + 90
+                game.activeAnimatedData.append({"x":int(xpos) ,"y": int(ypos),"libraryKey": self.selectedAnimKey,"speed":speed, "classObject": terrainObj})
+                print("Added animation object ")
+
+
+
+
+    def renderEnemyMap(self,gui,game,startX,startY):
+
+        if(self.currentLayer in ['l1','l2','A']):
+            return()
+
+        # RENDER AND MANAGE ENEMY LAYER
+
+        
+        if(self.currentLayer in ['E', 'S','Q']):
 
             # DISPLAY CURRENT SELECTED TILE
             if(self.currentLayer in ['E']):
@@ -792,9 +956,26 @@ class mapCreator():
                 if(gui.clicked and nothingSelected and not deleteHover and self.updateTileEnabled):
                     if(self.enemySelectionState=='notSelected'):
                         self.enemyToPlace = {'x':gui.mx+gui.camX ,'y':gui.my+gui.camY ,'image':selectedTile ,'enemyKeyName':self.selectedEnemyKey ,'enemySubKeyName':self.selectedEnemySubKey ,'rotation':self.currentEnemyRotation ,'patrolRoute':[] ,'lv':3}
-                        self.enemySelectionState='setPatrolCoords'
+                        self.enemySelectionState='askPatrol'
 
                 # --------WAYPOINTS
+
+                if(self.enemySelectionState=='askPatrol'):
+                    chosenFont       = gui.largeFont
+                    borderColour     =(60,60,200)
+                    tw= getTextWidth(chosenFont,'Yes.')
+                    drawTextWithBackground(gui.screen,chosenFont,'Add Patrol Route?',0.4*gui.w,0.35*gui.h,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                    yes,tex,tey      = simpleButton(0.4*gui.w,0.4*gui.h,'Yes',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+                    no,tex,tey       = simpleButton(0.45*gui.w,0.4*gui.h,'No',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+                    
+                    self.scrollEnabled = False
+                    if(yes):
+                        self.enemySelectionState='setPatrolCoords'
+                        self.scrollEnabled = True
+                    if(no):
+                        self.patrolCoords = [(self.enemyToPlace['x'],self.enemyToPlace['y']),(self.enemyToPlace['x'],self.enemyToPlace['y']),(self.enemyToPlace['x'],self.enemyToPlace['y']),(self.enemyToPlace['x'],self.enemyToPlace['y'])]
+                        self.enemySelectionState='complete'
+                        self.scrollEnabled = True
 
                 # DRAW WAYPOINT INDEXES
                 if(self.enemySelectionState=='setPatrolCoords'):
@@ -812,16 +993,26 @@ class mapCreator():
                         self.patrolCoords.append((gui.mx +gui.camX,gui.my+gui.camY))
             
                     if(len(self.patrolCoords)>3):
-                        
-                        self.enemySelectionState = 'notSelected'
-                        self.enemyToPlace['patrolRoute'] = self.patrolCoords
-                        game.activeEnemyData.append(self.enemyToPlace) 
-                        self.enemyToPlace = {}
-                        self.patrolCoords = []
-                        self.currentEnemyRotation = 0
+                        self.enemySelectionState='complete'
                         
 
+                if(self.enemySelectionState=='complete'):
+                    self.enemySelectionState = 'notSelected'
+                    self.enemyToPlace['patrolRoute'] = self.patrolCoords
+                    game.activeEnemyData.append(self.enemyToPlace) 
+                    self.enemyToPlace = {}
+                    self.patrolCoords = []
+                    self.currentEnemyRotation = 0
 
+                        
+
+                # --------OBJECTIVE NAME
+
+                # drawText(gui,gui.font,questionList[self.questionCursor],500,300, colour=(100, 100, 255))
+                # game.input.drawTextInputSingleLine(game.input.enteredString,500,400,gui,boxBorder=(50,50,200),boxFill=(0,0,0) ,colour=(80,80,255))
+                # returnvalue = game.input.processInput()
+            
+            if(game.input.returnedKey=='ENTER'):
 
                 #------ROTATE ENEMY
 
@@ -878,6 +1069,35 @@ class mapCreator():
             # Write the updated content back to the file
             with open(game.chosenMapPath, 'w') as file:
                 file.write(new_content)
+
+
+            # ----------A
+
+            with open(game.chosenMapPath, 'r') as file:
+                content = file.read()
+
+            # Split the content into sections
+            before_animated, animated_data, after_animated = content.split('*ANIMATED', 2)
+
+            new_animated_data_str = ''
+
+            for anim in game.activeAnimatedData:
+                # conveyor/90/200/420/fast
+                facing = anim['classObject'].facing 
+                changeDurationDict   = { "0.2": "fast", "0.4": "medium","0.6" :"slow"}
+                
+                new_animated_data_str += anim['libraryKey'] + '/' + str(facing) + '/' + str(anim['x']) + '/' + str(anim['y']) + '/' + anim['speed'] + ','
+            
+
+            # Combine the sections back together with the updated animated_data
+            new_content = before_animated + '*ANIMATED\n' + new_animated_data_str + '\n*ANIMATED' + after_animated
+
+            # Write the updated content back to the file
+            with open(game.chosenMapPath, 'w') as file:
+                file.write(new_content)
+
+            
+            
             # ----------E
 
             with open(game.chosenMapPath, 'r') as file:
@@ -920,10 +1140,45 @@ class mapCreator():
             new_content = before_spawn + '*SPAWN\n' + spawn_data_str + '\n*SPAWN' + after_spawn
 
 
+            # Write the updated content back to the file
+            with open(game.chosenMapPath, 'w') as file:
+                file.write(new_content)
+
+
+            # ----------Q
+
+            with open(game.chosenMapPath, 'r') as file:
+                content = file.read()
+
+            quadrant_data_string = ""
+            for s in game.activeQuadrants:
+
+                quadrant_data_string += str(s[0]) + '/' + str(s[1]) + '/' + str(s[2]) + '/' + str(s[3]) + ','
+
+
+            createNew = False
+            # Split the content into sections
+            try:
+                before_quadrant, quandrant_data, after_quadrant = content.split('*QUADRANT', 2)
+            except:
+                createNew = True
+                
+
+
+            if(not createNew):
+                # Combine the sections back together with the updated enemy data
+                new_content = before_quadrant + '*QUADRANT\n' + quadrant_data_string + '\n*QUADRANT' + after_quadrant
+            else:
+                print("Quadrant data doesn't exist - appending")
+                new_content = content + '\n' + '*QUADRANT\n' + quadrant_data_string + '\n*QUADRANT'
+
+
 
             # Write the updated content back to the file
             with open(game.chosenMapPath, 'w') as file:
                 file.write(new_content)
+
+
 
             self.saving = True
             self.savegame = False
@@ -1003,72 +1258,104 @@ class mapCreator():
             print("Resetting box coords")
 
 
-    def spawnZones(self,gui,game):
-        
-        if(self.currentLayer!='Q'):
-            return()
-        # ------ GET MAPTILE LIST
-        game.activeSpawnZones
 
-        # ------USES THE type and index as keys to gui.tileDict
-        collidesWithExisting = False
-        startingColour       = (20,30,70)
-        collideIndex = 0
-        for sz in range(len(game.activeSpawnZones)):
-            spawnZone = game.activeSpawnZones[sz]
+
+
+    @staticmethod
+    def collides_objectless(x, y, w, h, x1, y1, w1, h1):
+        return (x >= x1 and x <= x1 + w1 and y >= y1 and y <= y1 + h1) or \
+               (x1 >= x and x1 <= x + w and y1 >= y and y1 <= y + h)
+
+    def spawnZones(self, gui, game):
+        if self.currentLayer != 'S':
+            return
+
+        collides_with_existing = False
+        starting_colour = (20, 30, 70)
+        collide_index = None
+
+        for idx, spawn_zone in enumerate(game.activeSpawnZones):
             # DELETE EXISTING IF CLICKED
-            if(gui.mouseCollides(spawnZone[0]-gui.camX,spawnZone[1]-gui.camY,spawnZone[2],spawnZone[3])):
-                collidesWithExisting = True
-                collideIndex = sz
+            if gui.mouseCollides(spawn_zone[0] - gui.camX, spawn_zone[1] - gui.camY, spawn_zone[2], spawn_zone[3]):
+                collides_with_existing = True
+                collide_index = idx
 
             # MERGE JOINT BOXES
-            for sz2 in range(len(game.activeSpawnZones)):
-                spawnZoneTwo = game.activeSpawnZones[sz2]
-                if(sz==sz2):
-                    pass
-                elif(collidesObjectless(spawnZone[0],spawnZone[1],spawnZone[2],spawnZone[3], spawnZoneTwo[0],spawnZoneTwo[1],spawnZoneTwo[2],spawnZoneTwo[3])):
-                    rhs = max((spawnZone[0] + spawnZone[2]),(spawnZoneTwo[0] + spawnZoneTwo[2]))
-                    bhs = max((spawnZone[1] + spawnZone[3]),(spawnZoneTwo[1] + spawnZoneTwo[3]))
-                    nbx = min(spawnZone[0],spawnZoneTwo[0])
-                    nby = min(spawnZone[1],spawnZoneTwo[1])
-                    
-                    newBox = [nbx,nby,rhs-nbx,bhs-nby]
-                    print([sz,sz2])
-                    print("{} and {} collide".format(str(spawnZone),str(spawnZone)))
-                    # DELETE OLD BOXES
-                    game.activeSpawnZones.remove(spawnZone)
-                    game.activeSpawnZones.remove(spawnZoneTwo)
-                    game.activeSpawnZones.append(newBox)
-                    return()
+            for other_idx, spawn_zone_two in enumerate(game.activeSpawnZones[idx + 1:], start=idx + 1):
+                if self.collides_objectless(*spawn_zone, *spawn_zone_two):
+                    new_box = self.merge_boxes(spawn_zone, spawn_zone_two)
+                    game.activeSpawnZones.remove(spawn_zone)
+                    game.activeSpawnZones.remove(spawn_zone_two)
+                    game.activeSpawnZones.append(new_box)
+                    return
 
+            # DRAW SPAWN ZONE MARKER
+            pygame.draw.rect(gui.screen, starting_colour, (spawn_zone[0] - gui.camX, spawn_zone[1] - gui.camY, spawn_zone[2], spawn_zone[3]))
+            starting_colour = lighten(starting_colour)
+            drawTextWithBackground(gui.screen, gui.font, str(idx), spawn_zone[0] - gui.camX + 0.4 * spawn_zone[2], spawn_zone[1] - gui.camY + 0.3 * spawn_zone[3], textColour=(255, 255, 255), backColour=(0, 0, 0), borderColour=(50, 50, 200))
 
-            # DRAW SPAWN ZONE
-            pygame.draw.rect(gui.screen,startingColour,(spawnZone[0]-gui.camX,spawnZone[1]-gui.camY,spawnZone[2],spawnZone[3]))
-            startingColour  = lighten(startingColour)
-            drawTextWithBackground(gui.screen,gui.font,str(sz),spawnZone[0]-gui.camX + 0.4*spawnZone[2],spawnZone[1]-gui.camY + 0.3*spawnZone[3],textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
-
-
-
-        # ------MAKE A SPAWN ZONE BY DRAGGING MOUSE
-
-
-        if(collidesWithExisting and gui.clicked):
-            print('deleting ' + str(collideIndex))
-            del game.activeSpawnZones[collideIndex]
-            gui.pressed=False
+        if collides_with_existing and gui.clicked:
+            del game.activeSpawnZones[collide_index]
+            gui.pressed = False
             gui.clicked = False
-            return()
-        elif(self.updateTileEnabled==True and gui.scrollEnabled):
-            self.spawnBoxSelector(gui,game)
+            return
 
+        if self.updateTileEnabled and gui.scrollEnabled:
+            self.spawn_box_selector(gui, game)
 
-    def spawnBoxSelector(self,gui,game):
+    def setQuadrants(self, gui, game):
+        if self.currentLayer != 'Q':
+            return
 
-        # SELECTING UNITS 
-        selectedArea = self.dragSelect.dragSelect(gui,gui.camX,gui.camY)
-        if(selectedArea!=None):
-            if(selectedArea[2] > 1 and selectedArea[3] > 1):
-                game.activeSpawnZones.append(selectedArea)
+        collides_with_existing = False
+        starting_colour = (20, 30, 70)
+        collide_index = None
+
+        for idx, currentQuadrant in enumerate(game.activeQuadrants):
+            # DELETE EXISTING IF CLICKED
+            if gui.mouseCollides(currentQuadrant[0] - gui.camX, currentQuadrant[1] - gui.camY, currentQuadrant[2], currentQuadrant[3]):
+                collides_with_existing = True
+                collide_index = idx
+
+            # MERGE JOINT BOXES
+            for other_idx, currentQuadrant_two in enumerate(game.activeQuadrants[idx + 1:], start=idx + 1):
+                if self.collides_objectless(*currentQuadrant, *currentQuadrant_two):
+                    new_box = self.merge_boxes(currentQuadrant, currentQuadrant_two)
+                    game.activeQuadrants.remove(currentQuadrant)
+                    game.activeQuadrants.remove(currentQuadrant_two)
+                    game.activeQuadrants.append(new_box)
+                    return
+
+            # DRAW SPAWN ZONE MARKER
+            pygame.draw.rect(gui.screen, starting_colour, (currentQuadrant[0] - gui.camX, currentQuadrant[1] - gui.camY, currentQuadrant[2], currentQuadrant[3]))
+            starting_colour = lighten(starting_colour)
+            drawTextWithBackground(gui.screen, gui.font, str(idx), currentQuadrant[0] - gui.camX + 0.4 * currentQuadrant[2], currentQuadrant[1] - gui.camY + 0.3 * currentQuadrant[3], textColour=(255, 255, 255), backColour=(0, 0, 0), borderColour=(50, 50, 200))
+
+        if collides_with_existing and gui.clicked:
+            del game.activeQuadrants[collide_index]
+            gui.pressed = False
+            gui.clicked = False
+            return
+
+        if self.updateTileEnabled and gui.scrollEnabled:
+            self.quadrant_box_selector(gui, game)
+
+    def merge_boxes(self, box1, box2):
+        nbx = min(box1[0], box2[0])
+        nby = min(box1[1], box2[1])
+        rhs = max(box1[0] + box1[2], box2[0] + box2[2])
+        bhs = max(box1[1] + box1[3], box2[1] + box2[3])
+        return [nbx, nby, rhs - nbx, bhs - nby]
+
+    def spawn_box_selector(self, gui, game):
+        selected_area = self.dragSelect.dragSelect(gui, gui.camX, gui.camY)
+        if selected_area and selected_area[2] > 1 and selected_area[3] > 1:
+            game.activeSpawnZones.append(selected_area)
+
+    def quadrant_box_selector(self, gui, game):
+        selected_area = self.dragSelect.dragSelect(gui, gui.camX, gui.camY)
+        if selected_area and selected_area[2] > 1 and selected_area[3] > 1:
+            game.activeQuadrants.append(selected_area)
 
 
     def nav(self,gui,game):
@@ -1096,8 +1383,8 @@ class mapCreator():
         if(gui.camX<0): gui.camX = 0
         if(gui.camY<0): gui.camY = 0
 
-        if(gui.camX+gui.camW>game.mapWidth): gui.camX = game.mapWidth - gui.camW
-        if(gui.camY+gui.camH>game.mapHeight): gui.camY = game.mapHeight - gui.camH
+        if(gui.camX+gui.camW>self.mapWidth): gui.camX = self.mapWidth - gui.camW
+        if(gui.camY+gui.camH>self.mapHeight): gui.camY = self.mapHeight - gui.camH
 
 def get_next_subkey(tile_data, tile_key, tile_subkey):
     subkeys = list(tile_data[tile_key].keys())

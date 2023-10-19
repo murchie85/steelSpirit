@@ -98,8 +98,12 @@ gui.L1_1               = pygame.image.load(IMAGEASSETPATH + 'gui/L1_1.png')
 gui.L1_2		       = pygame.image.load(IMAGEASSETPATH + 'gui/L1_2.png')
 gui.L2_1               = pygame.image.load(IMAGEASSETPATH + 'gui/L2_1.png')
 gui.L2_2		       = pygame.image.load(IMAGEASSETPATH + 'gui/L2_2.png')
+gui.Anim_1             = pygame.image.load(IMAGEASSETPATH + 'gui/Anim_1.png')
+gui.Anim_2		       = pygame.image.load(IMAGEASSETPATH + 'gui/Anim_2.png')
 gui.E_1                = pygame.image.load(IMAGEASSETPATH + 'gui/E_1.png')
 gui.E_2		           = pygame.image.load(IMAGEASSETPATH + 'gui/E_2.png')
+gui.S_1                = pygame.image.load(IMAGEASSETPATH + 'gui/S_1.png')
+gui.S_2		           = pygame.image.load(IMAGEASSETPATH + 'gui/S_2.png')
 gui.Q_1                = pygame.image.load(IMAGEASSETPATH + 'gui/Q_1.png')
 gui.Q_2		           = pygame.image.load(IMAGEASSETPATH + 'gui/Q_2.png')
 gui.openTileWindow     = pygame.image.load(IMAGEASSETPATH + 'gui/tileWindow1.png')
@@ -215,6 +219,8 @@ gui.frigateMulti      = [pygame.image.load(IMAGEASSETPATH + 'units/navalFrigate/
 gui.frigatMultiHit    = loadImageFiles('multiTurretHit1.png',IMAGEASSETPATH + 'units/navalFrigate/',convert=False)
 gui.frigateMultiRemains = [pygame.image.load(IMAGEASSETPATH + 'units/navalFrigate/multiTurretRemains.png')]
 
+
+
 # ---------BUILDINGS INTERACTABLE
 
 
@@ -311,13 +317,13 @@ gui.space              = [pygame.image.load(IMAGEASSETPATH + 'tilesets/50/space/
 
 
 # TILELESS LAYER 
-#gui.missileBase        =loadImageFiles('missileBase1.png',IMAGEASSETPATH + 'tilesets/missileBase/',convert=False,alphaConvert=True)
-#gui.missileBaseBldings =loadImageFiles('buildings1.png',IMAGEASSETPATH + 'tilesets/missileBase/',convert=False,alphaConvert=True)
+gui.missileBase        =loadImageFiles('missileBase1.png',IMAGEASSETPATH + 'tilesets/ISOMETRIC/missileBase/',convert=False,alphaConvert=True)
+gui.missileBaseBldings =loadImageFiles('buildings1.png',IMAGEASSETPATH + 'tilesets/ISOMETRIC/missileBase/',convert=False,alphaConvert=True)
 #gui.snowBase           =loadImageFiles('snowbase1.png',IMAGEASSETPATH + 'tilesets/snowlv/snowBase/',convert=False,alphaConvert=True)
 
-#gui.isoMetric           =loadImageFiles('iso1.png',IMAGEASSETPATH + 'tilesets/ISOMETRIC/',convert=True,alphaConvert=False)
-#[x.set_colorkey((0, 0, 0)) for x in gui.isoMetric]
-#[x.set_alpha(130) for x in gui.isoMetric]
+gui.isoMetric           =loadImageFiles('iso1.png',IMAGEASSETPATH + 'tilesets/ISOMETRIC/',convert=True,alphaConvert=False)
+[x.set_colorkey((0, 0, 0)) for x in gui.isoMetric]
+[x.set_alpha(130) for x in gui.isoMetric]
 
 
 gui.tileDict           = {'Grass': gui.grassTiles,

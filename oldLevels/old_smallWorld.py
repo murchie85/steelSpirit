@@ -1,18 +1,18 @@
 from utils._utils import drawImage,load_pickle
 from utils.gameUtils import *
-from levels.levelFunctions import *
+from oldLevels.levelFunctions import *
 from scenes.cutSceneGui import * 
 from units.player import *
 
-class levelFive():
-	def __init__(self,gui,game):
+class old_smallWorld():
+	def __init__(self,gui,game,filePath):
 		self.state = 'init'
 		self.mapx  = 0
 		self.mapy  = 0
 
 		
 		self.player    = player(gui)
-		self.gameMap   = load_pickle('state/' + 'lv5.pkl')
+		self.gameMap   = load_pickle(filePath)
 		self.mapw      = self.gameMap['width']
 		self.maph      = self.gameMap['height']
 
@@ -28,7 +28,7 @@ class levelFive():
 		self.defaultEnemyList  = [] # This contains a backup
 		self.deadList          = []
 		self.fids              = [1]
-		self.enemyComponentList = [] # THINGS LIKE TURRETS ETC
+		self.enemyComponentList = []
 
 		self.enemyDestroyed = False
 
@@ -48,14 +48,16 @@ class levelFive():
 
 		# --------- OBJECTIVES
 		# EACH ITEM IS AN OBJ, could be group of enemies, one enemy or location. 
-		self.objectives        = {'destroyAAQ1': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyTanksQ1','pauseGame':False, 'startMessage':'Greetings rookie, take out the enemy AA and watch out for tanks, good luck!', 'completionMessage': 'Great job!','activeQuandrant': {'x':0 ,'w':0.5 *self.mapw ,'y':self.maph-2200 ,'h':2200} },
-								  'destroyTanksQ1': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'eliminateMissileBase','pauseGame':True,  'startMessage':'Next up, take out the heavy armoured tanks, use your range and missiles to make short work of them.', 'completionMessage': 'Nicely done!','activeQuandrant': {'x':0 ,'w':self.mapw ,'y':self.maph-2200 ,'h':self.maph} },
-								  'eliminateMissileBase': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyBioLab', 'pauseGame':False, 'startMessage':'Ok, next up is a real challenge, take out all MLRS launchers in the missile base - dont forget to use chaff!.', 'completionMessage': "Impressive! Keep it up!",'activeQuandrant': {'x':0 ,'w':self.mapw ,'y':5090 ,'h':self.maph} },
-								  'destroyBioLab': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'complete', 'pauseGame':True, 'startMessage':'You are doing great, now comes the real reason we brought you here. There is a Bio weapons lab to the north, take it out before they can get those cannisters into trucks. Good hunting!', 'completionMessage': "Damn! If this wasn't VR training i'd have to promote you or something.",'activeQuandrant': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph} }
+		#self.spawn_1           = {'spawnCount': 3,'spawnIndex':0, 'spawn' : [{'type': 'hind','count':5, 'direction': 'front','spawnLocation':self.gameMap['spawnZones'][0]}, {'type': 'hind','count':3, 'direction': 'front','spawnLocation': self.gameMap['spawnZones'][1]},{'type': 'hind','count':8, 'direction': 'front','spawnLocation': self.gameMap['spawnZones'][2]} ]}
+		#'destroyAllTargets': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyTanksQ1','pauseGame':False, 'startMessage':'First up, take out the enemy AA, good luck!', 'completionMessage': 'Great job!','activeQuandrant': {'x':self.mapw-3000 ,'w':3000 ,'y':self.maph-6000 ,'h':6000}, 'enemySpawn':self.spawn_1},
+		self.objectives        = {'destroyAllTargets': {'objective':'eliminate','targetObjects':[], 'status': 'notStarted', 'nextObjective':'destroyTanksQ1','pauseGame':False, 'startMessage':'Rookie, this VR training sim is not fully complete, but should be enough to give you a challenge. Go get em.', 'completionMessage': 'Wow, great job - what do you think of this map?','activeQuandrant': {'x':0 ,'w':self.mapw ,'y':0,'h':self.maph}},
 								  }
-		self.currentObjective    = 'destroyAAQ1'
-		self.objectiveTimer      = countUpTimer()
+		self.currentObjective    = 'destroyAllTargets'
 		self.objectiveIntroState = 'notIntroduced'
+		self.objectiveTimer      = countUpTimer()
+		self.spawnIndex          = 0 # index of the enemy spawn list
+		self.spawnDelayTimer     = stopTimer()
+		self.spawnDelay          = 3
 
 		# ------ LEVEL TIMER 
 
@@ -66,7 +68,7 @@ class levelFive():
 
 		# CUTSCENE STUFF
 
-		self.scene = 'gameUnderway'
+		self.scene = 'debug'
 
 
 
@@ -151,14 +153,13 @@ class levelFive():
 			self.player.drawSelf(gui,game,self)
 			if(self.player.alive): 
 				self.player.actions(gui,game,self)
-				#game.calculatePlayerSpeed(self.player)
+				game.calculatePlayerSpeed(self.player)
 
 			# ------DISPLAY OBJECTIVES 
 
 			if('O' in gui.input.returnedKey.upper()):
 				print('displaying objective')
 				self.displayObjectiveArrow = True
-
 
 
 
@@ -174,8 +175,11 @@ class levelFive():
 		self.quandrantManager(gui,game) # ensure units properly clamped 
 
 
-		# OBJECTIVE MANAGER 
-		if(self.scene=='gameUnderway'):  self.objectiveManager(gui,game)
+		# OBJECTIVE MANAGER  
+		self.objectiveManager(gui,game)
+
+		# ENEMY SPAWNER
+		self.enemySpawnManager(gui,game)
 
 
 
@@ -250,13 +254,14 @@ class levelFive():
 
 
 	def objectiveManager(self,gui,game):
-	
-		currentObjective = self.objectives[self.currentObjective]
 
 		# IF ALL OBJECTIVES COMPLETE
 		if(self.currentObjective==None or self.currentObjective=='complete'):
 			self.scene = 'levelComplete'
 			return()
+
+	
+		currentObjective = self.objectives[self.currentObjective]
 
 		# COUNT IN TIMER FOR EACH OBJECTIVE
 		if(self.objectiveIntroState=='notIntroduced' and currentObjective['status']=='notStarted'):
@@ -284,7 +289,7 @@ class levelFive():
 			
 			# ANIMATE ONCE WINDOW OPEN
 			if(self.cutScene.pannelOpen):
-				self.displayObjectiveArrow = True
+				#self.displayObjectiveArrow = True
 				gui.claireTalking.animateNoRotation(gui,'claireTalking',[self.cutScene.imageLeftX,self.cutScene.imageY],game)
 				self.cutScene.drawMask(gui,game,overlay=False,border='ally',codec=True)
 				
@@ -383,8 +388,11 @@ class levelFive():
 			if(enemy.name=='tank' and self.currentObjective=='destroyTanksQ1'):
 				self.objectives['destroyTanksQ1']['targetObjects'].append(enemy)
 
+			# OBJECTIVE 3
+
 			if(enemy.name=='mlrs' and self.currentObjective=='eliminateMissileBase'):
 				self.objectives['eliminateMissileBase']['targetObjects'].append(enemy)
+			# OBJECTIVE 4
 
 			if(enemy.name=='bioLab' and self.currentObjective=='destroyBioLab'):
 				self.objectives['destroyBioLab']['targetObjects'].append(enemy)
@@ -406,6 +414,61 @@ class levelFive():
 
 
 
+	# MANAGES ENEMY SPAWN
+	def enemySpawnManager(self,gui,game):
+
+		# ONLY CALL IF THERE IS AN OBJECTIVE
+		if(self.currentObjective!= None and self.currentObjective != 'complete'):
+			currentObjective = self.objectives[self.currentObjective]
+			# 'enemySpawn':{'spawnCount': 3,  'spawn' : [{'type': 'hind','count':5, 'direction': 'front','spawnLocation': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph-400}}, {'type': 'hind','count':5, 'direction': 'back','spawnLocation': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph-400}},{'type': 'hind','count':5, 'direction': 'any','spawnLocation': {'x':0 ,'w':self.mapw ,'y':0 ,'h':self.maph-400}} ]}
+			# IF ENEMY SPAWN IS SET
+			if('enemySpawn' in currentObjective.keys()):
+				enemySpawnDict = currentObjective['enemySpawn']
+				# IF SPAWN AVAILABLE
+				if(enemySpawnDict['spawnIndex']<=enemySpawnDict['spawnCount']-1):
+					
+					# TIMER DELAY - DON'T GO THROUGH ALL SPAWN LIST T ONCE
+					spawnReady = self.spawnDelayTimer.stopWatch(self.spawnDelay,'spawning group ' + str(enemySpawnDict['spawnIndex']), str(enemySpawnDict['spawnIndex']),game,silence=True)
+
+					if(spawnReady):
+						currentSpawn = enemySpawnDict['spawn'][enemySpawnDict['spawnIndex']]
+
+						# check player in spawn location 
+						if(collidesWithObjectLess(currentSpawn['spawnLocation'][0],currentSpawn['spawnLocation'][1],currentSpawn['spawnLocation'][2],currentSpawn['spawnLocation'][3],self.player)):
+							print('Spawn number ' + str(enemySpawnDict['spawnIndex']) + 'in grid ' + str(currentSpawn))
+							#print('Spawning ' + str(currentSpawn))
+							if(currentSpawn['direction']=='front'):
+								for i in range(currentSpawn['count']):
+									enemy = {'kind':currentSpawn['type'],'seekAndStrafe':True}
+									
+									# IF IN FRONT, ANYWHERE WITHIN X VALUE AND JUST OUT OF Y RANGE
+									if(currentSpawn['direction']=='front'):
+										
+										xSpawn = self.player.x-0.5*gui.w + random.randrange(0,gui.w)
+										if(xSpawn<0):xSpawn = 100
+										if(xSpawn>self.mapw): xSpawn = self.mapw-100
+										ySpawn = self.player.y - gui.h - random.randrange(0,0.5*gui.h)
+										if(ySpawn<0): ySpawn = 100
+										if(ySpawn>self.maph): ySpawn = self.maph - 100
+										print('Adding enemy ' + str(enemy) + ' spawning at ' + str([xSpawn,ySpawn]))
+										addEnemy(self,xSpawn,ySpawn,enemy,gui)
+
+							enemySpawnDict['spawnIndex']+=1
+
+
+					# if in spawn, spawn enemies 
+
+
+					# pick theirl ocation 
+
+					#  add to enemy list
+
+					# incriment counter
+
+					# random timer 1-5 seconds
+
+
+
 
 
 
@@ -414,16 +477,23 @@ class levelFive():
 	def initMe(self,gui,game):
 		init(self,gui,game)
 
+		# SET PLAYER INIT POSITION 
+
+		self.player.x = 0.99*self.mapw
+		self.player.y = 0.99*self.maph
+
+		# DON'T INIT IF COMPLETE/NONE
+		if(self.currentObjective=='complete' or self.currentObjective==None):
+			return
+
+
+
+
+
 		# QUANDRANT AREA AND CURRENT OBJECIVE
 
 		currentObjective = self.objectives[self.currentObjective]
 		activeQuandrant  = currentObjective['activeQuandrant']
-
-
-		# SET PLAYER INIT POSITION 
-
-		self.player.x = activeQuandrant['x']+ 0.1*activeQuandrant['w']
-		self.player.y = activeQuandrant['y']+ 0.95*activeQuandrant['h']
 
 
 		# ONLY FIELD PLAYERS ACTIVE IN THIS QUADRANT
@@ -457,8 +527,7 @@ class levelFive():
 		
 		# Load selected enemies in range to given objectives
 		for enemy in self.enemyList:
-			if(enemy.name=='aaSmall'):
-				self.objectives['destroyAAQ1']['targetObjects'].append(enemy)
+			self.objectives['destroyAllTargets']['targetObjects'].append(enemy)
 
 
 def inQuandrant(unit, quandrant):

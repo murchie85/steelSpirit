@@ -1,18 +1,18 @@
 from utils._utils import drawImage,load_pickle
 from utils.gameUtils import *
-from levels.levelFunctions import *
+from oldLevels.levelFunctions import *
 from scenes.cutSceneGui import * 
 from units.player import *
 
-class iceWorld():
-	def __init__(self,gui,game):
+class old_iceWorld():
+	def __init__(self,gui,game,filePath):
 		self.state = 'init'
 		self.mapx  = 0
 		self.mapy  = 0
 
 		
 		self.player    = player(gui)
-		self.gameMap   = load_pickle('state/' + 'iceWorld.pkl')
+		self.gameMap   = load_pickle(filePath)
 		self.mapw      = self.gameMap['width']
 		self.maph      = self.gameMap['height']
 

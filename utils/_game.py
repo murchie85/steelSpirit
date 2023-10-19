@@ -1,18 +1,22 @@
 import pygame 
 import random
-from utils._utils          import stopTimer
-from scenes.title          import *
-from levels.mapMaker       import *
-from levels.MAP_CREATOR    import *
-from levels.LOAD_MAP_DATA  import *
-from units.player          import *
-from levels.levelOne       import *
-from levels.levelTwo       import *
-from levels.levelThree     import *
-from levels.levelFour      import *
-from levels.levelFive      import *
-from levels.iceWorld       import *
-from levels.smallWorld     import *
+from utils._utils              import stopTimer
+from scenes.title              import *
+
+from levels.MAP_CREATOR        import *
+from levels.LOAD_MAP_DATA      import *
+from levels.level_ruralAssault import *
+from units.player              import *
+
+from oldLevels.mapMaker           import *
+from oldLevels.old_levelOne       import *
+from oldLevels.old_levelTwo       import *
+from oldLevels.old_levelThree     import *
+from oldLevels.old_levelFour      import *
+from oldLevels.old_levelFive      import *
+from oldLevels.old_iceWorld       import *
+from oldLevels.old_smallWorld     import *
+
 
 """
 GAME OBJECT STORES SAVE STATE
@@ -83,6 +87,7 @@ class gameObject():
         self.chosenMapPath        = None
         self.activeL1Data         = [] # LOADED BY LOAD_MAP_DATA
         self.activeL2Data         = []
+        self.activeAnimatedData   = []
         self.activeEnemyData      = []
         self.rawL1Data            = []
         self.rawL2Data            = []
@@ -102,51 +107,12 @@ class gameObject():
         self.dynamicBorder        = dynamicBorder(borderColour=(60,60,200),noShadeShifts=10)
         self.buttonIndex          = 0
 
-    def initLevels(self,gui):
-        
-        # ----------IN GAME
-        mandatoryLevels      = ['lv1','lv2','lv3','lv4','lv5','iceWorld','smallWorld']
-
-        if(self.leveltoLoad<=len(mandatoryLevels)-1):
-            level = mandatoryLevels[self.leveltoLoad]
-            
-            if(self.loadingFail ==False):
-                try:
-                    print("Attempting to load Level : " + str(level))
-                    sampleLevel=load_pickle('state/' + str(level) +'.pkl')
-                except:
-                    print('Load failed')
-                    self.loadingFail = True
-
-                if(self.loadingFail == False):
-                    print(str(level) + ' : LOADED')
-                    if(self.leveltoLoad==len(mandatoryLevels)-1):
-                        self.levelLoadComplete = True
-                        print('COMPLETE')
-                    else:
-                        self.leveltoLoad +=1
-                        print("Incrementing to next level")
-
-
-            # CREATE NEW MAP IF FAILED
-            if(self.loadingFail):
-                complete = self.mapEditor.createNewMap(gui,self,externallyCalled=True,specifiedName=level)
-                if(complete):
-                    self.loadingFail = False
-            
-        if(self.levelLoadComplete):
-            self.levelOne             = levelOne(gui,self)
-            self.levelTwo             = levelTwo(gui,self)
-            self.levelThree           = levelThree(gui,self)
-            self.levelFour            = levelFour(gui,self)
-            self.levelFive            = levelFive(gui,self)
-            self.iceWorld             = iceWorld(gui,self)
-            self.smallWorld           = smallWorld(gui,self)
-            
-            self.levelsInitialised    = True
-                    
+     
 
     def coordinateGame(self,gui):
+
+        self.chosenLevels      = ['ruralAssault','osmallWorld', 'olv5','olv4','olv3','olv2','olv1','oiceWorld', ]
+
 
         if(self.state == 'intro'):
             self.introScene.showstartup(gui,self)
@@ -170,102 +136,47 @@ class gameObject():
                 self.mapMenu(gui,self)
 
 
+        # -----------LOAD GAME
+
 
         if(self.state == 'start'):
+
             if(self.levelsInitialised==False):
-                self.initLevels(gui)
+                self.instiantiateLevels(gui)
+
                 return()
+
+            self.levelSelectMenu(gui)
+
             
+
+
             # ---RUN THE ACTUAL LEVEL 
 
             if(self.levelSelectMode==False):
 
-                if(self.selectedLevel=='levelOne'):
-                    self.levelOne.run(gui,self)
-                elif(self.selectedLevel=='levelTwo'):
-                    self.levelTwo.run(gui,self)
-                elif(self.selectedLevel=='levelThree'):
-                    self.levelThree.run(gui,self)
-                elif(self.selectedLevel=='levelFour'):
-                    self.levelFour.run(gui,self)
-                elif(self.selectedLevel=='levelFive'):
-                    self.levelFive.run(gui,self)
-                elif(self.selectedLevel=='iceWorld'):
-                    self.iceWorld.run(gui,self)
-                elif(self.selectedLevel=='smallWorld'):
-                    self.smallWorld.run(gui,self)
+                # new levels
+                if(self.selectedLevel=='ruralAssault'):
+                    self.ruralAssault.run(gui,self)
+
+
+                if(self.selectedLevel=='olv1'):
+                    self.old_levelOne.run(gui,self)
+                elif(self.selectedLevel=='olv2'):
+                    self.old_levelTwo.run(gui,self)
+                elif(self.selectedLevel=='olv3'):
+                    self.old_levelThree.run(gui,self)
+                elif(self.selectedLevel=='olv4'):
+                    self.old_levelFour.run(gui,self)
+                elif(self.selectedLevel=='olv5'):
+                    self.old_levelFive.run(gui,self)
+                elif(self.selectedLevel=='oiceWorld'):
+                    self.old_iceWorld.run(gui,self)
+                elif(self.selectedLevel=='osmallWorld'):
+                    self.old_smallWorld.run(gui,self)
 
 
 
-
-            # ----CHOSE A LEVEL 
-            
-            if(self.levelSelectMode):
-
-                # DRAW COVER PICTURE
-
-                drawImage(gui.screen,gui.cover3,(0.5*(gui.w-gui.cover1.get_width()),0.44*(gui.h-gui.cover1.get_height())))
-                self.levelScreenMask.set_alpha(self.alphaI)
-                self.levelScreenMask.fill((0,0,0))
-                gui.screen.blit(self.levelScreenMask,(0,0))
-
-                # DRAW TITLE
-                
-                chosenFont = gui.largeFont
-                borderColour=(60,60,200)
-                tw,th   = getTextWidth(chosenFont,'A menu item yep sure.'),getTextHeight(chosenFont,'A menu item yep sure.')
-                drawText(gui,gui.bigFont,'Select Level',0.52*(gui.w-tw),0.03*gui.h, colour=(100, 100, 255))
-
-                # GET LEVELS AVAILABLE
-                loadPath       = 'state/'
-                availableFiles = os.listdir(loadPath)
-                availableFiles = [x for x in availableFiles if x[-4:]=='.pkl']
-                chosenFont = gui.smallFont
-                borderColour=(60,60,200)
-                tw,th   = getTextWidth(chosenFont,'A menu item yep sure.'),getTextHeight(chosenFont,'A menu item yep sure.')
-
-                buttonY = 300
-                for f in availableFiles:
-                    
-                    backColour =(0,0,0)
-                    if(f[:-4] =='iceWorld'):
-                        backColour =(250,20,20)
-
-                    chosenFile,tex,tey  = simpleButton(0.5*(gui.w-tw),buttonY,f,gui,chosenFont,setTw=tw,backColour=backColour,borderColour=borderColour, textColour=(255,255,255))
-                    
-                    buttonY += 1.5*th
-                    # IF FILE SELECTED LOAD FILE 
-                    if(chosenFile):
-                        if(f[:-4] =='lv1'):
-                            self.selectedLevel = 'levelOne'
-                            self.levelSelectMode   = False
-                        if(f[:-4] =='lv2'):
-                            self.selectedLevel = 'levelTwo'
-                            self.levelSelectMode   = False
-                        if(f[:-4] =='lv3'):
-                            self.selectedLevel = 'levelThree'
-                            self.levelSelectMode   = False
-                        if(f[:-4] =='lv4'):
-                            self.selectedLevel = 'levelFour'
-                            self.levelSelectMode   = False
-                        if(f[:-4] =='lv5'):
-                            self.selectedLevel = 'levelFive'
-                            self.levelSelectMode   = False
-                        if(f[:-4] =='iceWorld'):
-                            #self.selectedLevel = 'iceWorld'
-                            #self.levelSelectMode   = False
-                            pass
-                        if(f[:-4] =='smallWorld'):
-                            self.selectedLevel = 'smallWorld'
-                            self.levelSelectMode   = False
-                        
-
-
-                tw,th             = getTextWidth(chosenFont,'A menu item.'),getTextHeight(chosenFont,'A menu item.')
-                back,tex,tey      = simpleButton(100,0.93*gui.h,'Back',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
-                if(back):
-                    self.introScene.state = 'intro'
-                    self.state            = 'intro'  
 
     def mapMenu(self,gui,game):
         
@@ -352,10 +263,13 @@ class gameObject():
             
             if(chosenFile):
 
-                raw_map_data,map_l2_data,map_enemy_data,spawn_zones = loadUnconverted(loadPath+f)
+                raw_map_data,map_l2_data,animated_data,map_enemy_data,spawn_zones,quadrants = loadUnconverted(loadPath+f)
                 game.rawL1Data         = raw_map_data
                 game.rawL2Data         = map_l2_data
+                game.rawAnimData       = animated_data
+                game.rawEnemyData      = map_enemy_data
                 game.rawSpawnData      = spawn_zones
+                game.rawQuadrantData   = quadrants
                 
                 self.chosenMapName = f.replace('.txt','')
                 self.chosenMapPath = game.mapPaths + self.chosenMapName + '.txt'
@@ -395,3 +309,119 @@ class gameObject():
 
 
 
+    def levelSelectMenu(self,gui):
+        # ----CHOSE A LEVEL 
+        
+        if(self.levelSelectMode):
+
+            # DRAW COVER PICTURE
+
+            drawImage(gui.screen,gui.cover3,(0.5*(gui.w-gui.cover1.get_width()),0.44*(gui.h-gui.cover1.get_height())))
+            self.levelScreenMask.set_alpha(self.alphaI)
+            self.levelScreenMask.fill((0,0,0))
+            gui.screen.blit(self.levelScreenMask,(0,0))
+
+            # DRAW TITLE
+            
+            chosenFont = gui.largeFont
+            borderColour=(60,60,200)
+            tw,th   = getTextWidth(chosenFont,'A menu item yep sure.'),getTextHeight(chosenFont,'A menu item yep sure.')
+            drawText(gui,gui.bigFont,'Select Level',0.52*(gui.w-tw),0.03*gui.h, colour=(100, 100, 255))
+
+            # GET LEVELS AVAILABLE
+            chosenFont = gui.smallFont
+            borderColour=(60,60,200)
+            tw,th   = getTextWidth(chosenFont,'A menu item yep sure.'),getTextHeight(chosenFont,'A menu item yep sure.')
+
+            buttonY = 300
+            for level in self.chosenLevels:
+                
+                backColour =(0,0,0)
+                if(level=='iceWorld'):
+                    backColour =(250,20,20)
+
+                chosenFile,tex,tey  = simpleButton(0.5*(gui.w-tw),buttonY,level,gui,chosenFont,setTw=tw,backColour=backColour,borderColour=borderColour, textColour=(255,255,255))
+                
+                buttonY += 1.5*th
+                # IF FILE SELECTED LOAD FILE 
+                if(chosenFile):
+                    self.selectedLevel = level
+                    self.levelSelectMode   = False
+                    
+
+
+            tw,th             = getTextWidth(chosenFont,'A menu item.'),getTextHeight(chosenFont,'A menu item.')
+            back,tex,tey      = simpleButton(100,0.93*gui.h,'Back',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+            if(back):
+                self.introScene.state = 'intro'
+                self.state            = 'intro'
+
+    def instiantiateLevels(self,gui):
+        
+        # ----------IN GAME
+
+        self.old_levelOne             = old_levelOne(gui,self,'state/' + 'olv1.pkl')
+        self.old_levelTwo             = old_levelTwo(gui,self,'state/' + 'olv2.pkl')
+        self.old_levelThree           = old_levelThree(gui,self,'state/' + 'olv3.pkl')
+        self.old_levelFour            = old_levelFour(gui,self,'state/' + 'olv4.pkl')
+        self.old_levelFive            = old_levelFive(gui,self,'state/' + 'olv5.pkl')
+        self.old_iceWorld             = old_iceWorld(gui,self,'state/' + 'oiceWorld.pkl')
+        self.old_smallWorld           = old_smallWorld(gui,self,'state/' + 'osmallWorld.pkl')
+        
+        self.ruralAssault             = ruralAssault(gui,self)
+        self.levelsInitialised    = True
+    
+    
+    def loadMapData(self,game,gui,parent):
+        raw_map_data,map_l2_data,animated_data,map_enemy_data,spawn_zones,quadrants               = loadUnconverted(game.chosenMapPath)
+        game.rawL1Data       = raw_map_data
+        game.rawL2Data       = map_l2_data
+        game.rawAnimData     = animated_data
+        game.rawEnemyData    = map_enemy_data
+        game.rawSpawnData    = spawn_zones
+        game.rawQuadrantData = quadrants
+
+        # This is the data that matters
+        parent.tileReferenceData,game.activeL1Data                          = loadMapRefData(gui,game)
+        parent.layer2RefData, game.activeL2Data,parent.layer2RefDataScaled  = loadLayer2RefData(gui,game)
+        parent.animatedRefData, game.activeAnimatedData                     = loadAnimatedData(gui,game)
+        parent.enemyRefData,game.activeEnemyData                            = loadEnemyRefData(gui,game)
+        game.activeSpawnZones                                               = loadSpawnZones(gui,game)
+        game.activeQuadrants                                               = loadQuadrants(gui,game)
+
+        parent.sampleTile                 = self.activeL1Data[1][2] # A tile representative of the height/width
+        parent.tileWidth                  = parent.sampleTile.get_width()
+        parent.tileHeight                 = parent.sampleTile.get_height()
+        parent.mapWidth, parent.mapHeight = len(self.activeL1Data[0])  * parent.tileWidth ,len(self.activeL1Data) * parent.tileHeight
+
+
+    # not used 
+    def checkLoaded(self,gui):
+        if(self.leveltoLoad<=len(self.chosenLevels)-1):
+            level = self.chosenLevels[self.leveltoLoad]
+            
+            if(self.loadingFail ==False):
+                try:
+                    print("Attempting to load Level : " + str(level))
+                    sampleLevel=load_pickle('state/' + str(level) +'.pkl')
+                except:
+                    print('Load failed')
+                    self.loadingFail = True
+
+                if(self.loadingFail == False):
+                    print(str(level) + ' : LOADED')
+                    if(self.leveltoLoad==len(self.chosenLevels)-1):
+                        self.levelLoadComplete = True
+                        print('COMPLETE')
+                    else:
+                        self.leveltoLoad +=1
+                        print("Incrementing to next level")
+
+
+            # CREATE NEW MAP IF FAILED
+            if(self.loadingFail):
+                print("****FAILED CREATING NEW MAP")
+                complete = self.mapEditor.createNewMap(gui,self,externallyCalled=True,specifiedName=level)
+                if(complete):
+                    self.loadingFail = False
+               
