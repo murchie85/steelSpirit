@@ -112,7 +112,7 @@ class player():
 
 
 		# ATTRIBUTES 
-		self.defaultHp         = 200
+		self.defaultHp         = 20
 		self.hp                = self.defaultHp
 		self.speed             = 0
 		self.maxSpeed          = 8
@@ -147,14 +147,22 @@ class player():
 		self.invincibleCount     = 0
 
 		# BULLETS 
-		self.shotType			= 'hotTripple'
-		self.availableWeapons   = ['hotRound','hotDouble','hotTripple','beam','pellet','doublePellet' ,'slitherShot','doubleSlither','triBlast']
-		self.bulletAttrs        = {'hotRound':{'speed':20,'damage':6}, 'hotDouble':{'speed':20,'damage':5}, 'hotTripple':{'speed':20,'damage':4},  'pellet':{'speed':15,'damage':7}, 'doublePellet':{'speed':15,'damage':7},  'slitherShot':{'speed':3,'damage':20}, 'doubleSlither':{'speed':3,'damage':20} , 'triBlast':{'speed':12,'damage':30}, 'beam':{'speed':12,'damage':30}}
+		self.shotType			= 'angleRound'
+		#						   'pellet','doublePellet' ,'tripplePellet',
+		self.availableWeapons   = ['angleRound','angleRoundFaster','angleRoundFullSpeed','angleRound3', 'hotRound','hotDouble','hotTripple','beam','slitherShot','doubleSlither','triBlast']
+		self.bulletAttrs        = {'hotRound':{'speed':20,'damage':6}, 'hotDouble':{'speed':20,'damage':5}, 'hotTripple':{'speed':20,'damage':4},  'angleRound':{'speed':20,'damage':6},'angleRoundFaster':{'speed':20,'damage':4},'angleRoundFullSpeed':{'speed':20,'damage':6}, 'angleround2':{'speed':20,'damage':5}, 'angleRound3':{'speed':20,'damage':4},'pellet':{'speed':15,'damage':7}, 'doublePellet':{'speed':15,'damage':7}, 'tripplePellet':{'speed':15,'damage':7},  'slitherShot':{'speed':3,'damage':20}, 'doubleSlither':{'speed':3,'damage':20} , 'triBlast':{'speed':12,'damage':30}, 'beam':{'speed':12,'damage':30}}
 		self.beamImage          = imageAnimateAdvanced(gui.beamPart,0.2)
 		self.beamHead           = imageAnimateAdvanced(gui.beamHead,0.2)
-
+		self.loadOutImageDict   = {"angleRound":gui.weaponsLoadout["missiles_angleRound"],"angleRoundFaster":gui.weaponsLoadout["missiles_angleRoundFaster"],"angleRoundFullSpeed":gui.weaponsLoadout["missiles_angleRoundFullSpeed"],"angleRound3":gui.weaponsLoadout["missiles_angleRound3"], "hotRound":gui.weaponsLoadout["missiles_1hot"],"hotDouble":gui.weaponsLoadout["missiles_2hot"],"hotTripple":gui.weaponsLoadout["missiles_3hot"]}
+		self.loadOutCurrentImage = self.loadOutImageDict[self.shotType]
+		
+		self.nextShotDict        = {"angleRound":"angleRoundFaster","angleRoundFaster":"angleRoundFullSpeed","angleRoundFullSpeed":"angleRound3","hotRound":"hotDouble","hotDouble":"hotTripple"}
+		self.maxPowerReference   = ['angleRound3','hotTripple']
 
 		self.bulletTimer        = stopTimer()           # BUFF
+		self.angleTimer         = stopTimer()           # BUFF
+		self.blastCount         = 3
+		self.angleDelay         = 0.4
 		self.shootDelay         = 0.1                   # BUFF
 		self.bulletsFired       = 0
 
@@ -238,7 +246,7 @@ class player():
 		# ------KILL ME
 		
 		if(self.hp<1):
-			killme(self,lv,killMesssage=' collided with enemy.',printme=True)
+			killme(self,lv,killMesssage=' died because hp under 1.',printme=True)
 
 		# ---------SHOOT
 
@@ -259,6 +267,8 @@ class player():
 		detectEnemies = []
 		targetList = lv.enemyList + lv.enemyComponentList
 		for enemy in targetList:
+			if(enemy.name in ['powerDrone']):
+				continue
 			if(onScreen(enemy.x,enemy.y,enemy.w,enemy.h,gui)):
 				if cone_rect.collidepoint((enemy.x, enemy.y)):
 					distance = getDistance(self.x,self.y,enemy.x,enemy.y)
@@ -378,10 +388,10 @@ class player():
 
 
 			# ----SWITCH OFF CONDITIONS 
-
-			if(self.lockedOn==False or self.boosting or(onScreen(self.lockedEnemy.x,self.lockedEnemy.y,self.lockedEnemy.w,self.lockedEnemy.h,gui)==False)):
-				self.lockedEnemy = None
-				self.lockonIndex = 0
+			if(self.lockedEnemy!=None):
+				if(self.lockedOn==False or self.boosting or(onScreen(self.lockedEnemy.x,self.lockedEnemy.y,self.lockedEnemy.w,self.lockedEnemy.h,gui)==False)):
+					self.lockedEnemy = None
+					self.lockonIndex = 0
 
 		# RESET LOCKON IF NO ENEMIES OR IN BOOST MODE
 		if(len(enemies)<1 or  self.boosting):
@@ -400,13 +410,120 @@ class player():
 
 		self.firing = True
 
+
 		# BULLET DELAY TIMER
 		shotAvailable = self.bulletTimer.stopWatch(self.shootDelay,'player shoot', str(self.id + self.bulletsFired), game,silence=True)
 		
 		# IF SHOOT CRITEREA MET,
 		if((shotAvailable and self.blitPos!=None)):
 
-			if(self.shotType=='doublePellet'):
+
+
+
+			if(self.shotType=='angleRound'):
+				self.angleDelay = 0.4
+
+				if(self.blastCount>0):
+					self.bulletsFired +=2
+					self.blastCount  -= 1
+
+					# ADDS BULLET TO BULLET LIST
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['middleL'][0]+ gui.camX,self.blitPos['middleL'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['middleR'][0]+ gui.camX,self.blitPos['middleR'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+
+
+				else:
+					angleReload = self.angleTimer.stopWatch(self.angleDelay,'player angleRound', str(self.id + self.bulletsFired + self.blastCount), game,silence=True)
+					if(angleReload):
+						self.blastCount = 3
+
+
+			elif(self.shotType=='angleRoundFaster'):
+				self.angleDelay = 0.15
+
+
+				if(self.blastCount>0):
+					self.bulletsFired +=2
+					self.blastCount  -= 1
+					# ADDS BULLET TO BULLET LIST
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['middleL'][0]+ gui.camX,self.blitPos['middleL'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['middleR'][0]+ gui.camX,self.blitPos['middleR'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+				else:
+					angleReload = self.angleTimer.stopWatch(self.angleDelay,'player angleRoundFaster', str(self.id + self.bulletsFired + self.blastCount), game,silence=True)
+					if(angleReload):
+						self.blastCount = 3
+
+
+			elif(self.shotType=='angleRoundFullSpeed'):
+
+				self.angleDelay = 0.05
+
+
+
+				if(self.blastCount>0):
+					self.bulletsFired +=2
+					self.blastCount  -= 1
+					# ADDS BULLET TO BULLET LIST
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['middleL'][0]+ gui.camX,self.blitPos['middleL'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['middleR'][0]+ gui.camX,self.blitPos['middleR'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+
+				else:
+					angleReload = self.angleTimer.stopWatch(self.angleDelay,'player angleRoundFullSpeed', str(self.id + self.bulletsFired + self.blastCount), game,silence=True)
+					if(angleReload):
+						self.blastCount = 3
+
+			elif(self.shotType=='angleRound3'):
+				self.angleDelay = 0.3
+
+
+
+				if(self.blastCount>0):
+					self.bulletsFired +=6
+					self.blastCount  -= 1
+					# ADDS BULLET TO BULLET LIST
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['middleL'][0]+ gui.camX,self.blitPos['middleL'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['middleR'][0]+ gui.camX,self.blitPos['middleR'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['centerL'][0]+ gui.camX,self.blitPos['centerL'][1]+ gui.camY,bid,self.classification, self.facing-15,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['centerR'][0]+ gui.camX,self.blitPos['centerR'][1]+ gui.camY,bid,self.classification, self.facing-15,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['centerL'][0]+ gui.camX,self.blitPos['centerL'][1]+ gui.camY,bid,self.classification, self.facing+15,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+					bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+					lv.bulletList.append(bullet(gui,self.blitPos['centerR'][0]+ gui.camX,self.blitPos['centerR'][1]+ gui.camY,bid,self.classification, self.facing+15,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+
+				else:
+					angleReload = self.angleTimer.stopWatch(self.angleDelay,'player angleRound3', str(self.id + self.bulletsFired + self.blastCount), game,silence=True)
+					if(angleReload):
+						self.blastCount = 3
+
+
+
+
+			elif(self.shotType=='pellet'):
+
+				# ADDS BULLET TO BULLET LIST
+				self.bulletsFired +=1
+				# ADDS BULLET TO BULLET LIST
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+
+			elif(self.shotType=='doublePellet'):
 				self.bulletsFired +=1
 				# ADDS BULLET TO BULLET LIST
 				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
@@ -417,6 +534,25 @@ class player():
 				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
 				lv.bulletList.append(bullet(gui,self.blitPos['rightTop'][0]+ gui.camX,self.blitPos['rightTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
 
+			elif(self.shotType=='tripplePellet'):
+				self.bulletsFired +=1
+				# ADDS BULLET TO BULLET LIST
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.blitPos['leftTop'][0]+ gui.camX,self.blitPos['leftTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+				# ADDS BULLET TO BULLET LIST
+				self.bulletsFired +=1
+				# ADDS BULLET TO BULLET LIST
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.blitPos['midTop'][0] + gui.camX,self.blitPos['midTop'][1]+gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+
+				# ADDS BULLET TO BULLET LIST
+				self.bulletsFired +=1
+				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+				lv.bulletList.append(bullet(gui,self.blitPos['rightTop'][0]+ gui.camX,self.blitPos['rightTop'][1]+ gui.camY,bid,self.classification, self.facing,self.shotType, speed=self.maxSpeed + self.bulletAttrs[self.shotType]['speed'],damage=self.bulletAttrs[self.shotType]['damage'],colour=bulletColour))
+
+			
 			elif(self.shotType=='doubleSlither'):
 				self.bulletsFired +=2
 				# ADDS BULLET TO BULLET LIST
@@ -719,6 +855,8 @@ class player():
 		if(gui.input.returnedKey.upper()=='E'):
 			nextIndex    = (self.availableWeapons.index(self.shotType) + 1) % len(self.availableWeapons)
 			self.shotType = self.availableWeapons[nextIndex]
+			if(self.shotType in self.loadOutImageDict.keys()):
+				self.loadOutCurrentImage = self.loadOutImageDict[self.shotType]
 
 		# -------SPEED BOOST PHASE 1
 		

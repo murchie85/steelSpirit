@@ -44,6 +44,7 @@ class gameObject():
         self.dt                   = 0
         self.levelSelectMode          = True
         self.selectedLevel        = 'levelOne'
+        self.activeLevel          = None
 
 
         #------------SCENES
@@ -111,7 +112,8 @@ class gameObject():
 
     def coordinateGame(self,gui):
 
-        self.chosenLevels      = ['ruralAssault','osmallWorld', 'olv5','olv4','olv3','olv2','olv1','oiceWorld', ]
+        self.newLevels         = ['Rural Assault']
+        self.chosenLevels      = self.newLevels + ['osmallWorld', 'olv5','olv4','olv3','olv2','olv1','oiceWorld']
 
 
         if(self.state == 'intro'):
@@ -141,11 +143,6 @@ class gameObject():
 
         if(self.state == 'start'):
 
-            if(self.levelsInitialised==False):
-                self.instiantiateLevels(gui)
-
-                return()
-
             self.levelSelectMenu(gui)
 
             
@@ -155,25 +152,35 @@ class gameObject():
 
             if(self.levelSelectMode==False):
 
-                # new levels
-                if(self.selectedLevel=='ruralAssault'):
-                    self.ruralAssault.run(gui,self)
+                if(self.activeLevel==None):
+
+                    if(self.selectedLevel in self.newLevels):
+                        self.chosenMapPath = self.mapPaths + self.selectedLevel + '.txt'
+                        self.loadMapData(gui,self)
+                        
 
 
-                if(self.selectedLevel=='olv1'):
-                    self.old_levelOne.run(gui,self)
-                elif(self.selectedLevel=='olv2'):
-                    self.old_levelTwo.run(gui,self)
-                elif(self.selectedLevel=='olv3'):
-                    self.old_levelThree.run(gui,self)
-                elif(self.selectedLevel=='olv4'):
-                    self.old_levelFour.run(gui,self)
-                elif(self.selectedLevel=='olv5'):
-                    self.old_levelFive.run(gui,self)
-                elif(self.selectedLevel=='oiceWorld'):
-                    self.old_iceWorld.run(gui,self)
-                elif(self.selectedLevel=='osmallWorld'):
-                    self.old_smallWorld.run(gui,self)
+
+
+                    if(self.selectedLevel=='Rural Assault'):
+                        self.activeLevel             = ruralAssault(gui,self)
+                    elif(self.selectedLevel=='olv1'):
+                        self.activeLevel             = old_levelOne(gui,self,'state/' + 'olv1.pkl')
+                    elif(self.selectedLevel=='olv2'):
+                        self.activeLevel             = old_levelTwo(gui,self,'state/' + 'olv2.pkl')
+                    elif(self.selectedLevel=='olv3'):
+                        self.activeLevel           = old_levelThree(gui,self,'state/' + 'olv3.pkl')
+                    elif(self.selectedLevel=='olv4'):
+                        self.activeLevel            = old_levelFour(gui,self,'state/' + 'olv4.pkl')
+                    elif(self.selectedLevel=='olv5'):
+                        self.activeLevel            = old_levelFive(gui,self,'state/' + 'olv5.pkl')
+                    elif(self.selectedLevel=='oiceWorld'):
+                        self.activeLevel             = old_iceWorld(gui,self,'state/' + 'oiceWorld.pkl')
+                    elif(self.selectedLevel=='osmallWorld'):
+                        self.activeLevel           = old_smallWorld(gui,self,'state/' + 'osmallWorld.pkl')
+
+
+                self.activeLevel.run(gui,self)
 
 
 
@@ -272,7 +279,7 @@ class gameObject():
                 game.rawQuadrantData   = quadrants
                 
                 self.chosenMapName = f.replace('.txt','')
-                self.chosenMapPath = game.mapPaths + self.chosenMapName + '.txt'
+                self.chosenMapPath = self.mapPaths + self.chosenMapName + '.txt'
                 self.mapSelection = 'editMap'
                 break
 
@@ -356,72 +363,33 @@ class gameObject():
                 self.introScene.state = 'intro'
                 self.state            = 'intro'
 
-    def instiantiateLevels(self,gui):
-        
-        # ----------IN GAME
+    
+    
+    def loadMapData(self,gui,parent):
+        raw_map_data,map_l2_data,animated_data,map_enemy_data,spawn_zones,quadrants               = loadUnconverted(parent.chosenMapPath)
+        parent.rawL1Data       = raw_map_data
+        parent.rawL2Data       = map_l2_data
+        parent.rawAnimData     = animated_data
+        parent.rawEnemyData    = map_enemy_data
+        parent.rawSpawnData    = spawn_zones
+        parent.rawQuadrantData = quadrants
 
-        self.old_levelOne             = old_levelOne(gui,self,'state/' + 'olv1.pkl')
-        self.old_levelTwo             = old_levelTwo(gui,self,'state/' + 'olv2.pkl')
-        self.old_levelThree           = old_levelThree(gui,self,'state/' + 'olv3.pkl')
-        self.old_levelFour            = old_levelFour(gui,self,'state/' + 'olv4.pkl')
-        self.old_levelFive            = old_levelFive(gui,self,'state/' + 'olv5.pkl')
-        self.old_iceWorld             = old_iceWorld(gui,self,'state/' + 'oiceWorld.pkl')
-        self.old_smallWorld           = old_smallWorld(gui,self,'state/' + 'osmallWorld.pkl')
-        
-        self.ruralAssault             = ruralAssault(gui,self)
-        self.levelsInitialised    = True
-    
-    
-    def loadMapData(self,game,gui,parent):
-        raw_map_data,map_l2_data,animated_data,map_enemy_data,spawn_zones,quadrants               = loadUnconverted(game.chosenMapPath)
-        game.rawL1Data       = raw_map_data
-        game.rawL2Data       = map_l2_data
-        game.rawAnimData     = animated_data
-        game.rawEnemyData    = map_enemy_data
-        game.rawSpawnData    = spawn_zones
-        game.rawQuadrantData = quadrants
+
 
         # This is the data that matters
-        parent.tileReferenceData,game.activeL1Data                          = loadMapRefData(gui,game)
-        parent.layer2RefData, game.activeL2Data,parent.layer2RefDataScaled  = loadLayer2RefData(gui,game)
-        parent.animatedRefData, game.activeAnimatedData                     = loadAnimatedData(gui,game)
-        parent.enemyRefData,game.activeEnemyData                            = loadEnemyRefData(gui,game)
-        game.activeSpawnZones                                               = loadSpawnZones(gui,game)
-        game.activeQuadrants                                               = loadQuadrants(gui,game)
+        parent.tileReferenceData,parent.activeL1Data                          = loadMapRefData(gui,parent)
+        parent.layer2RefData, parent.activeL2Data,parent.layer2RefDataScaled  = loadLayer2RefData(gui,parent)
+        parent.animatedRefData, parent.activeAnimatedData                     = loadAnimatedData(gui,parent)
+        parent.enemyRefData,parent.activeEnemyData                            = loadEnemyRefData(gui,parent)
+        parent.activeSpawnZones                                               = loadSpawnZones(gui,parent)
+        parent.activeQuadrants                                                = loadQuadrants(gui,parent)
 
-        parent.sampleTile                 = self.activeL1Data[1][2] # A tile representative of the height/width
+        parent.sampleTile                 = parent.activeL1Data[1][2] # A tile representative of the height/width
         parent.tileWidth                  = parent.sampleTile.get_width()
         parent.tileHeight                 = parent.sampleTile.get_height()
-        parent.mapWidth, parent.mapHeight = len(self.activeL1Data[0])  * parent.tileWidth ,len(self.activeL1Data) * parent.tileHeight
+        parent.mapWidth, parent.mapHeight = len(parent.activeL1Data[0])  * parent.tileWidth ,len(parent.activeL1Data) * parent.tileHeight
 
 
-    # not used 
-    def checkLoaded(self,gui):
-        if(self.leveltoLoad<=len(self.chosenLevels)-1):
-            level = self.chosenLevels[self.leveltoLoad]
-            
-            if(self.loadingFail ==False):
-                try:
-                    print("Attempting to load Level : " + str(level))
-                    sampleLevel=load_pickle('state/' + str(level) +'.pkl')
-                except:
-                    print('Load failed')
-                    self.loadingFail = True
-
-                if(self.loadingFail == False):
-                    print(str(level) + ' : LOADED')
-                    if(self.leveltoLoad==len(self.chosenLevels)-1):
-                        self.levelLoadComplete = True
-                        print('COMPLETE')
-                    else:
-                        self.leveltoLoad +=1
-                        print("Incrementing to next level")
 
 
-            # CREATE NEW MAP IF FAILED
-            if(self.loadingFail):
-                print("****FAILED CREATING NEW MAP")
-                complete = self.mapEditor.createNewMap(gui,self,externallyCalled=True,specifiedName=level)
-                if(complete):
-                    self.loadingFail = False
                

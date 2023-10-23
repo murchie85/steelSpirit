@@ -34,6 +34,7 @@ class bullet():
 		self.redPlasmaBall      = ['redPlasmaBall']
 		self.lightRedPlasmaBall = ['lightRedPlasmaBall']
 		self.hotRoundTypes      = ['hotRound','hotDouble','hotTripple']
+		self.angleRoundTypes    = ['angleRound','angleRoundFaster','angleRoundFullSpeed','angleRound2','angleRound3']
 		
 		if(self.bulletType in self.slitherTypes):
 			self.bulletImage   = imageAnimateAdvanced(gui.slitherShot,0.1)
@@ -47,6 +48,8 @@ class bullet():
 			self.bulletImage   = imageAnimateAdvanced(gui.lightRedPlasma,0.1)
 		if(self.bulletType in self.hotRoundTypes):
 			self.bulletImage   = imageAnimateAdvanced(gui.hotRound,0.1)
+		if(self.bulletType in self.angleRoundTypes):
+			self.bulletImage   = imageAnimateAdvanced(gui.angleRound,0.1)
 
 
 	def move(self,gui,lv,game):
@@ -114,6 +117,14 @@ class bullet():
 		# ------HOT ROUNDS
 		elif(self.bulletType in self.hotRoundTypes):
 			self.bulletImage.animate(gui,'hotRound fire',[x-0.5*gui.hotRound[0].get_width(),y-0.5*gui.hotRound[0].get_height()],game,rotation=self.facing-90)
+		
+		# ------ANGLEROUNDS
+		elif(self.bulletType in self.angleRoundTypes):
+			self.bulletImage.animate(gui,'Angleround fire',[x-0.5*gui.angleRound[0].get_width(),y-0.5*gui.angleRound[0].get_height()],game,rotation=self.facing-90)
+		
+
+
+
 		elif(self.shrapnellType==None):
 			pygame.draw.circle(gui.screen, self.colour, (x,y), self.w, 0)
 
@@ -145,7 +156,7 @@ class bullet():
 			# ----KILL THE ENEMY 
 			if(target.hp<=0):
 				target.alive = False
-				killme(target,lv,killMesssage= str(target.name) + ' struck by enemy fire.',printme=True)
+				killme(target,lv,killMesssage= str(target.name) + ' struck by enemy fire.',printme=False)
 
 	# ENSURE BULLET DIES. 
 
@@ -153,8 +164,14 @@ class bullet():
 		for i in lv.bulletList:
 			if(self.id==i.id):
 				lv.bulletList.remove(self)
+				# try:
+				# 	lv.bulletList.remove(self)
+				# except:
+				# 	print('Unable to remove '  + str(self.classification) + ' id: ' + str(self.id))
+				# 	exit()
+				
 				if(printme):
-					print("Bullett destroyed : " + killMessage + ' ' + str(self.classification))
+					print("Bullett destroyed : " + killMessage + ' ' + str(self.classification) + ' id: ' + str(self.id))
 
 
 

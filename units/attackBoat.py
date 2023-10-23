@@ -162,6 +162,7 @@ class attackBoat(parent):
 
 
 		if(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) and not self.hit):
+			print("Drawing self")
 			animate,self.blitPos     = self.images.animate(gui,'tank' + str(self.id),[x,y],game,rotation=self.facing-90)
 			turretAnimage,self.turretPos  = self.turretImage.animate(gui,'turret' + str(self.id),[x,y],game,rotation=self.turretFacing-90)
 

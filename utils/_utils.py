@@ -1667,6 +1667,9 @@ class scrollingDialogueSimple():
         #    NEXT PAGE & SKIP
         #
         #----------------------------------------------------------
+        
+
+
         if((hovered and clicked) or gui.input.returnedKey.upper()=='RETURN'): 
             
             # IF BEFORE THE LAST PAGE 
@@ -1683,6 +1686,8 @@ class scrollingDialogueSimple():
                     self.scrollSpeedOverride = None
 
         # GOING TO NEXT PAGE
+
+        # PASS in a pagewait int, that is how long until the next page.
         if(type(pageWait)==int):
             # Adding in these values means if anythign changes the timer resets state
             nextPage = self.pageTimer.stopWatch(pageWait, 'waiting to go to next page','next page' + str([self.arrIndex,self.baseArray,self.currentArrayIndex,self.senPos]),game,silence=True)
@@ -1873,8 +1878,14 @@ class imageAnimateAdvanced():
         centerX,centerY   = (blitPos[0]+0.5*imgW + rotatedWidth*0.01*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH -rotatedHeight*0.01*math.sin(wrapAngle(rotation+90)*math.pi/180))
 
         smallOx,smallOy = 20 * math.cos(math.radians(360-rotation)), 20 * math.sin(math.radians(360-rotation))
+        tinyOx,tinyOy   = 10 * math.cos(math.radians(360-rotation)), 10 * math.sin(math.radians(360-rotation))
+        
         centerRx,CenterRy = centerX + smallOx, centerY + smallOy
         centerLx,CenterLy = centerX - smallOx, centerY - smallOy
+
+        centerLsx,CenterLsy = centerX - tinyOx, centerY - tinyOy
+        centerRsx,CenterRsy = centerX + tinyOx, centerY + tinyOy
+
 
         behindX,behindY   = (blitPos[0]+0.5*imgW - imgW*1.3*math.cos(wrapAngle(rotation+90)*math.pi/180),blitPos[1]+0.5*imgH +imgH*1.3*math.sin(wrapAngle(rotation+90)*math.pi/180))
         
@@ -1882,7 +1893,7 @@ class imageAnimateAdvanced():
         #pygame.draw.circle(gui.screen, (220,100,100), (blitPos[0],blitPos[1]), 10, 0)
 
 
-        return(self.reelComplete,{'center':(centerX,centerY ), 'centerL':(centerLx,CenterLy ),'centerR':(centerRx,CenterRy ), 'midTop':(midTopX,midTopY),'leftTop':(leftTopX, leftTopY),'rightTop':(rightTopX, rightTopY),'behind':(behindX,behindY) , 'rotatedDims': (rotatedWidth,rotatedHeight)})
+        return(self.reelComplete,{'center':(centerX,centerY ), 'centerL':(centerLx,CenterLy ),'middleR':(centerRsx,CenterRsy ), 'middleL':(centerLsx,CenterLsy ),'centerR':(centerRx,CenterRy ), 'midTop':(midTopX,midTopY),'leftTop':(leftTopX, leftTopY),'rightTop':(rightTopX, rightTopY),'behind':(behindX,behindY) , 'rotatedDims': (rotatedWidth,rotatedHeight)})
 
 
 

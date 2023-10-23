@@ -26,17 +26,41 @@ QUALITY CONTROL - Does it still have slug throwing SHmup feel?
 
 ## FEATURES UNSORTED 
 
-SORTED
-
-1. POWER UPs 
-2. SQUARE SAMS
-3. SCORE SYSTEM - Extra life at 1k
-4. WIREFRAME GUI
+SORTED - THIS WEEK 
 
 
 
+RUNWAY
+
+6. SCORE SYSTEM - Extra life at 1k
+2. Destroyable Barracks
+3. SQUARE SAMS
+- PLACE ENEMIES SO THEY SEEK YOU OUT (INCREASE THEIR RANGE) gives more shmup like feel
+4. HEALTH POWER UP
+Improve art:
+https://opengameart.org/art-search-advanced?keys=&field_art_type_tid%5B%5D=14&sort_by=count&sort_order=DESC
 
 
+7. SPAWN POWERUP OPTION (RANDOM POWERUP - BUT IT STEPS YOU UP NOT JUMPS TO THREE SHOT)
+5. Spider crawler shooter bots
+6. chain gun
+- bullet flash https://duckduckgo.com/?va=o&t=ha&q=shmup+sprites+powerups&iax=images&ia=images&iai=https%3A%2F%2Fimages.squarespace-cdn.com%2Fcontent%2Fv1%2F551a19f8e4b0e8322a93850a%2F1607969224266-KWX66VFLV66TT276HVRM%2F83-Projectiles_P.gif
+
+LOWER 
+
+- Animated pond
+
+DONE: 
+
+WIREFRAME GUI
+MAP OVERHAUL
+ANGLE BULLETS
+POWER UPs [from box, basic gui to show what i'm shooting with
+- Trees (so they cluster as group too)
+
+
+
+Turret blow off
 CLEARLY SIGNPOST: FREE MODE <-->LOCKON MODE
 CLEARLY SIGNPOST: Boosting, side dodge etc
 NOTES: Use a single frame pic (ace combat style) to speed up dev

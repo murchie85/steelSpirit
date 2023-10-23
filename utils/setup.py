@@ -49,6 +49,7 @@ gui.font           = pygame.font.Font(FONTPATH + '/Orbitron-Regular.ttf', 25)
 gui.smallishFont   = pygame.font.Font(FONTPATH + '/Orbitron-Regular.ttf', 23)
 gui.smallFont      = pygame.font.Font(FONTPATH + '/Orbitron-Regular.ttf', 20)
 gui.nanoFont       = pygame.font.Font(FONTPATH + '/Orbitron-Regular.ttf', 14)
+gui.picoFont       = pygame.font.Font(FONTPATH + '/Orbitron-Regular.ttf', 8)
 gui.vSmallFont     = pygame.font.Font(FONTPATH + '/Orbitron-Regular.ttf', 14)
 gui.largeFont      = pygame.font.Font(FONTPATH + '/Orbitron-Regular.ttf', 26)
 gui.bigFont        = pygame.font.Font(FONTPATH + '/Orbitron-Regular.ttf', 32)
@@ -128,6 +129,25 @@ gui.cyborgCover       = pygame.image.load(IMAGEASSETPATH + 'cover/cyborgGirl.png
 gui.bunnyGirlYCover   = pygame.image.load(IMAGEASSETPATH + 'cover/bunnyGirlYellowCover.png')
 
 
+
+# ----- GUI
+
+gui.objectiveArrow         = loadImageFiles('directionArrow1.png',IMAGEASSETPATH + 'gui/')
+gui.shipHealthDisplay      = {"100": pygame.image.load(IMAGEASSETPATH + 'gui/guibox/playerIcon_100percent.png'),
+							  "10": pygame.image.load(IMAGEASSETPATH + 'gui/guibox/playerIcon_10percent.png')}
+
+gui.weaponsLoadout         = {"missiles_1hot": pygame.image.load(IMAGEASSETPATH + 'gui/guibox/loadOut_missles_1HotRounds.png'),
+							  "missiles_2hot": pygame.image.load(IMAGEASSETPATH + 'gui/guibox/loadOut_missles_2HotRounds.png'),
+							  "missiles_3hot": pygame.image.load(IMAGEASSETPATH + 'gui/guibox/loadOut_missles_3HotRounds.png'),
+							  "missiles_angleRound": pygame.image.load(IMAGEASSETPATH + 'gui/guibox/loadOut_missles_angleRound.png'),
+							  "missiles_angleRoundFaster": pygame.image.load(IMAGEASSETPATH + 'gui/guibox/loadOut_missles_angleRoundFaster.png'),
+							  "missiles_angleRoundFullSpeed": pygame.image.load(IMAGEASSETPATH + 'gui/guibox/loadOut_missles_angleRoundFullSpeed.png'),
+							  "missiles_angleRound3": pygame.image.load(IMAGEASSETPATH + 'gui/guibox/loadOut_missles_angleRound3.png'),
+							  }
+
+gui.bombIcons               = {"nuke": pygame.image.load(IMAGEASSETPATH + 'gui/guibox/nuke.png')
+							  }
+
 # ----- UNITS AND PLAYER 
 
 gui.player            = loadImageFiles('fighter1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
@@ -150,6 +170,24 @@ gui.playerHit         = loadImageFiles('g12_Hit1.png',IMAGEASSETPATH + 'units/fi
 gui.scoutRed          = loadImageFiles('crabRed1.png',IMAGEASSETPATH + 'units/crab/',convert=False)
 gui.scoutRedHit       = loadImageFiles('crabRedhit1.png',IMAGEASSETPATH + 'units/crab/',convert=False)
 gui.scoutShadow       = [pygame.image.load(IMAGEASSETPATH + 'units/crab/crabShadow.png')]
+
+
+gui.powerDrone        = {"ready":loadImageFiles('powerDrone1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False),
+						 "3":loadImageFiles('powerDroneThree1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False),
+						 "2":loadImageFiles('powerDroneTwo1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False),
+						 "1":loadImageFiles('powerDroneOne1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False),
+						 "0":loadImageFiles('powerDroneZero1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False),
+						 "shadow":[pygame.image.load(IMAGEASSETPATH + 'powerups/drone/powerDroneShadow.png')],
+						 "static":loadImageFiles('powerDrone1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False)[0],
+						 "hit":loadImageFiles('pdHit1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False), 
+						 "destroyed":loadImageFiles('pdHitDestroyed1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False), }
+gui.pdAmmo            = { "angleRound": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/angle1.png'),
+						 "angleRoundFaster": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/angle2.png'),
+						 "angleRoundFullSpeed": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/angle3.png'),
+						 "angleRound3": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/angle4.png'),
+						 "hotRound": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/hotRound1.png'),
+						 "hotDouble": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/hotRound2.png'),
+						 "hotTripple": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/hotRound3.png'),}
 
 
 gui.hind              = loadImageFiles('hind1.png',IMAGEASSETPATH + 'units/hind/',convert=False)
@@ -251,6 +289,7 @@ gui.yellowPlasma           = loadImageFiles('yellowPlasmaBall1.png',IMAGEASSETPA
 gui.redPlasma              = loadImageFiles('redPlasmaBall1.png',IMAGEASSETPATH + 'ordinance/plasma/redPlasma/',convert=False)
 gui.lightRedPlasma         = loadImageFiles('lightRedPlasmaBall1.png',IMAGEASSETPATH + 'ordinance/plasma/lightRedPlasma/',convert=False)
 gui.hotRound               = loadImageFiles('hotRound1.png',IMAGEASSETPATH + 'ordinance/hotRound/',convert=False)
+gui.angleRound             = loadImageFiles('angleRounds1.png',IMAGEASSETPATH + 'ordinance/angleRounds/',convert=False)
 gui.beamPart               = loadImageFiles('beamPart1.png',IMAGEASSETPATH + 'ordinance/beam/',convert=False)
 gui.beamHead               = loadImageFiles('beamHead1.png',IMAGEASSETPATH + 'ordinance/beam/',convert=False)
 
@@ -419,9 +458,6 @@ gui.medSmoke               = loadImageFiles('belching1.png',IMAGEASSETPATH + 'SF
 gui.shrapnellA             =  loadImageFiles('shrapnell1.png',IMAGEASSETPATH + 'SFX/shrapnell/')      
 gui.shrapnellPlume         =  loadImageFiles('plume1.png',IMAGEASSETPATH + 'SFX/shrapnellPlume/')      
 
-# ----- GUI ICONS 
-
-gui.objectiveArrow         = loadImageFiles('directionArrow1.png',IMAGEASSETPATH + 'gui/')
 
 
 #---------------------CUTSCENE

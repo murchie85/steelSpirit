@@ -1,6 +1,9 @@
 import pygame
 import os
 from buildings.nonInteractable import *
+from levels.level_ruralAssault import *
+
+
 
 
 def loadUnconverted(mapPath):
@@ -262,30 +265,40 @@ def loadEnemyRefData(gui,game):
                           'attackBoat':{'image': gui.attackBoatStatic},
                           }
 
-  
+    enemyDict['passive'] = {
+                          'powerDrone':{'image': gui.powerDrone['static']},
+                          }
+
+
 
 
     game.activeEnemyData = []
     for item in game.rawEnemyData:
         # objectTiles/obj1/200/420
-        if(item.count('/')==6):
-            xpos            = item.split('/')[0].strip()
-            ypos            = item.split('/')[1].strip()
-            enemyKeyName    = item.split('/')[2].strip()
-            enemySubKeyName = item.split('/')[3].strip()
-            rotation        = item.split('/')[4].strip()
-            patrol          = item.split('/')[5].strip()
-            patrolU         = patrol.split(':')
-            patrolRoute     = []
-            for r in patrolU:
-                patrolRoute.append([r.split('-')[0],r.split('-')[1]])
-            lv           = item.split('/')[6].strip()
 
-            # x,y, image, rotation, patrol,powerlevel
-            # 200/300/ground/tank/30/200-300:400-320:200-250:500-220/3,400/700/air/scout/30/400-700:400-320/3
-            #{'x':200,'y':300,'enemyKeyName':'ground','enemySubKeyName':'tank','patrolRoute':[(200,300),(400-320),(200-250),(500-220)],'lv':3}
-            rotatedImage = pygame.transform.rotate(enemyDict[enemyKeyName][enemySubKeyName]['image'],int(rotation))
-            game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'objectiveNumber':'none', 'lv':lv})
+        xpos            = item.split('/')[0].strip()
+        ypos            = item.split('/')[1].strip()
+        enemyKeyName    = item.split('/')[2].strip()
+        enemySubKeyName = item.split('/')[3].strip()
+        rotation        = item.split('/')[4].strip()
+        patrol          = item.split('/')[5].strip()
+        patrolU         = patrol.split(':')
+        patrolRoute     = []
+        for r in patrolU:
+            patrolRoute.append((int(r.split('-')[0]),int(r.split('-')[1])))
+        lv              = item.split('/')[6].strip()
+        try:
+            objectiveKey    = item.split('/')[7].strip()
+        except:
+            print("Enemy does not have objective key, adding default value")
+            objectiveKey = 'no objective',
+
+        # x,y, image, rotation, patrol,powerlevel
+        # 200/300/ground/tank/30/200-300:400-320:200-250:500-220/3,400/700/air/scout/30/400-700:400-320/3
+        #{'x':200,'y':300,'enemyKeyName':'ground','enemySubKeyName':'tank','patrolRoute':[(200,300),(400-320),(200-250),(500-220)],'lv':3}
+        rotatedImage = pygame.transform.rotate(enemyDict[enemyKeyName][enemySubKeyName]['image'],int(rotation))
+        game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'lv':lv,'assignedObjective':objectiveKey})
+
 
     # Create a new dict with the images scaled
     for category, items in enemyDict.items():
@@ -296,6 +309,7 @@ def loadEnemyRefData(gui,game):
 
 
     return(enemyDict,game.activeEnemyData)
+
 
 
 def loadSpawnZones(gui,game):
