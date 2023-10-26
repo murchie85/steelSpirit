@@ -107,7 +107,7 @@ SFX
 
 
 
-def drawText(gui,myfont, text,x,y,maxw=None, colour=(0, 128, 0),center=False,pos=None):
+def drawText(gui,myfont, text,x,y,maxw=None, colour=(0, 128, 0),center=False,pos=None,alpha=255):
     """ Center means giving the far x point """
     hovered = None 
     textsurface = myfont.render(text, True, colour)
@@ -133,6 +133,8 @@ def drawText(gui,myfont, text,x,y,maxw=None, colour=(0, 128, 0),center=False,pos
                 textsurface = myfont.render(text, True, (128,0,0))
                 hovered = text
 
+    if(alpha!=255):
+        textsurface.set_alpha(alpha)
     gui.screen.blit(textsurface,(x,y))
     return(hovered,tw,th)
 
@@ -1834,7 +1836,7 @@ class imageAnimateAdvanced():
         self.reelComplete    = False
         self.changeCount     = 0
 
-    def animate(self,gui,trackedName,blitPos,game,rotation=None,centerOfRotation=(0.5,0.5),repeat=True,skipBlit=False):
+    def animate(self,gui,trackedName,blitPos,game,rotation=None,centerOfRotation=(0.5,0.5),repeat=True,skipBlit=False, repeatIndex=None):
         # TIMER THAT ITERATES THROUGH A FRAME EACH GIVEN INTERVAL
         changeFrame = self.frameTimer.stopWatch(self.changeDuration,trackedName, str(self.changeCount) + trackedName, game,silence=True)
         
@@ -1843,7 +1845,11 @@ class imageAnimateAdvanced():
             self.currentFrame +=1
             if(self.currentFrame>=len(self.imageFrames)):
                 if(repeat==False):
-                    self.currentFrame = len(self.imageFrames)-1
+                    
+                    if(repeatIndex != None):
+                        self.currentFrame= repeatIndex
+                    else:
+                        self.currentFrame = len(self.imageFrames)-1
                 else:
                     self.currentFrame = 0
                 self.reelComplete = True

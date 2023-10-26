@@ -1,4 +1,4 @@
-from utils._utils import stopTimer,loadingBarClass,wrapAngle,imageAnimateAdvanced
+from utils._utils import stopTimer,loadingBarClass,wrapAngle,imageAnimateAdvanced,drawText
 from utils.gameUtils import *
 from units.ordinance import *
 
@@ -38,6 +38,8 @@ class parent():
 		self.decelleration  = 0.2
 
 		self.shrapnellEjected = False
+		self.killScore	 	  = 100
+		self.pointsAwarded    = False
 
 
 
@@ -72,6 +74,10 @@ class parent():
 		# OVERRIDE
 		self.chosenExplosionImg = gui.smallCloudyExplosion
 		self.explosion          = imageAnimateAdvanced(self.chosenExplosionImg,0.1)
+
+
+		self.growingFontIndex = 0
+		self.fontTimer        = stopTimer()
 
 
 
@@ -130,6 +136,16 @@ class parent():
 				y += 0.5*self.centerPoint[1]
 			complete,blitPos = self.explosion.animate(gui,str(str(self.name) +' explosion'),[x,y],game)
 			bid = max(([x.id for x in lv.bulletList]),default=0) + 1
+
+
+			#---------DRAW SCORE
+
+			if(self.killScore!=0):
+				drawText(gui,gui.growingFont[self.growingFontIndex],str(self.killScore),x+ 0.4*self.w,y-0.4*self.h + -(self.growingFontIndex/20 * 0.1*gui.h), colour=(255, 255, 255),alpha=(1 - self.growingFontIndex/len(gui.growingFont))*255)
+				incFont = self.fontTimer.stopWatch(0.025,'expanding font', str(self.growingFontIndex), game,silence=True)
+				if(incFont):
+					if(not self.growingFontIndex>=len(gui.growingFont)-1):
+						self.growingFontIndex +=1
 
 
 			if(self.debris<=12):

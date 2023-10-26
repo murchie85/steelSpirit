@@ -79,6 +79,13 @@ gui.squareFontMed    = pygame.font.Font(FONTPATH + 'FORCEDSQUARE.ttf', 26)
 gui.squareFontH      = pygame.font.Font(FONTPATH + 'FORCEDSQUARE.ttf', 28)
 
 
+gui.growingFont = []
+
+for x in range(19,29):
+	gui.growingFont.append(pygame.font.Font(FONTPATH + 'FORCEDSQUARE.ttf', x))
+
+
+
 gui.titleFont         = pygame.font.Font(FONTPATH + 'squids.ttf', 60)
 gui.titleFontB        = pygame.font.Font(FONTPATH + 'squids.ttf', 90)
 
@@ -114,19 +121,20 @@ gui.next2              = pygame.image.load(IMAGEASSETPATH + 'tilesets/50/templat
 
 
 # -----MENU/STARTUP
-gui.coverLogo         = pygame.image.load(IMAGEASSETPATH + 'cover/logo.png')
-gui.cover1            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover.png')
-gui.cover2            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover2.png')
-gui.cover3            = pygame.image.load(IMAGEASSETPATH + 'cover/altCover3.png')
-gui.kira              = pygame.image.load(IMAGEASSETPATH + 'cover/kira.png')
-gui.madge             = pygame.image.load(IMAGEASSETPATH + 'cover/madge.png')
-gui.madgeInv          = pygame.image.load(IMAGEASSETPATH + 'cover/madgeInv.png')
-gui.bunnyTank         = pygame.image.load(IMAGEASSETPATH + 'cover/bunnyTank.png')
-gui.cherry            = pygame.image.load(IMAGEASSETPATH + 'cover/cherry.png')
-gui.sarah             = pygame.image.load(IMAGEASSETPATH + 'cover/sarah.png')
-gui.apacheJack        = pygame.image.load(IMAGEASSETPATH + 'cover/apacheJack.png')
-gui.cyborgCover       = pygame.image.load(IMAGEASSETPATH + 'cover/cyborgGirl.png')
-gui.bunnyGirlYCover   = pygame.image.load(IMAGEASSETPATH + 'cover/bunnyGirlYellowCover.png')
+gui.coverLogo            = pygame.image.load(IMAGEASSETPATH + 'cover/logo.png')
+gui.cover1               = pygame.image.load(IMAGEASSETPATH + 'cover/altCover.png')
+gui.cover2               = pygame.image.load(IMAGEASSETPATH + 'cover/altCover2.png')
+gui.cover3               = pygame.image.load(IMAGEASSETPATH + 'cover/altCover3.png')
+gui.kira                 = pygame.image.load(IMAGEASSETPATH + 'cover/kira.png')
+gui.madge                = pygame.image.load(IMAGEASSETPATH + 'cover/madge.png')
+gui.madgeInv             = pygame.image.load(IMAGEASSETPATH + 'cover/madgeInv.png')
+gui.bunnyTank            = pygame.image.load(IMAGEASSETPATH + 'cover/bunnyTank.png')
+gui.cherry               = pygame.image.load(IMAGEASSETPATH + 'cover/cherry.png')
+gui.sarah                = pygame.image.load(IMAGEASSETPATH + 'cover/sarah.png')
+gui.apacheJack           = pygame.image.load(IMAGEASSETPATH + 'cover/apacheJack.png')
+gui.cyborgCover          = pygame.image.load(IMAGEASSETPATH + 'cover/cyborgGirl.png')
+gui.bunnyGirlYCover      = pygame.image.load(IMAGEASSETPATH + 'cover/bunnyGirlYellowCover.png')
+gui.settingsBackground   = pygame.image.load(IMAGEASSETPATH + 'cover/settings.jpg')
 
 
 
@@ -160,6 +168,8 @@ gui.playerHit         = loadImageFiles('playerHit1.png',IMAGEASSETPATH + 'units/
 gui.player            = loadImageFiles('g12_1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 gui.playerShooting    = loadImageFiles('g12_Shooting1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 gui.playerBoost       = loadImageFiles('g12_boost1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerThustR       = loadImageFiles('g12_ThrustRight1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerThustL       = loadImageFiles('g12_ThrustLeft1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 gui.playerShadow      = loadImageFiles('g12_Shadow1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 gui.playerHit         = loadImageFiles('g12_Hit1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 
@@ -173,10 +183,10 @@ gui.scoutShadow       = [pygame.image.load(IMAGEASSETPATH + 'units/crab/crabShad
 
 
 gui.powerDrone        = {"ready":loadImageFiles('powerDrone1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False),
-						 "3":loadImageFiles('powerDroneThree1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False),
-						 "2":loadImageFiles('powerDroneTwo1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False),
-						 "1":loadImageFiles('powerDroneOne1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False),
-						 "0":loadImageFiles('powerDroneZero1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False),
+						 "3":pygame.image.load(IMAGEASSETPATH + 'powerups/drone/powerDroneThree1.png'),
+						 "2":pygame.image.load(IMAGEASSETPATH + 'powerups/drone/powerDroneTwo1.png'),
+						 "1":pygame.image.load(IMAGEASSETPATH + 'powerups/drone/powerDroneOne1.png'),
+						 "0":pygame.image.load(IMAGEASSETPATH + 'powerups/drone/powerDroneZero1.png'),
 						 "shadow":[pygame.image.load(IMAGEASSETPATH + 'powerups/drone/powerDroneShadow.png')],
 						 "static":loadImageFiles('powerDrone1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False)[0],
 						 "hit":loadImageFiles('pdHit1.png',IMAGEASSETPATH + 'powerups/drone/',convert=False), 
@@ -262,14 +272,18 @@ gui.frigateMultiRemains = [pygame.image.load(IMAGEASSETPATH + 'units/navalFrigat
 # ---------BUILDINGS INTERACTABLE
 
 
-gui.bioLab                    = [pygame.image.load(IMAGEASSETPATH + 'tilesets/L2/interactable/biolab/bioLab.png')]
-gui.bioLabHit                 = loadImageFiles('bioLabHit1.png',IMAGEASSETPATH + 'tilesets/L2/interactable/biolab/',convert=False)
-gui.bioLabRemains             = loadImageFiles('bioLabRemains1.png',IMAGEASSETPATH + 'tilesets/L2/interactable/biolab/',convert=False)
+gui.bioLab                    = [pygame.image.load(IMAGEASSETPATH + 'buildings/biolab/bioLab.png')]
+gui.bioLabHit                 = loadImageFiles('bioLabHit1.png',IMAGEASSETPATH + 'buildings/biolab/',convert=False)
+gui.bioLabRemains             = loadImageFiles('bioLabRemains1.png',IMAGEASSETPATH + 'buildings/biolab/',convert=False)
+
+gui.samSite                    = [pygame.image.load(IMAGEASSETPATH + 'buildings/SAM/silo.png')]
+gui.samSiteHit                 = loadImageFiles('silo_hit1.png',IMAGEASSETPATH + 'buildings/SAM/',convert=False)
+gui.samSiteRemains             = loadImageFiles('silo_remains1.png',IMAGEASSETPATH + 'buildings/SAM/',convert=False)
 
 
-gui.barrelGroupRed            = [pygame.image.load(IMAGEASSETPATH + 'tilesets/L2/interactable/barrel/barrelGroupRed.png')]
-gui.barrelGroupRedHit         = loadImageFiles('barrelGroupRedHit1.png',IMAGEASSETPATH + 'tilesets/L2/interactable/barrel/',convert=False)
-gui.barrelGroupRedRemains     = loadImageFiles('barellGroupRedRemains1.png',IMAGEASSETPATH + 'tilesets/L2/interactable/barrel/',convert=False)
+gui.barrelGroupRed            = [pygame.image.load(IMAGEASSETPATH + 'buildings/barrel/barrelGroupRed.png')]
+gui.barrelGroupRedHit         = loadImageFiles('barrelGroupRedHit1.png',IMAGEASSETPATH + 'buildings/barrel/',convert=False)
+gui.barrelGroupRedRemains     = loadImageFiles('barellGroupRedRemains1.png',IMAGEASSETPATH + 'buildings/barrel/',convert=False)
 
 
 #----TERRAIN TILELESS
@@ -485,6 +499,11 @@ gui.clareSmiling      = imageAnimateAdvanced(gui.claireSmileFrames,0.2)
 gui.talkScreenW       = gui.claireTalk[0].get_width()
 gui.talkScreenH       = gui.claireTalk[0].get_height()
 
+
+
+# ---------AUDIO
+
+gui.cutsceneAudio  = {"ruralAssault": {"scene1": ASSETSPATH + "/Audio/RuralAssault/intro_rookieClearAPath.mp3"}}
 
 
 

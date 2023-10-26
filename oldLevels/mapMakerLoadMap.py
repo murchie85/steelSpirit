@@ -14,7 +14,7 @@ def loadMap(self,gui,game):
 	gui.screen.blit(self.levelScreenMask,(0,0))
 
 	# ------GET LOADED MAPS 
-	loadPath       = 'state/'
+	loadPath       = 'state/old/'
 	availableFiles = os.listdir(loadPath)
 	availableFiles = [x for x in availableFiles if x[-4:]=='.pkl']
 	

@@ -38,6 +38,8 @@ class player():
 		self.facing         = 90
 		self.images         = imageAnimateAdvanced(gui.player,0.2)
 		self.boostImage     = imageAnimateAdvanced(gui.playerBoost,0.2)
+		self.thrustRImg     = imageAnimateAdvanced(gui.playerThustR,0.2)
+		self.thrustLImg     = imageAnimateAdvanced(gui.playerThustL,0.2)
 		self.shadow         = imageAnimateAdvanced(gui.playerShadow,0.2)
 		self.shootingImg    = imageAnimateAdvanced(gui.playerShooting,0.2)
 		self.lockOnImage    = imageAnimateAdvanced(gui.lockOn,0.05)
@@ -104,6 +106,9 @@ class player():
 		self.shake_timer     = 0
 		self.camShakeStarted = False
 
+		self.thrustingR      = False
+		self.thrustingL      = False
+
 		# SHOULD BE OVERRIDEN
 
 		self.hitImage         = gui.playerHit
@@ -157,6 +162,8 @@ class player():
 		self.loadOutCurrentImage = self.loadOutImageDict[self.shotType]
 		
 		self.nextShotDict        = {"angleRound":"angleRoundFaster","angleRoundFaster":"angleRoundFullSpeed","angleRoundFullSpeed":"angleRound3","hotRound":"hotDouble","hotDouble":"hotTripple"}
+		self.swapShotDict        = {"angleRound":"hotRound","angleRoundFaster":"hotRound","angleRoundFullSpeed":"hotDouble","angleRound3":"hotTripple",
+									"hotRound":"angleRound","hotDouble":"angleRoundFaster","hotTripple":"angleRound3"}
 		self.maxPowerReference   = ['angleRound3','hotTripple']
 
 		self.bulletTimer        = stopTimer()           # BUFF
@@ -195,6 +202,7 @@ class player():
 		self.chosenExplosionImg  = gui.smallYellowExplosion
 		self.explosion           = imageAnimateAdvanced(self.chosenExplosionImg,0.1)
 		self.debris 			 = 0
+		self.score               = 0
 
 	
 	# MANAGE ACCELLERATION 
@@ -213,6 +221,10 @@ class player():
 			self.BOOST_BUTTON       = 'U' 
 			self.JINK_BUTTON        = 'K' 
 			self.SPECIAL            = 'J'
+
+
+		# ensure animation not stuck
+		self.thrustingL,self.thrustingR = False,False
 
 		# --------GET PRESSED KEYS
 
@@ -272,7 +284,8 @@ class player():
 			if(onScreen(enemy.x,enemy.y,enemy.w,enemy.h,gui)):
 				if cone_rect.collidepoint((enemy.x, enemy.y)):
 					distance = getDistance(self.x,self.y,enemy.x,enemy.y)
-					detectEnemies.append((enemy,int(distance)))
+					if(distance>200):
+						detectEnemies.append((enemy,int(distance)))
 
 		# RETURN ENEMY LIST IN ORDER OF NEAREST
 		sorted_list  = sorted(detectEnemies, key=lambda x: x[1])
@@ -720,10 +733,11 @@ class player():
 			vy = self.maxSpeed * math.sin(math.radians(360-self.facing))
 
 			
-
+			self.thrustingR,self.thrustingL = False, False
 			# MOVE X COMP
 			if('D' in pressedKeys):
 				self.x  +=    0.8*self.maxSpeed
+				self.thrustingR = True
 			# TURN
 			if('D' in pressedKeys and self.JINK_BUTTON in pressedKeys):
 				self.facing -= 4
@@ -731,6 +745,7 @@ class player():
 			# MOVE X COMP
 			if('A' in pressedKeys):
 				self.x  -= 0.8*self.maxSpeed
+				self.thrustingL = True
 			# LEFT     - TURN IF JINK BUTTON HELD
 			if('A' in pressedKeys and self.JINK_BUTTON in pressedKeys):
 				self.facing += 4
@@ -761,12 +776,16 @@ class player():
 				
 				self.x -= vel_x
 				self.y -= vel_y
+				self.thrustingR = True
+
 
 			if('A' in pressedKeys):
 				if('J' in pressedKeys and self.firing):
 					self.facing +=1.4
 				self.x += vel_x
 				self.y += vel_y
+				self.thrustingL = True
+			
 			if('W' in pressedKeys ):
 				self.speed += 0.7
 				accell = True
@@ -805,15 +824,21 @@ class player():
 			if('D' in pressedKeys):
 				if('J' in pressedKeys and self.firing):
 					self.facing +=0.8
-				self.x -= vel_x 
-				self.y -= vel_y 
+					self.thrustingR = True
+				else:
+					self.x -= vel_x 
+					self.y -= vel_y 
+					
 
 			# LEFT
 			if('A' in pressedKeys):
 				if('J' in pressedKeys and self.firing):
 					self.facing -=0.8
-				self.x += vel_x 
-				self.y += vel_y 
+					self.thrustingL = True
+				else:
+					self.x += vel_x 
+					self.y += vel_y 
+					
 				
 
 			
@@ -1076,6 +1101,10 @@ class player():
 			
 			if(self.boosting):
 				animate,imageParms = self.boostImage.animate(gui,'playerBoosting',[x,y],game,rotation=self.facing-90)
+			elif(self.thrustingR):
+				animate,imageParms = self.thrustRImg.animate(gui,'playerThrusting',[x,y],game,rotation=self.facing-90,repeat= True, repeatIndex=len(gui.playerThustR)-3)
+			elif(self.thrustingL):
+				animate,imageParms = self.thrustLImg.animate(gui,'playerThrusting',[x,y],game,rotation=self.facing-90,repeat= True, repeatIndex=len(gui.playerThustL)-3)
 			else:
 				animate,imageParms = self.images.animate(gui,'player',[x,y],game,rotation=self.facing-90)
 			

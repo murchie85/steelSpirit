@@ -5,6 +5,9 @@
 
 # SCENE MECHANICS 
 
+
+
+
 It's a FAST DESERT STRIKE like shooter.
 
 With SHMUP TRANSITION scenes
@@ -22,33 +25,47 @@ QUALITY CONTROL - Does it still have slug throwing SHmup feel?
 
 
 
-
+# TRACTION: gamedev.net, linkedin, reddit pygame, indiedev, fungames, twitter, tiktok
 
 ## FEATURES UNSORTED 
 
 SORTED - THIS WEEK 
 
+FILTER AND RANK BETTER 
 
 
-RUNWAY
 
-6. SCORE SYSTEM - Extra life at 1k
-2. Destroyable Barracks
-3. SQUARE SAMS
-- PLACE ENEMIES SO THEY SEEK YOU OUT (INCREASE THEIR RANGE) gives more shmup like feel
-4. HEALTH POWER UP
-Improve art:
-https://opengameart.org/art-search-advanced?keys=&field_art_type_tid%5B%5D=14&sort_by=count&sort_order=DESC
+CODE: Enemy Respawn
+CODE : PLACE ENEMIES SO THEY SEEK YOU OUT (INCREASE THEIR RANGE) gives more shmup like feel
+Bonus: multiplier to prevent me snipping from a distance.  Use a timer 
+
+BURNING ANIMATION: Leave stuff burning (runway, barracks, sam)
+UNITS/ITEMS:
+							RUNWAY
+							Destroyable Barracks
+							SQUARE SAMS
+UNIT: Spider crawler shooter bots
+UNIT: chain gun
+
+SETTINGS : DPAD
+
+ANIMATION: NOT ALL STUFF SHOULD EXPLODE: FIRE AND CRASH DEBRIS LEAVES POT HOLE (L2): slower flipping debris 
+
+HEALTH: HEALTH POWER UP
+ART: Improve art https://opengameart.org/art-search-advanced?keys=&field_art_type_tid%5B%5D=14&sort_by=count&sort_order=DESC
+BULLET: bullet flash https://duckduckgo.com/?va=o&t=ha&q=shmup+sprites+powerups&iax=images&ia=images&iai=https%3A%2F%2Fimages.squarespace-cdn.com%2Fcontent%2Fv1%2F551a19f8e4b0e8322a93850a%2F1607969224266-KWX66VFLV66TT276HVRM%2F83-Projectiles_P.gif
 
 
-7. SPAWN POWERUP OPTION (RANDOM POWERUP - BUT IT STEPS YOU UP NOT JUMPS TO THREE SHOT)
-5. Spider crawler shooter bots
-6. chain gun
-- bullet flash https://duckduckgo.com/?va=o&t=ha&q=shmup+sprites+powerups&iax=images&ia=images&iai=https%3A%2F%2Fimages.squarespace-cdn.com%2Fcontent%2Fv1%2F551a19f8e4b0e8322a93850a%2F1607969224266-KWX66VFLV66TT276HVRM%2F83-Projectiles_P.gif
+
+
 
 LOWER 
 
 - Animated pond
+Crates/containers like in raiden
+map texture example https://youtu.be/XqinwSr2yD8?si=IRvjGLWmDKA3l6UA&t=664
+
+
 
 DONE: 
 
@@ -74,7 +91,7 @@ GUI: GUI LAYOUT: HEALTH, INFO PANEL like DC
 GUI: GUI LAYOUT: RIGHT VIDEO SCREEN FOR FAST, INGAME POPUP SCREEN FOR BLUR
 GUI: Video phase in animation - telegraph it
 
-CODE: Enemy Respawn
+
 CODE:Third layer with paralax canv Speed (possibly cloud cover) - canvas transparent. MOD to pick layer size
 CODE: PROPER SCREEN PANNING so north,south gets more coverage in facing dir
 CODE: ANIMATED TILES
@@ -556,3 +573,30 @@ Consider making units smaller
 - snow tank, 
 - Fix frigate
 2. Add blue laser
+
+
+Enemy power up spawner
+
+Add option on map selector for unit
+Or in level code i.e. every 5th tank
+Adds spawn power up to class attr
+
+Add check at death
+Adds PD to enemy list
+
+---self kill
+
+Kill timer
+Start once seen
+Animate all slides but slowly
+Terninate
+
+---Pd- cycle different weapon
+
+Random chance at spawn
+Have it cycle between weap types 
+Cycle timer
+Need a switch dict
+If timer met switch to same level tho
+6. SCORE SYSTEM - Extra life at 1k
+7. SPAWN POWERUP OPTION (RANDOM POWERUP - BUT IT STEPS YOU UP NOT JUMPS TO THREE SHOT)

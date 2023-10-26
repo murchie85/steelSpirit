@@ -11,10 +11,12 @@ from units.mlrs import *
 from units.frigate import *
 from units.powerDrone import *
 from buildings.bioLab import *
+from buildings.samSite import *
 from buildings.barrelRed import *
 from buildings.nonInteractable import *
 from scenes.cutSceneGui import * 
 from units.player import *
+
 
 
 
@@ -72,6 +74,8 @@ class ruralAssault():
         self.enemyComponentList = [] # THINGS LIKE TURRETS ETC
         self.unfieldedEnemies   = [] # this contains remaining enemies to put on the  board
         self.defaultEnemyList   = [] # This contains a backup
+        
+        # ENEMIES AND MISSILES ARE ADDED TO THIS
         self.deadList           = []
         self.terrainList        = []
         self.fids               = [1]
@@ -117,6 +121,7 @@ class ruralAssault():
                                                 'nextObjective':'destroyBase',
                                                 'holdGame':False, 
                                                 'startMessage':'Rookie, clear a path into the base, good luck!', 
+                                                'audio':gui.cutsceneAudio['ruralAssault']['scene1'],
                                                 'completionMessage': 'Nicely done!',
                                                 'activeQuandrant': {'x':self.gameMap['quadrants'][0][0],'w':self.gameMap['quadrants'][0][2] ,'y':self.gameMap['quadrants'][0][1],'h':self.gameMap['quadrants'][0][3]},
                                                 'enemySpawn':self.spawn_1},
@@ -125,7 +130,7 @@ class ruralAssault():
                                                     'status': 'notStarted', 
                                                     'nextObjective':'complete',
                                                     'holdGame':False,  
-                                                    'startMessage':'Take out the resupply base.', 
+                                                    'startMessage':'Get to the resupply base and take out those siloes.', 
                                                     'completionMessage': 'Great job! Our forces can carry on unimpeded, make your way to the next objective.',
                                                     'activeQuandrant': {'x':self.gameMap['quadrants'][0][0],'w':self.gameMap['quadrants'][0][2] ,'y':self.gameMap['quadrants'][0][1],'h':self.gameMap['quadrants'][0][3]},
                                                     'enemySpawn':self.spawn_2 },
@@ -148,8 +153,9 @@ class ruralAssault():
 
         # CUTSCENE STUFF
 
-        self.scene = 'debug'
-        self.state ='NOT_STARTED'
+        self.scene      = 'debug'
+        self.state      ='NOT_STARTED'
+        self.audioState = None
 
     def run(self,gui,game):
 
@@ -168,6 +174,7 @@ class ruralAssault():
         # ----PAUSE GAME 
 
         self.pauseGame(gui,game)
+
 
 
 
@@ -195,6 +202,17 @@ class ruralAssault():
 
                     # DRAW DEATH EXPLOSION
                     dead.animateDestruction(gui,self,game)
+
+                    # SPAWN POWERUP
+                    if(hasattr(dead,'itemDrop')):
+                        if(dead.itemDrop=='PowerUp'):
+                            self.enemyList.append(powerDrone(createFid(self),gui,x=dead.x,y=dead.y))
+                            dead.itemDrop = 'None'
+
+                    if(hasattr(dead,'pointsAwarded')):
+                        if(dead.pointsAwarded==False):
+                            self.player.score += dead.killScore
+                            dead.pointsAwarded = True
 
             # ------DISPLAY OBJECTIVES 
 
@@ -277,7 +295,7 @@ class ruralAssault():
         self.objectiveManager(gui,game)
 
         # ENEMY SPAWNER
-        self.enemySpawnManager(gui,game)
+        #self.enemySpawnManager(gui,game)
 
 
 
@@ -335,37 +353,54 @@ class ruralAssault():
             x,y = e['x'], e['y']
             if(e['enemySubKeyName']=='scout'):
                 enemyObject = scout(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore =100
             if(e['enemySubKeyName']=='scout'):
                 enemyObject = scout(createFid(self),gui,x=x,y=y)
             if(e['enemySubKeyName']=='hind'):
                 enemyObject = hind(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore =100
             elif(e['enemySubKeyName']=='tank'):
                 enemyObject = tank(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 200
             elif(e['enemySubKeyName']=='snowTank'):
                 enemyObject = snowTank(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 300
             elif(e['enemySubKeyName']=='attackBoat'):
                 enemyObject = attackBoat(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore =150
             elif(e['enemySubKeyName']=='greenTank'):
                 enemyObject = greenTank(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore =150
             elif(e['enemySubKeyName']=='aaSmall'):
                 enemyObject = aaSmall(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore =300
             elif(e['enemySubKeyName']=='mlrs'):
                 enemyObject = mlrs(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 500
             elif(e['enemySubKeyName']=='frigate'):
                 enemyObject = frigate(createFid(self),gui,self,x=x,y=y)
+                enemyObject.killScore = 1000
             elif(e['enemySubKeyName']=='powerDrone'):
                 enemyObject = powerDrone(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 0
 
             elif(e['enemySubKeyName']=='bioLab'):
                 enemyObject = bioLab(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 500
+            elif(e['enemySubKeyName']=='samSite'):
+                enemyObject = samSite(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 300
             elif(e['enemySubKeyName']=='barrelRed'):
                 enemyObject = barrelRed(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 0
             
             enemyObject.facing            = wrapAngle(e['rotation'])
             
             enemyObject.patrolLocations   = e['patrolRoute']
             
             enemyObject.assignedObjective = e['assignedObjective']
+
+            enemyObject.itemDrop          = e['itemDrop']
 
 
             self.enemyList.append(enemyObject)
@@ -583,11 +618,18 @@ class ruralAssault():
                 gui.claireTalking.animateNoRotation(gui,'claireTalking',[self.cutScene.imageLeftX,self.cutScene.imageY],game)
                 self.cutScene.drawMask(gui,game,overlay=False,border='ally',codec=True)
                 
+
+                if('audio' in currentObjective.keys() and self.audioState==None):
+                    gui.musicPlayer.play(currentObjective['audio'])
+                    self.audioState = 'playing'
+
                 finished = self.cutScene.dialogue.drawScrollingDialogue(gui,game,self.cutScene.textW,self.cutScene.textH,gui.smallFont, sceneMessage, textStartingPos=(self.cutScene.textX ,self.cutScene.textY),colour=(51,189,251),closeOutDelay=True,maxLines=4,scrollInterval=0.02,pageWait=3)
+
                 if(finished):
                     currentObjective['status'] = 'inProgress'
                     if(currentObjective['holdGame']):
                         self.holdGame = False
+                        self.audioState = None
                     
                     self.cutScene.reset()
 
@@ -676,6 +718,7 @@ class ruralAssault():
             # IF ENEMY SPAWN IS SET
             if('enemySpawn' in currentObjective.keys()):
                 enemySpawnDict = currentObjective['enemySpawn']
+                
                 # IF SPAWN AVAILABLE
                 if(enemySpawnDict['spawnIndex']<=enemySpawnDict['spawnCount']-1):
                     
@@ -786,11 +829,14 @@ def levelGui(self,gui,game):
 
 
      
-    # -------------ENEMIES REMAINING
+    # -------------ENEMIES REMAINING / SCORE
 
     setWidth=getTextWidth(gui.hugeFont,'ENEMIES.')   
+    
     self.remainingEnemies = len([x for x in self.enemyList if(x.alive)])
-    drawTextWithBackground(gui.screen,gui.hugeFont,str(self.remainingEnemies),50,20, setWidth=setWidth,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+    renderString = str(self.remainingEnemies)
+    renderString = str(self.player.score)
+    drawTextWithBackground(gui.screen,gui.hugeFont,renderString,50,20, setWidth=setWidth,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
 
 
     # ------------------OBJECTIVE ARROW 

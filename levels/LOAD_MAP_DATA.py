@@ -171,11 +171,11 @@ def loadLayer2RefData(gui,game):
 
 
     l2Dict = {}
-    l2Dict['objectTiles']  = objectTiles
+    l2Dict['lv1']          = lv1
     l2Dict['pilonLeft']    = pilonLeft
     l2Dict['pilonRight']   = pilonRight
     l2Dict['barracks']     = barracks
-    l2Dict['lv1']          = lv1
+    l2Dict['objectTiles']  = objectTiles
 
 
     game.activeL2Data = []
@@ -259,7 +259,8 @@ def loadEnemyRefData(gui,game):
                           'hind':{'image': gui.hind[0]}
                           }
     enemyDict['buildings'] = {
-                          'bioLab':{'image': gui.bioLab[0]}
+                          'bioLab':{'image': gui.bioLab[0]},
+                          'samSite':{'image': gui.samSite[0]},
                           }
     enemyDict['sea'] = {
                           'attackBoat':{'image': gui.attackBoatStatic},
@@ -291,13 +292,18 @@ def loadEnemyRefData(gui,game):
             objectiveKey    = item.split('/')[7].strip()
         except:
             print("Enemy does not have objective key, adding default value")
-            objectiveKey = 'no objective',
+            objectiveKey = 'no objective'
+        try:
+            itemDrop    = item.split('/')[8].strip()
+        except:
+            print("Enemy does not have itemDrop key, adding default value")
+            itemDrop = 'None'
 
         # x,y, image, rotation, patrol,powerlevel
         # 200/300/ground/tank/30/200-300:400-320:200-250:500-220/3,400/700/air/scout/30/400-700:400-320/3
         #{'x':200,'y':300,'enemyKeyName':'ground','enemySubKeyName':'tank','patrolRoute':[(200,300),(400-320),(200-250),(500-220)],'lv':3}
         rotatedImage = pygame.transform.rotate(enemyDict[enemyKeyName][enemySubKeyName]['image'],int(rotation))
-        game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'lv':lv,'assignedObjective':objectiveKey})
+        game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'lv':lv,'assignedObjective':objectiveKey,'itemDrop': itemDrop})
 
 
     # Create a new dict with the images scaled

@@ -2,6 +2,7 @@ import pygame
 import math
 from pygame.locals import *
 from utils._utils import stopTimer
+from utils.music import *
 import time
 
 
@@ -30,6 +31,8 @@ class gui():
         self.scrollDown      = False
         self.scrollEnabled   = True
         self.input           = None # Assigned during main
+        self.musicPlayer     = music()
+
 
         self.screen          = screen
         self.x               = 0

@@ -104,6 +104,9 @@ class mapCreator():
         self.currentObjectiveCursor = None
         self.navEnabled             = True
 
+        self.bonusSpawnTypes = ["None","PowerUp","Missiles","HealthUp"]
+        self.bonusSpawn     = 'None'
+
 
 
 
@@ -954,7 +957,11 @@ class mapCreator():
                 tw= getTextWidth(gui.picoFont,string)
                 drawTextWithBackground(gui.screen,gui.picoFont,string,ex-0.5*tw,ey+1.1*item['image'].get_height(),textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
                 # DRAW OBJECTIVES
-                string = str(item['assignedObjective'])
+                if(item['itemDrop']!= 'None'):
+                    dropString = "Drops"
+                else:
+                    dropString = "No Drop"
+                string = str(item['assignedObjective']) + " : " + dropString
                 tw= getTextWidth(gui.picoFont,string)
                 drawTextWithBackground(gui.screen,gui.nanoFont,string,ex-0.5*tw,ey+1.3*item['image'].get_height(),textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
 
@@ -981,8 +988,69 @@ class mapCreator():
                 nothingSelected = True
                 if(gui.clicked and nothingSelected and not deleteHover and self.updateTileEnabled):
                     if(self.enemySelectionState=='notSelected'):
-                        self.enemyToPlace = {'x':gui.mx+gui.camX ,'y':gui.my+gui.camY ,'image':selectedTile ,'enemyKeyName':self.selectedEnemyKey ,'enemySubKeyName':self.selectedEnemySubKey ,'rotation':wrapAngle(self.currentEnemyRotation),'patrolRoute':[] ,'lv':3}
+                        self.enemyToPlace = {'x':gui.mx+gui.camX ,'y':gui.my+gui.camY ,'image':selectedTile ,'enemyKeyName':self.selectedEnemyKey ,'enemySubKeyName':self.selectedEnemySubKey ,'rotation':wrapAngle(self.currentEnemyRotation),'patrolRoute':[],'itemDrop':'None', 'lv':3}
+                        self.enemySelectionState='setObjectives'
+
+
+                # ----------OBJECTIVE SELECTION
+
+                if(self.enemySelectionState=='setObjectives'):
+                    self.navEnabled   = False
+                    gui.scrollEnabled = False
+                    drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+                    
+                    # initialise objective if not exist
+                    if(self.currentObjectiveCursor==None):
+                        self.currentObjectiveCursor = self.availableObjectives[0]
+                    
+                    pressedKey     = gui.input.returnedKey.upper()
+                    # GET DIRECTION OF ACCELLERATION
+                    if('D' == pressedKey):
+                        self.currentObjectiveCursor = self.availableObjectives[(self.availableObjectives.index(self.currentObjectiveCursor) + 1) % len(self.availableObjectives)]
+                    if('A' == pressedKey):
+                        self.currentObjectiveCursor = self.availableObjectives[(self.availableObjectives.index(self.currentObjectiveCursor) - 1) % len(self.availableObjectives)]
+                    if('RETURN' == pressedKey):
+                        self.enemyToPlace['assignedObjective'] = self.currentObjectiveCursor
+                        self.currentObjectiveCursor = None
+                        self.enemySelectionState='itemDrop'
+                        gui.input.returnedKey = ''
+
+
+
+                    string = str(self.currentObjectiveCursor)
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                
+                
+                # ----------ENEMY DROP
+
+                if(self.enemySelectionState=='itemDrop'):
+                    self.navEnabled   = False
+                    gui.scrollEnabled = False
+                    drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+                    
+                    
+                    pressedKey     = gui.input.returnedKey.upper()
+
+                    # GET DIRECTION OF ACCELLERATION
+                    if('D' == pressedKey):
+                        self.bonusSpawn = self.bonusSpawnTypes[(self.bonusSpawnTypes.index(self.bonusSpawn) + 1) % len(self.bonusSpawnTypes)]
+                    if('A' == pressedKey):
+                        self.bonusSpawn = self.bonusSpawnTypes[(self.bonusSpawnTypes.index(self.bonusSpawn) - 1) % len(self.bonusSpawnTypes)]
+                    if('RETURN' == pressedKey):
+                        self.enemyToPlace['itemDrop'] = self.bonusSpawn
                         self.enemySelectionState='askPatrol'
+                        self.bonusSpawn = 'None'
+                        gui.input.returnedKey = ''
+
+
+
+                    string = str(self.bonusSpawn)
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                
+                
+
 
                 # --------WAYPOINTS
 
@@ -1005,7 +1073,7 @@ class mapCreator():
                         gui.scrollEnabled = True
                     if(no or gui.input.returnedKey.upper()=='RETURN'):
                         self.patrolCoords = [(self.enemyToPlace['x'],self.enemyToPlace['y']),(self.enemyToPlace['x'],self.enemyToPlace['y']),(self.enemyToPlace['x'],self.enemyToPlace['y']),(self.enemyToPlace['x'],self.enemyToPlace['y'])]
-                        self.enemySelectionState='setObjectives'
+                        self.enemySelectionState='complete'
                         gui.scrollEnabled = True
                         gui.input.returnedKey = ''
 
@@ -1025,38 +1093,11 @@ class mapCreator():
                         self.patrolCoords.append((gui.mx +gui.camX,gui.my+gui.camY))
             
                     if(len(self.patrolCoords)>3):
-                        self.enemySelectionState='setObjectives'
+                        self.enemySelectionState='complete'
                         
 
 
-                if(self.enemySelectionState=='setObjectives'):
-                    self.navEnabled   = False
-                    gui.scrollEnabled = False
-                    drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
-                    
-                    # initialise objective if not exist
-                    if(self.currentObjectiveCursor==None):
-                        self.currentObjectiveCursor = self.availableObjectives[0]
-                    
-                    pressedKey     = gui.input.returnedKey.upper()
-                    # GET DIRECTION OF ACCELLERATION
-                    if('D' == pressedKey):
-                        self.currentObjectiveCursor = self.availableObjectives[(self.availableObjectives.index(self.currentObjectiveCursor) + 1) % len(self.availableObjectives)]
-                    if('A' == pressedKey):
-                        self.currentObjectiveCursor = self.availableObjectives[(self.availableObjectives.index(self.currentObjectiveCursor) - 1) % len(self.availableObjectives)]
-                    if('RETURN' == pressedKey):
-                        self.enemyToPlace['assignedObjective'] = self.currentObjectiveCursor
-                        self.currentObjectiveCursor = None
-                        self.enemySelectionState='complete'
-
-
-
-                    string = str(self.currentObjectiveCursor)
-                    tw= getTextWidth(gui.smallFont,string)
-                    drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
-                
-
-
+                #-----------COMPLETE
 
 
                 if(self.enemySelectionState=='complete'):
@@ -1164,7 +1205,7 @@ class mapCreator():
             new_enemy_data_str = []
             for enemy in self.activeEnemyData:
                 patrol_route_str = ':'.join(['-'.join(map(str, point)) for point in enemy['patrolRoute']])
-                enemy_str = f"{enemy['x']}/{enemy['y']}/{enemy['enemyKeyName']}/{enemy['enemySubKeyName']}/{enemy['rotation']}/{patrol_route_str}/{enemy['lv']}/{enemy['assignedObjective']}"
+                enemy_str = f"{enemy['x']}/{enemy['y']}/{enemy['enemyKeyName']}/{enemy['enemySubKeyName']}/{enemy['rotation']}/{patrol_route_str}/{enemy['lv']}/{enemy['assignedObjective']}/{enemy['itemDrop']}"
                 new_enemy_data_str.append(enemy_str)
             new_enemy_data_str = ','.join(new_enemy_data_str)
 

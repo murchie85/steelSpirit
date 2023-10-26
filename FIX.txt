@@ -1,3 +1,25 @@
+ENEMY SPAWN REDO
+
+WHAT DO I WANT?
+
+SPAWN AT EDGE OF PERIPHERY:  WITHIN A TARGET LOCATION
+
+SPAWN AT EDGE OF PERIPHERY:  WITHIN A GIVEN TIME FRAME AND OBJECTIVE
+
+SPAWN ON LOCATION: AT A GIVEN OBJECTIE 
+
+
+POSSIBLE SOLUTIONS:
+
+SPAWN PLACER: 
+
+...check notes 
+
+
+
+
+
+
 TO DO 
 
 - L1, L2(groundblocking)
@@ -7,16 +29,7 @@ TO DO
 
 
 
-- Add weapons powerups
 - Add more intense weapons
 
 
-FLOW
 
-GAME coordinateGame
-
-if start: instantiateLevels so that all level classes are instantiated to game class
-
-SELECT LEVEL
-
-then that level is run within the same method....

@@ -11,10 +11,11 @@ class powerDrone(parent):
 		self.kind           = 'air'
 		self.collideCollected = False
 		self.images         = imageAnimateAdvanced(gui.powerDrone['ready'],0.2)
+		self.countDownImgs  = imageAnimateAdvanced([gui.powerDrone['3'],gui.powerDrone['2'],gui.powerDrone['1'],gui.powerDrone['0'],],1)
 		self.destructionAnimation = imageAnimateAdvanced(gui.powerDrone['destroyed'],0.05)
 		self.shadow         = imageAnimateAdvanced(gui.powerDrone['shadow'],0.2)
 		self.ammoImage      = gui.pdAmmo['angleRound']
-		self.nextShot       = None
+		self.nextShot       = 'hotRound'
 		self.x,self.y       = 500,500
 		if(x!=None): self.x = x
 		if(y!=None): self.y = y
@@ -34,7 +35,7 @@ class powerDrone(parent):
 
 
 		# CLASS OVERRIDES
-		self.defaultSpeed    = 2
+		self.defaultSpeed    = 1
 
 		# ENEMY COORDS 
 
@@ -46,8 +47,15 @@ class powerDrone(parent):
 		self.hp              = 2000
 		self.defaultHp       = 2000
 
-		self.drawAmmo        = True
-		self.ammoTimer       = stopTimer()
+		self.drawAmmo            = True
+		self.ammoTimer           = stopTimer()
+		self.weaponTimer         = stopTimer()
+		self.startTerminateTimer = stopTimer()
+		self.facing              = 0
+		self.destructCountDown   = False
+		self.terminateSelf       = False
+		self.changeCount         = 0
+		self.swappedWeapon       = False
 
 
 
@@ -56,31 +64,14 @@ class powerDrone(parent):
 		self.facing = 90
 
 
-		#------MANAGE NEXT ROUND IMAGE 
 
-		shotType =lv.player.shotType
-		if(shotType in lv.player.nextShotDict.keys()):
-			self.nextShot       = lv.player.nextShotDict[lv.player.shotType]
-			self.ammoImage = gui.pdAmmo[self.nextShot]
-		
-		elif(shotType in lv.player.maxPowerReference):
-			chosenShotImageKey  = shotType
-			self.ammoImage      =  gui.pdAmmo[shotType]
-			self.nextShot       = shotType
-		else:
-			chosenShotImageKey = 'hotRound'
-			self.ammoImage     = gui.pdAmmo[chosenShotImageKey]
-			self.nextShot      = chosenShotImageKey
-
-
-
-
-
+		# -----COLLECT ME 
 
 		if(self.collideCollected):
 			lv.player.shotType = self.nextShot
 			lv.player.flicker  = True
 			killme(self,lv,killMesssage= str(self.name) + ' collected by enemy',printme=True)
+		
 		if(self.state=='patrol'):
 			self.patrol(gui,lv)
 
@@ -91,12 +82,24 @@ class powerDrone(parent):
 		if(self.state=='alert'):
 			self.alert(gui,lv)
 
+
+
+
+		if(self.destructCountDown==True):
+			beginTermination = self.startTerminateTimer.stopWatch(8,'wait to countdown termination', 'wait to terminate', game,silence=True)
+			if(beginTermination):
+				self.terminateSelf = True
+
+		self.updateSelf(gui,lv,game)
+
 		# ENSURE VECHICLE DOESN'T EXCEED BOUNDARIES
 		self.stayOnField(lv)
 
 
 
+
 	def patrol(self,gui,lv):
+
 		
 		# -----------GET CURRENT DESTINATION COORDS
 		
@@ -126,8 +129,9 @@ class powerDrone(parent):
 
 		# -----------GET DISTANCE TO ENEMY
 		angleDiffToEnemy, DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, lv.player.x,lv.player.y)
-		if(DistanceToEnemy<0.65*gui.h):
-			self.state = 'patrol'
+		if(DistanceToEnemy<0.35*gui.h):
+			self.state = 'evade'
+			self.destructCountDown = True
 			
 			# WORK OUT WHICH SECTOR IS NEAREST
 
@@ -137,7 +141,67 @@ class powerDrone(parent):
 
 
 	def evade(self,gui,lv,game):
-		pass
+		
+		# -----------GET DISTANCE TO ENEMY
+		angleDiffToEnemy, DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, lv.player.x,lv.player.y)
+		if(DistanceToEnemy>0.5*gui.h):
+			self.state = 'patrol'
+
+		self.speed = self.defaultSpeed
+		tx,ty = lv.player.x, lv.player.y
+
+		if(self.x<tx):
+			self.x -= self.speed
+		if(self.x>tx):
+			self.x += self.speed
+		if(self.y<ty):
+			self.y -= self.speed
+		if(self.y>ty):
+			self.y += self.speed
+
+	def updateSelf(self,gui,lv,game):
+
+		shotType =lv.player.shotType
+
+		if(self.swappedWeapon==False):
+			if(shotType in lv.player.nextShotDict.keys()):
+				self.nextShot       = lv.player.nextShotDict[lv.player.shotType]
+				self.ammoImage     = gui.pdAmmo[self.nextShot]
+			
+			elif(shotType in lv.player.maxPowerReference):
+				chosenShotImageKey  = shotType
+				self.ammoImage      =  gui.pdAmmo[shotType]
+				self.nextShot       = shotType
+			else:
+				chosenShotImageKey = 'hotRound'
+				self.ammoImage     = gui.pdAmmo[chosenShotImageKey]
+				self.nextShot      = chosenShotImageKey
+
+
+		changeWeapon = self.weaponTimer.stopWatch(3,'changeWeapon', str(self.changeCount), game,silence=True)
+		if(changeWeapon):
+			if(lv.player.shotType in lv.player.swapShotDict.keys()):
+				
+				self.nextShot       = lv.player.swapShotDict[lv.player.shotType]
+				self.ammoImage      = gui.pdAmmo[self.nextShot]
+				self.changeCount   +=1
+				print("Changing Weapon to " + str(self.nextShot))
+
+				
+				if(self.swappedWeapon==True):
+					self.swappedWeapon = False
+					return()
+
+
+				self.swappedWeapon = True
+
+
+
+
+
+
+
+
 
 
 	def alert(self,gui,lv):
@@ -163,8 +227,14 @@ class powerDrone(parent):
 			if(ammoTimer):
 				self.drawAmmo = not self.drawAmmo
 			
-			if(self.drawAmmo):
-				drawImage(gui.screen,self.ammoImage,(x,y))
+
+			if(self.terminateSelf == False):
+				if(self.drawAmmo):
+					drawImage(gui.screen,self.ammoImage,(x,y))
+			else:
+				animateComplete,self.blitPos  = self.countDownImgs.animate(gui,'terminating' + str(self.id),[x,y],game,rotation=self.facing-90,repeat=False)
+				if(animateComplete):
+					killme(self,lv)
 
 
 	def animateDestruction(self,gui,lv,game):

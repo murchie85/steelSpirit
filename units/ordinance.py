@@ -151,6 +151,8 @@ class bullet():
 			if(not target.invincible):
 				target.hp -= self.damage
 				target.hit = True
+
+				# JUST A BULLET SO REMOVES SELF
 				self.killSelf(lv,killMessage='struck enemy')
 
 			# ----KILL THE ENEMY 

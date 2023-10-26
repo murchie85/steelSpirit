@@ -300,6 +300,7 @@ def killme(self,lv,killMesssage=None,printme=False):
 				self.alive = False
 				lv.allyList.remove(self)
 				lv.deadList.append(self)
+				
 				if(printme):
 					print(self.classification +  ' ' + str(self.id)  + " : has been KIA." + str(killMesssage))
 				

@@ -108,6 +108,8 @@ class gameObject():
         self.dynamicBorder        = dynamicBorder(borderColour=(60,60,200),noShadeShifts=10)
         self.buttonIndex          = 0
 
+        self.levelMenuIndex      = 0
+
      
 
     def coordinateGame(self,gui):
@@ -117,7 +119,7 @@ class gameObject():
 
 
         if(self.state == 'intro'):
-            self.introScene.showstartup(gui,self)
+            self.introScene.mainMenu_and_startup(gui,self)
 
         if(self.state == 'editor'):
             self.mapEditor.run(gui,self)
@@ -164,20 +166,23 @@ class gameObject():
 
                     if(self.selectedLevel=='Rural Assault'):
                         self.activeLevel             = ruralAssault(gui,self)
+
+
+                    # OLD LEVELS
                     elif(self.selectedLevel=='olv1'):
-                        self.activeLevel             = old_levelOne(gui,self,'state/' + 'olv1.pkl')
+                        self.activeLevel             = old_levelOne(gui,self,'state/old/' + 'olv1.pkl')
                     elif(self.selectedLevel=='olv2'):
-                        self.activeLevel             = old_levelTwo(gui,self,'state/' + 'olv2.pkl')
+                        self.activeLevel             = old_levelTwo(gui,self,'state/old/' + 'olv2.pkl')
                     elif(self.selectedLevel=='olv3'):
-                        self.activeLevel           = old_levelThree(gui,self,'state/' + 'olv3.pkl')
+                        self.activeLevel           = old_levelThree(gui,self,'state/old/' + 'olv3.pkl')
                     elif(self.selectedLevel=='olv4'):
-                        self.activeLevel            = old_levelFour(gui,self,'state/' + 'olv4.pkl')
+                        self.activeLevel            = old_levelFour(gui,self,'state/old/' + 'olv4.pkl')
                     elif(self.selectedLevel=='olv5'):
-                        self.activeLevel            = old_levelFive(gui,self,'state/' + 'olv5.pkl')
+                        self.activeLevel            = old_levelFive(gui,self,'state/old/' + 'olv5.pkl')
                     elif(self.selectedLevel=='oiceWorld'):
-                        self.activeLevel             = old_iceWorld(gui,self,'state/' + 'oiceWorld.pkl')
+                        self.activeLevel             = old_iceWorld(gui,self,'state/old/' + 'oiceWorld.pkl')
                     elif(self.selectedLevel=='osmallWorld'):
-                        self.activeLevel           = old_smallWorld(gui,self,'state/' + 'osmallWorld.pkl')
+                        self.activeLevel           = old_smallWorld(gui,self,'state/old/' + 'osmallWorld.pkl')
 
 
                 self.activeLevel.run(gui,self)
@@ -335,19 +340,32 @@ class gameObject():
             tw,th   = getTextWidth(chosenFont,'A menu item yep sure.'),getTextHeight(chosenFont,'A menu item yep sure.')
             drawText(gui,gui.bigFont,'Select Level',0.52*(gui.w-tw),0.03*gui.h, colour=(100, 100, 255))
 
-            # GET LEVELS AVAILABLE
+            # SET LEVEL FONT
             chosenFont = gui.smallFont
             borderColour=(60,60,200)
             tw,th   = getTextWidth(chosenFont,'A menu item yep sure.'),getTextHeight(chosenFont,'A menu item yep sure.')
 
-            buttonY = 300
-            for level in self.chosenLevels:
-                
-                backColour =(0,0,0)
-                if(level=='iceWorld'):
-                    backColour =(250,20,20)
 
-                chosenFile,tex,tey  = simpleButton(0.5*(gui.w-tw),buttonY,level,gui,chosenFont,setTw=tw,backColour=backColour,borderColour=borderColour, textColour=(255,255,255))
+            # MANAGE DPAD CONTROL OF BUTTONS 
+            buttonColourList = []
+            for x in self.chosenLevels:
+                buttonColourList.append((0,0,0))
+
+            if(gui.input.returnedKey.upper()=='S'): self.levelMenuIndex  +=1
+            if(gui.input.returnedKey.upper()=='W'): self.levelMenuIndex  -=1
+            if(self.levelMenuIndex<0): self.levelMenuIndex = len(buttonColourList) -1
+            if(self.levelMenuIndex>len(buttonColourList)-1): self.levelMenuIndex = 0
+            backColour                   = buttonColourList
+            backColour[self.levelMenuIndex] = darken(borderColour,darkenAmount=60)
+
+            # GET LEVELS AVAILABLE
+            buttonY = 300
+            for l in range(len(self.chosenLevels)):
+                level = self.chosenLevels[l]
+                
+                # MOUSE CLICK SELECTION OF LEVEL
+
+                chosenFile,tex,tey  = simpleButton(0.5*(gui.w-tw),buttonY,level,gui,chosenFont,setTw=tw,backColour=backColour[l],borderColour=borderColour, textColour=(255,255,255))
                 
                 buttonY += 1.5*th
                 # IF FILE SELECTED LOAD FILE 
@@ -355,8 +373,14 @@ class gameObject():
                     self.selectedLevel = level
                     self.levelSelectMode   = False
                     
+            # BUTTON SELECTION OF LEVEL 
+            if(gui.input.returnedKey=='return'):
+                self.selectedLevel        = self.chosenLevels[self.levelMenuIndex]
+                self.levelSelectMode      = False
+                gui.input.returnedKey     = ''
 
 
+            # GO BACK
             tw,th             = getTextWidth(chosenFont,'A menu item.'),getTextHeight(chosenFont,'A menu item.')
             back,tex,tey      = simpleButton(100,0.93*gui.h,'Back',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
             if(back):

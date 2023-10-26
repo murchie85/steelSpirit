@@ -40,6 +40,8 @@ class missile():
 		self.lockedOnEnemy     = lockedOnEnemy
 		self.cumulatedDistance = 0
 		self.source 		   = source
+		self.pointsAwarded    = False
+		self.killScore         = 0
 
 		self.missileType     = missileType
 

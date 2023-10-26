@@ -1,6 +1,7 @@
 from utils._utils import *
 from utils._utils import stopTimer
 from scenes.profile import *
+from scenes.settings import *
 import random
 
 
@@ -31,11 +32,12 @@ class introScreen():
 
 		# PROFILE 
 
-		self.profile   = profilePage(gui)
+		self.profile    = profilePage(gui)
+		self.settings   = settingsPage(gui)
 
 
 
-	def showstartup(self,gui,game):
+	def mainMenu_and_startup(self,gui,game):
 
 
 		if(self.state=='start'):
@@ -136,7 +138,7 @@ class introScreen():
 			if(self.buttonIndex<0): self.buttonIndex = len(buttonColourList) -1
 			if(self.buttonIndex>len(buttonColourList)-1): self.buttonIndex = 0
 			backColour                   = buttonColourList
-			backColour[self.buttonIndex] = borderColour
+			backColour[self.buttonIndex] = darken(borderColour,60)
 
 
 
@@ -160,6 +162,7 @@ class introScreen():
 				profile      = 1==self.buttonIndex
 				newMapEditor = 3==self.buttonIndex
 				mapEditor    = 4==self.buttonIndex
+				settings    = 5==self.buttonIndex
 				gui.input.returnedKey       = ''
 
 
@@ -178,9 +181,15 @@ class introScreen():
 			if(mapEditor):
 				game.state = 'editor'
 				self.state = 'title'
+			
+			if(settings  ):
+				self.state = 'settings'
 
 		if(self.state=='profile'):
 			self.profile.renderProfile(gui,game)
+		
+		if(self.state=='settings'):
+			self.settings.renderSettings(gui,game)
 
 
 	def fadeInOut(self,gui,game,uniqueMessage,messageList,textColour,fadeInTime=1,fadeoutTime=2):
