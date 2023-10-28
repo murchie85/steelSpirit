@@ -288,22 +288,36 @@ def loadEnemyRefData(gui,game):
         for r in patrolU:
             patrolRoute.append((int(r.split('-')[0]),int(r.split('-')[1])))
         lv              = item.split('/')[6].strip()
+        
         try:
             objectiveKey    = item.split('/')[7].strip()
         except:
             print("Enemy does not have objective key, adding default value")
             objectiveKey = 'no objective'
+        
         try:
             itemDrop    = item.split('/')[8].strip()
         except:
             print("Enemy does not have itemDrop key, adding default value")
             itemDrop = 'None'
 
-        # x,y, image, rotation, patrol,powerlevel
-        # 200/300/ground/tank/30/200-300:400-320:200-250:500-220/3,400/700/air/scout/30/400-700:400-320/3
-        #{'x':200,'y':300,'enemyKeyName':'ground','enemySubKeyName':'tank','patrolRoute':[(200,300),(400-320),(200-250),(500-220)],'lv':3}
+        try:
+            spawnMe             = item.split('/')[9].strip()
+            spawn_wave_num      = item.split('/')[10].strip()
+            spawn_wave_Interval = item.split('/')[11].strip()
+            spawn_area          = item.split('/')[12].strip()
+            spawn_range         = item.split('/')[13].strip()
+            spawn_periphery     = item.split('/')[14].strip()
+            spawn_objective     = item.split('/')[15].strip()
+            
+
+        except:
+            print("Enemy does not have itemDrop key, adding default value")
+            spawnMe = 'False'
+
+
         rotatedImage = pygame.transform.rotate(enemyDict[enemyKeyName][enemySubKeyName]['image'],int(rotation))
-        game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'lv':lv,'assignedObjective':objectiveKey,'itemDrop': itemDrop})
+        game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'lv':lv,'assignedObjective':objectiveKey,'itemDrop': itemDrop, 'spawnMe': spawnMe})
 
 
     # Create a new dict with the images scaled

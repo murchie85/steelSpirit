@@ -11,7 +11,7 @@ class samSite(parent):
 		self.name           = 'samSite'
 		self.kind           = 'structure'
 		self.images         = imageAnimateAdvanced(gui.samSite,0.2)
-		self.chosenExplosionImg = gui.barrelExplosion
+		self.chosenExplosionImg = gui.redExplosion
 		self.explosion          = imageAnimateAdvanced(self.chosenExplosionImg,0.04)
 		self.x,self.y       = 0,0
 		if(x!=None): self.x = x
@@ -91,40 +91,3 @@ class samSite(parent):
 					self.hit = False
 					self.hitsTaken +=1
 
-
-	def animateDestruction(self,gui,lv,game):
-		x,y = self.x - gui.camX,self.y  - gui.camY
-
-		# *******BE CAREFUL ABOUNT ON SCREEN
-
-		if(self.destructionComplete==False and self.alive==False):
-			if(hasattr(self,'centerPoint')):
-				x += 0.5*self.centerPoint[0]
-				y += 0.5*self.centerPoint[1]
-			
-			complete,blitPos = self.explosion.animate(gui,str(str(self.name) +' explosion'),[x - 0.5*self.chosenExplosionImg[0].get_width(),y-0.5*self.chosenExplosionImg[0].get_height()],game)
-			bid = max(([x.id for x in lv.bulletList]),default=0) + 1
-
-			#---------DRAW SCORE
-
-			if(self.killScore!=0):
-				drawText(gui,gui.growingFont[self.growingFontIndex],str(self.killScore),x+ 0.4*self.w,y-0.4*self.h + -(self.growingFontIndex/20 * 0.1*gui.h), colour=(255, 255, 255),alpha=(1 - self.growingFontIndex/len(gui.growingFont))*255)
-				incFont = self.fontTimer.stopWatch(0.025,'expanding font', str(self.growingFontIndex), game,silence=True)
-				if(incFont):
-					if(not self.growingFontIndex>=len(gui.growingFont)-1):
-						self.growingFontIndex +=1
-
-
-			if(self.debris<=12):
-				self.debris +=1
-				# ADDS DEBRIS TO TO LIST
-				lv.bulletList.append(bullet(gui,self.x + 0.5* self.chosenExplosionImg[0].get_width(),self.y+ 0.5* self.chosenExplosionImg[0].get_height(),bid,'debris',random.randrange(0,360),'debris',speed=10, w=3,h=3,colour=(192,192,192)))
-			
-			# ADD FLYING SHRAPNELL 50% of the time
-			if(random.choice([1,2])==1 and not self.shrapnellEjected):
-				self.shrapnellEjected = True
-				bid = max(([x.id for x in lv.bulletList]),default=0) + 1
-				lv.bulletList.append(bullet(gui,self.x + 0.5* self.chosenExplosionImg[0].get_width(),self.y+ 0.5* self.chosenExplosionImg[0].get_height(),bid,'shrapnell',random.randrange(0,360),'shrapnell',speed=5,shrapnellType='A'))
-			
-			if(complete):
-				self.destructionComplete = True

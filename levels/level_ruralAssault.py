@@ -156,7 +156,7 @@ class ruralAssault():
         self.scene      = 'debug'
         self.state      ='NOT_STARTED'
         self.audioState = None
-
+        self.musicDelay = stopTimer()
     def run(self,gui,game):
 
 
@@ -620,8 +620,10 @@ class ruralAssault():
                 
 
                 if('audio' in currentObjective.keys() and self.audioState==None):
-                    gui.musicPlayer.play(currentObjective['audio'])
-                    self.audioState = 'playing'
+                    playMusic = self.musicDelay.stopWatch(1,'audio  ' + str(currentObjective['audio']), str(currentObjective['audio']),game,silence=True)
+                    if(playMusic):
+                        gui.musicPlayer.play(currentObjective['audio'])
+                        self.audioState = 'playing'
 
                 finished = self.cutScene.dialogue.drawScrollingDialogue(gui,game,self.cutScene.textW,self.cutScene.textH,gui.smallFont, sceneMessage, textStartingPos=(self.cutScene.textX ,self.cutScene.textY),colour=(51,189,251),closeOutDelay=True,maxLines=4,scrollInterval=0.02,pageWait=3)
 

@@ -77,7 +77,7 @@ class mapCreator():
 
         self.tileCursor         = 0
         self.updateTileEnabled   = True
-        self.currentLayer        = 'S'
+        self.currentLayer        = 'Q'
 
 
         self.tileReferenceData   = None
@@ -106,6 +106,23 @@ class mapCreator():
 
         self.bonusSpawnTypes = ["None","PowerUp","Missiles","HealthUp"]
         self.bonusSpawn     = 'None'
+
+
+        # enemy spawn
+        self.SPAWN_MODE            = None
+        self.spawnMasksInitialised = False
+        self.spawnZoneData        = []
+        self.spawnzonemaskFill     = 36,69,115
+        self.currentSpawnIndex     = 0
+        
+        # SPAWN ACTIVE VARS
+        self.currrentNumOfSpawnWaves  = 1
+        self.currentSpawnInterval     = 0.2
+        self.currentRandomSpawnRadius = 'small'
+        self.spawnRadiusMasks         = {'none':pygame.Surface((0.01*gui.w, 0.01*gui.h)),'small':pygame.Surface((0.5*gui.w, 0.5*gui.h)), 'medium': pygame.Surface((0.8*gui.w, 0.8*gui.h)),'big':pygame.Surface((1.2*gui.w, 1.2*gui.h))}
+        self.currentEnemyRange        = 'small'
+        self.currentPeripherySpawn    = False
+
 
 
 
@@ -255,7 +272,10 @@ class mapCreator():
 
         self.renderLayer1Map(gui,game,hoveredTile)
         self.setQuadrants(gui,game)
-        self.spawnZones(gui,game)
+        
+        # disabling
+        #self.spawnZones(gui,game)
+        
         self.renderLayer2Map(gui,game,startX,startY)
         self.renderAnimatedObjects(gui,game,startX,startY)
         self.renderEnemyMap(gui,game,startX,startY)
@@ -311,7 +331,7 @@ class mapCreator():
                 self.selectedL2SubKey = list(self.layer2RefData[self.selectedL2Key].keys())[0]
                 self.tileCursor =0
 
-        if(self.currentLayer=='E'):
+        if(self.currentLayer=='E' and self.enemySelectionState=='notSelected'):
 
             if(gui.input.returnedKey.upper()=='L' or gui.input.returnedKey.upper()=='E'):
                 self.selectedEnemyKey = get_next_tile_key(self.enemyRefData, self.selectedEnemyKey)
@@ -339,9 +359,9 @@ class mapCreator():
             elif(self.currentLayer=='A'):
                 self.currentLayer = 'E'
             elif(self.currentLayer=='E'):
-                self.currentLayer = 'S'
-            elif(self.currentLayer=='S'):
                 self.currentLayer = 'Q'
+            # elif(self.currentLayer=='S'):
+            #     self.currentLayer = 'Q'
             elif(self.currentLayer=='Q'):
                 self.currentLayer = 'l1'
 
@@ -660,7 +680,7 @@ class mapCreator():
     def showEnemyList(self,gui,sampleTile):
 
         # TILE/OBJECT WINDOW
-        if(self.toggleWindow and self.currentLayer=='E'):
+        if((self.toggleWindow and self.currentLayer=='E') or self.SPAWN_MODE=='modify'):
             windowItemLen = 30
             rows = 3
             cols = int(windowItemLen/rows)
@@ -932,14 +952,13 @@ class mapCreator():
         # RENDER AND MANAGE ENEMY LAYER
 
         
-        if(self.currentLayer in ['E', 'S','Q']):
+        if(self.currentLayer in ['E','Q']):
 
             # DISPLAY CURRENT SELECTED TILE
             if(self.currentLayer in ['E']):
                 selectedTile = self.enemyRefData[self.selectedEnemyKey][self.selectedEnemySubKey]['image']
             
                 selectedTile = pygame.transform.rotate(selectedTile,self.currentEnemyRotation-90)
-                print(self.currentEnemyRotation)
 
                 if(self.enemySelectionState=='notSelected'):
                     drawImage(gui.screen, selectedTile, (gui.mx,gui.my))
@@ -975,6 +994,35 @@ class mapCreator():
                     if(gui.mouseCollides(item['x']-gui.camX,item['y']-gui.camY,item['image'].get_width(),item['image'].get_height())):
                         pygame.draw.rect(gui.screen, (180,180,120), [item['x']-gui.camX,item['y']-gui.camY,item['image'].get_width(),item['image'].get_height()],4)
                         deleteHover = True
+                        dx,dy = item['x']-gui.camX - 300, item['y']-gui.camY
+
+
+
+                        if('spawnMe' in item.keys()):
+                            if(item['spawnMe']==True):
+                                spawnMask = self.spawnRadiusMasks[item['spawnArea']]
+                                spawnMask.set_alpha(100)
+                                spawnMask.fill((self.spawnzonemaskFill))
+                                x,y = item['x'] - 0.5*spawnMask.get_width(), item['y']  - 0.5*spawnMask.get_height()
+                                gui.screen.blit(spawnMask, (x- gui.camX, y- gui.camY))
+                                pygame.draw.rect(gui.screen, (255,255,255), [x- gui.camX, y - gui.camY,spawnMask.get_width(), spawnMask.get_height()],4)
+
+
+                        textBlob = ''
+                        for j in item.keys():
+                            if(j in ['image','enemyKeyName','enemySubKeyName','rotation','lv']):
+                                continue
+                            textBlob = str(j) + " : " +str(item[j]).upper() 
+                            string = textBlob
+                            tw= getTextWidth(gui.nanoFont,string)
+                            ty = getTextHeight(gui.nanoFont,string)
+                            drawTextWithBackground(gui.screen,gui.nanoFont,string,dx,dy,textColour=(50, 200, 50),backColour= (0,0,0),borderColour=None)
+                            dy+= 1.1*ty
+
+                        #fittedSentenceBox(gui,game,dx,dy,300,300,textBlob,0,gui.nanoFont,(255,255,255),textVerticalSpacing=1,boxColour=(15,56,15),boxLineColours=None,startYGap=None,autoPage=None)
+                        
+
+
                         if(gui.clicked):    
                             self.activeEnemyData.pop(i)
 
@@ -1021,6 +1069,10 @@ class mapCreator():
                     tw= getTextWidth(gui.smallFont,string)
                     drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
                 
+                    string = "Set Assigned Objective"
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,0.4*gui.w,0.9*gui.h,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                
                 
                 # ----------ENEMY DROP
 
@@ -1049,10 +1101,18 @@ class mapCreator():
                     tw= getTextWidth(gui.smallFont,string)
                     drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
                 
+
+                    string = "What item does enemy drop?"
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,0.4*gui.w,0.9*gui.h,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
                 
 
 
                 # --------WAYPOINTS
+
+
+
+                # ASK WAYPOINT
 
                 if(self.enemySelectionState=='askPatrol'):
                     drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
@@ -1063,9 +1123,6 @@ class mapCreator():
                     drawTextWithBackground(gui.screen,chosenFont,'Add Patrol Route?',0.4*gui.w,0.35*gui.h,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
                     yes,tex,tey      = simpleButton(0.4*gui.w,0.4*gui.h,'Yes',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
                     no,tex,tey       = simpleButton(0.45*gui.w,0.4*gui.h,'No',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
-                    
-
-
 
                     gui.scrollEnabled = False
                     if(yes):
@@ -1073,9 +1130,12 @@ class mapCreator():
                         gui.scrollEnabled = True
                     if(no or gui.input.returnedKey.upper()=='RETURN'):
                         self.patrolCoords = [(self.enemyToPlace['x'],self.enemyToPlace['y']),(self.enemyToPlace['x'],self.enemyToPlace['y']),(self.enemyToPlace['x'],self.enemyToPlace['y']),(self.enemyToPlace['x'],self.enemyToPlace['y'])]
-                        self.enemySelectionState='complete'
+                        self.enemySelectionState='askSpawn'
                         gui.scrollEnabled = True
                         gui.input.returnedKey = ''
+
+                
+                # PROCESS WAYPOINT 
 
                 # DRAW WAYPOINT INDEXES
                 if(self.enemySelectionState=='setPatrolCoords'):
@@ -1085,6 +1145,11 @@ class mapCreator():
                         coordIndex = str(self.patrolCoords.index(coords))
                         drawTextWithBackground(gui.screen,gui.hugeFont,coordIndex,coords[0]-gui.camX,coords[1]-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
 
+                    string = "Set the four corners of the patrol square"
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,0.4*gui.w,0.9*gui.h,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                
+
                 # SET WAYPOINTS
                 if(self.enemySelectionState=='setPatrolCoords'):
                     patrolIndex = str(len(self.patrolCoords))
@@ -1093,8 +1158,282 @@ class mapCreator():
                         self.patrolCoords.append((gui.mx +gui.camX,gui.my+gui.camY))
             
                     if(len(self.patrolCoords)>3):
-                        self.enemySelectionState='complete'
+                        self.enemySelectionState='askSpawn'
+
+
+                #  SPAWN DECISION
                         
+
+                if(self.enemySelectionState=='askSpawn'):
+                    drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+
+                    chosenFont       = gui.largeFont
+                    borderColour     =(60,60,200)
+                    tw= getTextWidth(chosenFont,'Yes.')
+                    drawTextWithBackground(gui.screen,chosenFont,'Make Enemy Spawn',0.4*gui.w,0.35*gui.h,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                    yes,tex,tey      = simpleButton(0.4*gui.w,0.4*gui.h,'Yes',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+                    no,tex,tey       = simpleButton(0.45*gui.w,0.4*gui.h,'No',gui,chosenFont,setTw=tw,backColour=(0,0,0),borderColour=borderColour, textColour=(255,255,255))
+                    
+                    gui.scrollEnabled = False
+                    if(yes):
+                        self.enemySelectionState='getNumberOfWaves'
+                        gui.scrollEnabled = True
+                        self.enemyToPlace['spawnMe'] = True
+                        self.enemyToPlace['image'].set_alpha(100)
+                    if(no or gui.input.returnedKey.upper()=='RETURN'):
+                        self.enemySelectionState='complete'
+                        gui.scrollEnabled = True
+                        gui.input.returnedKey = ''
+
+
+
+
+                # ----------NUMBER OF WAVES SPAWNED
+
+
+                if(self.enemySelectionState=='getNumberOfWaves'):
+                    self.navEnabled   = False
+                    gui.scrollEnabled = False
+                    drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+                    
+                    
+                    pressedKey     = gui.input.returnedKey.upper()
+                    # GET DIRECTION OF ACCELLERATION
+                    if('D' == pressedKey):
+                        self.currrentNumOfSpawnWaves +=1
+                    if('A' == pressedKey):
+                        self.currrentNumOfSpawnWaves -=1
+                    if(self.currrentNumOfSpawnWaves <=0):
+                        self.currrentNumOfSpawnWaves = 1
+                    
+                    if('RETURN' == pressedKey):
+                        self.enemyToPlace['numberOfWaves'] = self.currrentNumOfSpawnWaves
+                        self.currrentNumOfSpawnWaves = 1
+                        self.enemySelectionState='getWaveInterval'
+                        gui.input.returnedKey = ''
+
+
+
+                    string = "Number of waves: " + str(self.currrentNumOfSpawnWaves)
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                         
+
+                    string = "How many times should this spawn"
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,0.4*gui.w,0.9*gui.h,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+
+
+                # ----------WAVE INTERVAL
+
+                if(self.enemySelectionState=='getWaveInterval'):
+                    if(self.currrentNumOfSpawnWaves==1):
+                        self.enemySelectionState='getWaveInterval'
+                        self.enemyToPlace['waveInterval'] = self.currentSpawnInterval
+                    
+                    self.navEnabled   = False
+                    gui.scrollEnabled = False
+                    drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+                    
+                    pressedKey     = gui.input.returnedKey.upper()
+                    # GET DIRECTION OF ACCELLERATION
+                    if('D' == pressedKey):
+                        self.currentSpawnInterval +=0.2
+                    if('A' == pressedKey):
+                        self.currentSpawnInterval -=0.2
+                    if(self.currentSpawnInterval <=0.2):
+                        self.currentSpawnInterval = 0.2
+                    
+                    if('RETURN' == pressedKey):
+                        self.enemyToPlace['waveInterval'] = self.currentSpawnInterval
+                        self.currentSpawnInterval = 0.2
+                        self.enemySelectionState='getSpawnArea'
+                        gui.input.returnedKey = ''
+
+
+
+                    string = "Wave interval (seconds): " + str(self.currentSpawnInterval)
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                         
+
+                    string = "What time between successive waves should there be"
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,0.4*gui.w,0.9*gui.h,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                
+
+
+                # ----------RANDOM SPAWN RADIUS SELECTION
+
+                if(self.enemySelectionState=='getSpawnArea'):
+                    self.navEnabled   = True
+                    gui.scrollEnabled = True
+
+                    # DRAW SPAWN RADIUS BOX
+                    spawnMask = self.spawnRadiusMasks[self.currentRandomSpawnRadius]
+                    spawnMask.set_alpha(100)
+                    spawnMask.fill((self.spawnzonemaskFill))
+                    x,y = self.enemyToPlace['x'] - 0.5*spawnMask.get_width(), self.enemyToPlace['y']  - 0.5*spawnMask.get_height()
+                    gui.screen.blit(spawnMask, (x- gui.camX, y- gui.camY))
+                    pygame.draw.rect(gui.screen, (255,255,255), [x- gui.camX, y - gui.camY,spawnMask.get_width(), spawnMask.get_height()],4)
+
+
+                    # DRAW ENEMY
+                    drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+                    
+                    
+                    pressedKey     = gui.input.returnedKey.upper()
+                    # GET DIRECTION OF ACCELLERATION
+                    if('E' == pressedKey):
+                        if(self.currentRandomSpawnRadius=='small'):
+                            self.currentRandomSpawnRadius = 'medium'
+                        elif(self.currentRandomSpawnRadius=='medium'):
+                            self.currentRandomSpawnRadius = 'big'
+                        elif(self.currentRandomSpawnRadius=='big'):
+                            self.currentRandomSpawnRadius = 'none'
+                        elif(self.currentRandomSpawnRadius=='none'):
+                            self.currentRandomSpawnRadius = 'small'
+                    if('Q' == pressedKey):
+                        if(self.currentRandomSpawnRadius=='big'):
+                            self.currentRandomSpawnRadius = 'medium'
+                        elif(self.currentRandomSpawnRadius=='medium'):
+                            self.currentRandomSpawnRadius = 'small'
+                        elif(self.currentRandomSpawnRadius=='small'):
+                            self.currentRandomSpawnRadius = 'none'
+                        elif(self.currentRandomSpawnRadius=='none'):
+                            self.currentRandomSpawnRadius = 'big'
+                    if('RETURN' == pressedKey):
+                        self.enemyToPlace['spawnArea'] = self.currentRandomSpawnRadius
+                        self.currentRandomSpawnRadius = 'small'
+                        self.enemySelectionState='getSpawnRange'
+                        gui.input.returnedKey = ''
+
+
+
+                    string = "Spawn Radius: " + str(self.currentRandomSpawnRadius)
+                    tw= getTextWidth(gui.smallFont,string)
+                    ty = self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,ty,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                         
+                    string = "Number of waves: " + str(self.currrentNumOfSpawnWaves)
+                    tw= getTextWidth(gui.smallFont,string)
+                    ty += 30
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,ty,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                         
+
+                    string = "How big should the random spawn area be?"
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,0.4*gui.w,0.9*gui.h,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                
+
+                # ----------RANDOM SPAWN RANGE
+
+                if(self.enemySelectionState=='getSpawnRange'):
+                    self.navEnabled   = False
+                    gui.scrollEnabled = False
+
+                    # DRAW SPAWN RADIUS BOX
+                    spawnMask = self.spawnRadiusMasks[self.currentEnemyRange]
+                    spawnMask.set_alpha(100)
+                    spawnMask.fill((self.spawnzonemaskFill))
+                    x,y = self.enemyToPlace['x'] - 0.5*spawnMask.get_width(), self.enemyToPlace['y']  - 0.5*spawnMask.get_height()
+                    gui.screen.blit(spawnMask, (x- gui.camX, y- gui.camY))
+                    pygame.draw.rect(gui.screen, (255,255,255), [x- gui.camX, y - gui.camY,spawnMask.get_width(), spawnMask.get_height()],4)
+
+
+                    # DRAW ENEMY
+                    drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+                    
+                    
+                    pressedKey     = gui.input.returnedKey.upper()
+                    # GET DIRECTION OF ACCELLERATION
+                    if('E' == pressedKey):
+                        if(self.currentEnemyRange=='small'):
+                            self.currentEnemyRange = 'medium'
+                        elif(self.currentEnemyRange=='medium'):
+                            self.currentEnemyRange = 'big'
+                        elif(self.currentEnemyRange=='big'):
+                            self.currentEnemyRange = 'none'
+                        elif(self.currentEnemyRange=='none'):
+                            self.currentEnemyRange = 'small'
+                    if('Q' == pressedKey):
+                        if(self.currentEnemyRange=='big'):
+                            self.currentEnemyRange = 'medium'
+                        elif(self.currentEnemyRange=='medium'):
+                            self.currentEnemyRange = 'small'
+                        elif(self.currentEnemyRange=='small'):
+                            self.currentEnemyRange = 'none'
+                        elif(self.currentEnemyRange=='none'):
+                            self.currentEnemyRange = 'big'
+                    if('RETURN' == pressedKey):
+                        self.enemyToPlace['enemyRange'] = self.currentEnemyRange
+                        self.currentEnemyRange = 'small'
+                        self.enemySelectionState='spawnPeriphery'
+                        gui.input.returnedKey = ''
+
+
+
+                    string = "Spawn Range: " + str(self.currentEnemyRange)
+                    tw= getTextWidth(gui.smallFont,string)
+                    ty = self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,ty,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                         
+                    string = "Number of waves: " + str(self.currrentNumOfSpawnWaves)
+                    tw= getTextWidth(gui.smallFont,string)
+                    ty += 30
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,ty,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                         
+
+                    string = "What is enemy detection range?"
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,0.4*gui.w,0.9*gui.h,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                
+
+
+                    # FORCE CAMERA TO CURRENT INDEX
+                    if(gui.camX < self.enemyToPlace['x']-0.5*gui.w):
+                        gui.camX +=20
+                    if(gui.camX+0.5*gui.camW > self.enemyToPlace['x']):
+                        gui.camX -=20
+
+                    if(gui.camY < self.enemyToPlace['y']-0.5*gui.h):
+                        gui.camY +=20
+                    if(gui.camY+0.5*gui.camH > self.enemyToPlace['y']):
+                        gui.camY -=20
+
+
+
+                # ----------SPAWN AT PERIPHERY?
+
+
+                if(self.enemySelectionState=='spawnPeriphery'):
+                    self.navEnabled   = False
+                    gui.scrollEnabled = False
+                    drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+                    
+                    
+                    pressedKey     = gui.input.returnedKey.upper()
+                    # GET DIRECTION OF ACCELLERATION
+                    if('D' == pressedKey):
+                        self.currentPeripherySpawn = not self.currentPeripherySpawn
+                    if('A' == pressedKey):
+                        self.currentPeripherySpawn = not self.currentPeripherySpawn
+                    
+                    if('RETURN' == pressedKey):
+                        self.enemyToPlace['spawn_at_periphery'] = self.currentPeripherySpawn
+                        self.currentPeripherySpawn = False
+                        self.enemySelectionState='complete'
+                        gui.input.returnedKey = ''
+
+
+
+                    string = "Spawn at periphery? : " + str(self.currentPeripherySpawn)
+                    tw= getTextWidth(gui.smallFont,string)
+                    drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                         
+
+
+
 
 
                 #-----------COMPLETE
@@ -1103,12 +1442,28 @@ class mapCreator():
                 if(self.enemySelectionState=='complete'):
                     self.enemySelectionState = 'notSelected'
                     self.enemyToPlace['patrolRoute'] = self.patrolCoords
+
+                    if(self.enemyToPlace['spawnMe']==True):
+                        self.enemyToPlace['spawnObjective'] = self.enemyToPlace['assignedObjective']
+                        self.enemyToPlace['assignedObjective'] = 'no objective'
+
                     self.activeEnemyData.append(self.enemyToPlace) 
                     print("Enemy placed ")
                     print(self.enemyToPlace)
                     self.enemyToPlace = {}
                     self.patrolCoords = []
                     self.currentEnemyRotation = 0
+
+
+
+
+
+
+
+
+
+                    gui.scrollEnabled = True
+                    self.navEnabled   = True
 
                         
 
@@ -1119,10 +1474,6 @@ class mapCreator():
 
             if(gui.input.returnedKey.upper()=='R'):
                 self.currentEnemyRotation =  wrapAngle(self.currentEnemyRotation + 90)
-
-
-
-
 
 
 
@@ -1365,41 +1716,8 @@ class mapCreator():
         return (x >= x1 and x <= x1 + w1 and y >= y1 and y <= y1 + h1) or \
                (x1 >= x and x1 <= x + w and y1 >= y and y1 <= y + h)
 
-    def spawnZones(self, gui, game):
-        if self.currentLayer != 'S':
-            return
 
-        collides_with_existing = False
-        starting_colour = (20, 30, 70)
-        collide_index = None
-        for idx, spawn_zone in enumerate(self.activeSpawnZones):
-            # DELETE EXISTING IF CLICKED
-            if gui.mouseCollides(spawn_zone[0] - gui.camX, spawn_zone[1] - gui.camY, spawn_zone[2], spawn_zone[3]):
-                collides_with_existing = True
-                collide_index = idx
 
-            # MERGE JOINT BOXES
-            for other_idx, spawn_zone_two in enumerate(self.activeSpawnZones[idx + 1:], start=idx + 1):
-                if self.collides_objectless(*spawn_zone, *spawn_zone_two):
-                    new_box = self.merge_boxes(spawn_zone, spawn_zone_two)
-                    self.activeSpawnZones.remove(spawn_zone)
-                    self.activeSpawnZones.remove(spawn_zone_two)
-                    self.activeSpawnZones.append(new_box)
-                    return
-
-            # DRAW SPAWN ZONE MARKER
-            pygame.draw.rect(gui.screen, starting_colour, (spawn_zone[0] - gui.camX, spawn_zone[1] - gui.camY, spawn_zone[2], spawn_zone[3]))
-            starting_colour = lighten(starting_colour)
-            drawTextWithBackground(gui.screen, gui.font, str(idx), spawn_zone[0] - gui.camX + 0.4 * spawn_zone[2], spawn_zone[1] - gui.camY + 0.3 * spawn_zone[3], textColour=(255, 255, 255), backColour=(0, 0, 0), borderColour=(50, 50, 200))
-
-        if collides_with_existing and gui.clicked:
-            del self.activeSpawnZones[collide_index]
-            gui.pressed = False
-            gui.clicked = False
-            return
-
-        if self.updateTileEnabled and gui.scrollEnabled:
-            self.spawn_box_selector(gui, game)
 
     def setQuadrants(self, gui, game):
         if self.currentLayer != 'Q':
@@ -1445,10 +1763,7 @@ class mapCreator():
         bhs = max(box1[1] + box1[3], box2[1] + box2[3])
         return [nbx, nby, rhs - nbx, bhs - nby]
 
-    def spawn_box_selector(self, gui, game):
-        selected_area = self.dragSelect.dragSelect(gui, gui.camX, gui.camY)
-        if selected_area and selected_area[2] > 1 and selected_area[3] > 1:
-            self.activeSpawnZones.append(selected_area)
+
 
     def quadrant_box_selector(self, gui, game):
         selected_area = self.dragSelect.dragSelect(gui, gui.camX, gui.camY)
@@ -1495,6 +1810,273 @@ class mapCreator():
             self.activeLevel             = ruralAssault(gui,self)
             self.availableObjectives     = ['no objective'] + list(self.activeLevel.objectives.keys())
             del self.activeLevel
+
+
+
+
+
+    def spawnZones(self, gui, game):
+
+        """
+        IF SPAWN_MODE == 'MODIFY'
+            SHOW DELETE BUTTON
+            SHOW CREATE BUTTON
+        IF SPAWN_DETAILS==None
+            GENERATE SPAWN DETAIS: ITERATE ENEMIES, ADD ZONES ETC
+
+        IF SPAWN_DETAIL == 'CREATE':
+            STEP THRU
+
+        ITERATE ENEMIES
+        IF 
+
+        enemy.spawnMe         = True
+        enemy.spawnNumber     = 1
+        enemy.spawn_objective = destroyBase
+        enemy.spawn_coords    = [(),(),] 
+        enemy.spawn_wave      = 2
+        enemy.spawn_range     = 'small','med','big'
+        enemy.spawn_periphery = True
+
+
+        """
+        if self.currentLayer != 'S':
+            return
+
+
+        # INITIALISE TRANSPARENT MASKS
+
+        if(self.spawnMasksInitialised==False):
+            for x in self.activeSpawnZones:
+                mask = pygame.Surface((x[2], x[3]))
+                self.spawnZoneData.append({'spawnZone': x, 'spawnMask': mask})
+
+            self.spawnMasksInitialised = True
+
+
+        #---------DRAW current MODE
+        drawTextWithBackground(gui.screen, gui.font,'   '+ str(self.SPAWN_MODE) + '   ', 50,70, textColour=(255, 255, 255), backColour=(0, 0, 0), borderColour=(50, 50, 200))
+        
+        # ------DRAW SPAWN ZONES
+        collides_with_existing = False
+        starting_colour = (20, 30, 70)
+        collide_index = None
+        
+        for index, s in enumerate(self.spawnZoneData):
+
+            s['spawnMask'].set_alpha(100)
+            s['spawnMask'].fill((self.spawnzonemaskFill))
+            gui.screen.blit(s['spawnMask'], (s['spawnZone'][0]- gui.camX, s['spawnZone'][1]- gui.camY))
+            pygame.draw.rect(gui.screen, (255,255,255), [s['spawnZone'][0]- gui.camX, s['spawnZone'][1]- gui.camY,s['spawnZone'][2], s['spawnZone'][3]],4)
+            drawTextWithBackground(gui.screen, gui.font, str(index), s['spawnZone'][0] - gui.camX + 0.4 * s['spawnZone'][2], s['spawnZone'][1] - gui.camY + 0.3 * s['spawnZone'][3], textColour=(255, 255, 255), backColour=(0, 0, 0), borderColour=(50, 50, 200))
+
+
+
+        # --------SPAWN OPTION BUTTONS
+        boxX,boxY = 0.8*gui.w, 0.18*gui.h
+        boxW,boxH = 0.16*gui.w, 0.18*gui.h
+        chosenFont = gui.font
+        tw,th   = getTextWidth(chosenFont,'--Delete--.'),getTextHeight(chosenFont,'--Create--.')
+
+        if(self.SPAWN_MODE==None):
+            self.SPAWN_MODE = 'modify'
+        
+        if(self.SPAWN_MODE=='modify'):
+            # OPTION BUTTONS
+            Delete,tex,tey      = simpleButton(boxX,boxY+1.1*boxH,'Delete',gui,chosenFont,setTw=tw,backColour=((0,0,0) ),borderColour=((0,0,200) ), textColour=(255,255,255))
+            Create,tex,tey      = simpleButton(boxX,tey + 0.005*gui.h,'Create',gui,chosenFont,setTw=tw,backColour=((0,0,0) ),borderColour=((0,0,200) ), textColour=(255,255,255))
+
+
+            # ALLOW ENEMY CHOICE
+            self.showEnemyList(gui,self.sampleTile)
+
+
+            # ---------DISPLAY CURRENT SELECTED ENEMY
+
+            selectedTile = self.enemyRefData[self.selectedEnemyKey][self.selectedEnemySubKey]['image']
+            selectedTile = pygame.transform.rotate(selectedTile,self.currentEnemyRotation-90)
+            if(self.enemySelectionState=='notSelected'):
+                drawImage(gui.screen, selectedTile, (gui.mx,gui.my))
+            
+            deleteHover= False
+
+
+
+
+            # DRAW ALL ENEMIES
+            for i in range(len(self.activeEnemyData)-1,-1,-1):
+                item = self.activeEnemyData[i]
+                
+                # ONLY SHOW THE SPAWNED ENEMIES
+                if('spawnMe' not in item.keys() or item['spawnMe']=='False'):
+                    continue
+
+                ex,ey = item['x']-gui.camX,item['y']-gui.camY
+                drawImage(gui.screen, item['image'], (ex,ey))
+
+
+                # DRAW OBJECTIVES
+                if(item['itemDrop']!= 'None'):
+                    dropString = "Drops"
+                else:
+                    dropString = "No Drop"
+                string = str(item['assignedObjective']) + " : " + dropString
+                tw= getTextWidth(gui.picoFont,string)
+                drawTextWithBackground(gui.screen,gui.nanoFont,string,ex-0.5*tw,ey+1.3*item['image'].get_height(),textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+
+
+
+
+                # -------------DELETE
+
+                if(self.currentLayer in ['E']):
+                    if(gui.mouseCollides(item['x']-gui.camX,item['y']-gui.camY,item['image'].get_width(),item['image'].get_height())):
+                        pygame.draw.rect(gui.screen, (180,180,120), [item['x']-gui.camX,item['y']-gui.camY,item['image'].get_width(),item['image'].get_height()],4)
+                        deleteHover = True
+                        if(gui.clicked):    
+                            self.activeEnemyData.pop(i)
+
+
+
+
+            # --------PLACE ENEMY 
+
+            nothingSelected = True
+            if(gui.clicked and nothingSelected and not deleteHover and self.updateTileEnabled):
+                if(self.enemySelectionState=='notSelected'):
+                    print("Adding enemy")
+                    x,y  = gui.mx+gui.camX, gui.my+gui.camY
+                    self.enemyToPlace = {'x': x,
+                                         'y': y,
+                                         'image':selectedTile ,
+                                         'enemyKeyName':self.selectedEnemyKey ,
+                                         'enemySubKeyName':self.selectedEnemySubKey ,
+                                         'rotation':wrapAngle(self.currentEnemyRotation),
+                                         'patrolRoute':[(x,y),(x+100,y),(x+100,y+100),(x,y+100)],
+                                         'itemDrop':'None', 
+                                         'lv':3,
+                                         'spawnMe': True,
+                                         'random_spawn_radius': 0.4*gui.w,
+                                         'spawn_wave': 1,
+                                         'spawn_range': 1,
+                                         'spawn_at_periphery':True}
+
+                    
+                    # DO I EVEN NEED TO HAVE SPAWN ZONES?????
+
+                    # ASK FOR
+                    # OBJECTIVE OR AREA ONLY (none = area only)
+                    # RANDOM SPAWN RADIUS SMALL = .4 * GUI.W
+                    # NUMBRE OF WAVES
+                    # PERIPHERY
+
+                    # it should work out and add
+                    # SPAWN NUMBER 
+                    # X AMOUNT BASED ON WAVES
+                    # spawn objective = objective
+
+
+                    self.enemySelectionState='setObjectives'
+
+
+            # ----------OBJECTIVE VS AREA SELECTION (NONE = AREA)
+
+            if(self.enemySelectionState=='setObjectives'):
+                self.navEnabled   = False
+                gui.scrollEnabled = False
+                drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+                
+                # initialise objective if not exist
+                if(self.currentObjectiveCursor==None):
+                    self.currentObjectiveCursor = self.availableObjectives[0]
+                
+                pressedKey     = gui.input.returnedKey.upper()
+                # GET DIRECTION OF ACCELLERATION
+                if('D' == pressedKey):
+                    self.currentObjectiveCursor = self.availableObjectives[(self.availableObjectives.index(self.currentObjectiveCursor) + 1) % len(self.availableObjectives)]
+                if('A' == pressedKey):
+                    self.currentObjectiveCursor = self.availableObjectives[(self.availableObjectives.index(self.currentObjectiveCursor) - 1) % len(self.availableObjectives)]
+                if('RETURN' == pressedKey):
+                    self.enemyToPlace['assignedObjective'] = self.currentObjectiveCursor
+                    self.currentObjectiveCursor = None
+                    self.enemySelectionState='getNumberOfWaves'
+                    gui.input.returnedKey = ''
+
+
+
+                string = str(self.currentObjectiveCursor)
+                tw= getTextWidth(gui.smallFont,string)
+                drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+
+            # ----------RANDOM SPAWN RADIUS SELECTION
+
+            if(self.enemySelectionState=='getNumberOfWaves'):
+                self.navEnabled   = False
+                gui.scrollEnabled = False
+                drawImage(gui.screen, selectedTile, (self.enemyToPlace['x'] - gui.camX,self.enemyToPlace['y']-gui.camY))
+                
+                
+                pressedKey     = gui.input.returnedKey.upper()
+                # GET DIRECTION OF ACCELLERATION
+                if('D' == pressedKey):
+                    if(self.currentRandomSpawnRadius=='small'):
+                        self.currentRandomSpawnRadius = 'medium'
+                    elif(self.currentRandomSpawnRadius=='medium'):
+                        self.currentRandomSpawnRadius = 'big'
+                    elif(self.currentRandomSpawnRadius=='big'):
+                        self.currentRandomSpawnRadius = 'small'
+                if('A' == pressedKey):
+                    if(self.currentRandomSpawnRadius=='big'):
+                        self.currentRandomSpawnRadius = 'medium'
+                    elif(self.currentRandomSpawnRadius=='medium'):
+                        self.currentRandomSpawnRadius = 'small'
+                    elif(self.currentRandomSpawnRadius=='small'):
+                        self.currentRandomSpawnRadius = 'big'
+                if('RETURN' == pressedKey):
+                    self.enemyToPlace['random_spawn_radius'] = self.currentRandomSpawnRadius
+                    self.currentRandomSpawnRadius = 'small'
+                    self.enemySelectionState='none'
+                    gui.input.returnedKey = ''
+
+
+
+                string = "Spawn Radius: " + str(self.currentRandomSpawnRadius)
+                tw= getTextWidth(gui.smallFont,string)
+                drawTextWithBackground(gui.screen,gui.smallFont,string,self.enemyToPlace['x']-0.5*tw-gui.camX,self.enemyToPlace['y']+1.2*self.enemyToPlace['image'].get_height()-gui.camY,textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
+                     
+
+
+            # FORCE CAMERA TO CURRENT INDEX
+            if(len(self.spawnZoneData) > 0):
+                spawn = self.spawnZoneData[self.currentSpawnIndex]
+                spawnData = spawn['spawnZone']
+                if(gui.camX < spawnData[0]):
+                    gui.camX +=20
+                if(gui.camX > spawnData[0] + spawnData[2] ):
+                    gui.camX -=20
+
+                if(gui.camY < spawnData[1]):
+                    gui.camY+=20
+
+                if(gui.camY > spawnData[1] + spawnData[3] ):
+                    gui.camY -=20
+
+
+
+
+
+        if self.updateTileEnabled and gui.scrollEnabled:
+            self.spawn_box_selector(gui, game)
+
+    def spawn_box_selector(self, gui, game):
+        selected_area = self.dragSelect.dragSelect(gui, gui.camX, gui.camY)
+        if selected_area and selected_area[2] > 1 and selected_area[3] > 1:
+            self.activeSpawnZones.append(selected_area)
+            mask = pygame.Surface((selected_area[2], selected_area[3]))
+            self.spawnZoneData.append({'spawnZone': selected_area, 'spawnMask': mask})
+
+    
+
 
 
 def get_next_subkey(tile_data, tile_key, tile_subkey):

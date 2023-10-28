@@ -401,10 +401,9 @@ class player():
 
 
 			# ----SWITCH OFF CONDITIONS 
-			if(self.lockedEnemy!=None):
-				if(self.lockedOn==False or self.boosting or(onScreen(self.lockedEnemy.x,self.lockedEnemy.y,self.lockedEnemy.w,self.lockedEnemy.h,gui)==False)):
-					self.lockedEnemy = None
-					self.lockonIndex = 0
+			if(self.lockedOn==False or self.boosting or(onScreen(self.lockedEnemy.x,self.lockedEnemy.y,self.lockedEnemy.w,self.lockedEnemy.h,gui)==False)):
+				self.lockedEnemy = None
+				self.lockonIndex = 0
 
 		# RESET LOCKON IF NO ENEMIES OR IN BOOST MODE
 		if(len(enemies)<1 or  self.boosting):
