@@ -129,7 +129,7 @@ class frigate(parent):
 		self.turretTwo.x,self.turretTwo.y     = self.tx2, self.ty2
 		self.multiTurret.x,self.multiTurret.y = self.mtx, self.mty
 
-		# ENSURE VECHICLE DOESN'T EXCEED BOUNDARIES
+		# ENSURE vehicle DOESN'T EXCEED BOUNDARIES
 		self.stayOnField(lv)
 
 

@@ -54,11 +54,12 @@ class attackBoat(parent):
 		self.bulletTimer        = stopTimer()           # BUFF
 		self.shootDelay         = 0.3                   # BUFF
 		self.bulletsFired       = 0
+		self.detectionRange     = 0.5*gui.h
 
 	# AI LOGIC
 	def actions(self,gui,game,lv):
 
-		# ENSURE VECHICLE DOESN'T EXCEED BOUNDARIES
+		# ENSURE vehicle DOESN'T EXCEED BOUNDARIES
 		self.stayOnField(lv)
 
 
@@ -100,7 +101,7 @@ class attackBoat(parent):
 		angleDiffToEnemy, DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, lv.player.x,lv.player.y)
 		
 		self.turretFacing = self.facing
-		if(DistanceToEnemy<0.5*gui.h):
+		if(DistanceToEnemy<self.detectionRange):
 			self.state = 'attackPursue'
 			
 			# WORK OUT WHICH SECTOR IS NEAREST
@@ -124,7 +125,7 @@ class attackBoat(parent):
 		# -------SHOOT
 		if DistanceToEnemy<0.5*gui.h:
 			self.shoot(gui,lv,game)
-		else:
+		if DistanceToEnemy>1.1*self.detectionRange:
 			self.state = 'patrol'
 
 		#if(DistanceToEnemy>0.7*gui.h): self.state = 'patrol'

@@ -1,73 +1,38 @@
-ENEMY SPAWN REDO
 
-DO IN PARTS:
-
-
-PART ONE: PERIPHERY SPAWN, WITHIN A GIVEN AREA
-- only works for air vechicles
-
-1. Create: Modify: Delete spawn zone 
-2. Create 
-		Drag spawn zone (make transparent)
-		select enemy and place
-			- objective: none, clearout...etc
-			- number
-			- waves
-			- duration between waves
-3. Modify
-		 cycle zones left/right
-		 click on enemy to remove
-4. Delete
-		click delete button for this zone
-
-SAVED AS ENEMY LIST WITH THESE ADDED
-LOADED:
-	   create zone if not exist
+CONTROLS NEED DO-OVER
 
 
-enemy.spawnMe         = True
-enemy.spawnNumber     = 1
-enemy.spawn_objective = destroyBase
-enemy.spawn_coords    = [(),(),] 
-enemy.spawn_wave      = 2
-enemy.spawn_range     = 'small','med','big'
-enemy.spawn_periphery = True
+LOCK ON NEEDS TO BE PUSH BUTTON
+
+- COPY PLAYER
+- Design ground up
+- Should hold own key for lockon 
+
+H-lockon J-Shoot K-missiles
+or 
+H-lockon J-Shoot+Missiles K-Jink
+ l l dash left
 
 
+FIX SPAWN FOR PERIPHERY NO OBJECTIVE
 
+NGUNI
 
-WHAT DO I WANT?
+- 3 part damage animation - include crash
+- 2 PART ATTACK ANIMATION CANNONS EXTEND - FIRE
+- FIRE ANIMATION - RECOIL OF GUN
+- Slow bruiser
 
-SPAWN AT EDGE OF PERIPHERY:  IF PLAYER IS IN THIS GRID AREA AND/OR FOR  GIVEN OBJECTIVE
+VIPER HIND ADVANCED
+LOW HP BUT LOADS ZOOM IN
+- Diff colour
+- Faster, more aggressive actions.. i.e. it gets in jinks.
+- CODE : PLACE ENEMIES SO THEY SEEK YOU OUT (INCREASE THEIR RANGE) gives more shmup like feel
 
-SPAWN AT EDGE OF PERIPHERY:  WITHIN A GIVEN TIME FRAME AND OBJECTIVE
+RADAR TOWER
 
-SPAWN ON LOCATION: AT A GIVEN OBJECTIE 
-
-
-POSSIBLE SOLUTIONS:
-
-SPAWN PLACER: 
-
-...check notes 
-
-
-
-What i want to do is create a way to spawn enemies:
-
-Continuous Spawn - at a given point and/or given time spawn enemies, then after that time spawn them again for as many as specified by user.
-
-Or/And
-
-Continuous Spawn periphery - at a given point where the player is and/or given time spawn enemies, so they appear just outside the players view, so they come into view quite quickly (will set hteir field of view high)
-
-or/and
-
-Spawn on location: enemies spawn at a location for a given objective/phase in the level.
-
-
-
-
+- Spins around
+- Five parts to fully destroy
 
 
 

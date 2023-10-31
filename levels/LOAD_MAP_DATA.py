@@ -2,6 +2,7 @@ import pygame
 import os
 from buildings.nonInteractable import *
 from levels.level_ruralAssault import *
+from levels.sandbox import *
 
 
 
@@ -237,7 +238,7 @@ def loadAnimatedData(gui,game):
 
 
 
-def loadEnemyRefData(gui,game):
+def loadEnemyRefData(gui,game,debug=True):
     """
 
     X,Y, enemyKeyName,enemySubKeyName, ROTATION, PATROL_ROUTE, POWERLEVEL
@@ -256,7 +257,8 @@ def loadEnemyRefData(gui,game):
                           'barrelRed':{'image': gui.barrelGroupRed[0]}
                           }
     enemyDict['air']   = {'scout':{'image': gui.scoutRed[0]}, 
-                          'hind':{'image': gui.hind[0]}
+                          'hind':{'image': gui.hind[0]},
+                          'comanche':{'image': gui.comanche[0]}
                           }
     enemyDict['buildings'] = {
                           'bioLab':{'image': gui.bioLab[0]},
@@ -285,6 +287,8 @@ def loadEnemyRefData(gui,game):
         patrol          = item.split('/')[5].strip()
         patrolU         = patrol.split(':')
         patrolRoute     = []
+        if(debug):
+            print('Patrol route is : ' + str(patrolU))
         for r in patrolU:
             patrolRoute.append((int(r.split('-')[0]),int(r.split('-')[1])))
         lv              = item.split('/')[6].strip()
@@ -309,15 +313,40 @@ def loadEnemyRefData(gui,game):
             spawn_range         = item.split('/')[13].strip()
             spawn_periphery     = item.split('/')[14].strip()
             spawn_objective     = item.split('/')[15].strip()
-            
+
 
         except:
             print("Enemy does not have itemDrop key, adding default value")
-            spawnMe = 'False'
-
+            spawnMe             = 'False'
+            spawn_wave_num      = '0'
+            spawn_wave_Interval = '0.2'
+            spawn_area          = 'small'
+            spawn_range         = 'small'
+            spawn_periphery     = 'False'
+            spawn_objective     = 'No Objective'
 
         rotatedImage = pygame.transform.rotate(enemyDict[enemyKeyName][enemySubKeyName]['image'],int(rotation))
-        game.activeEnemyData.append({'x':int(xpos) ,'y':int(ypos) ,'image':rotatedImage ,'enemyKeyName':enemyKeyName ,'enemySubKeyName':enemySubKeyName ,'rotation':int(rotation) ,'patrolRoute':patrolRoute ,'lv':lv,'assignedObjective':objectiveKey,'itemDrop': itemDrop, 'spawnMe': spawnMe})
+        if(spawnMe=='True'):
+            rotatedImage.set_alpha(100)
+        game.activeEnemyData.append({'x':int(xpos) ,
+                                     'y':int(ypos) ,
+                                    'image':rotatedImage ,
+                                    'enemyKeyName':enemyKeyName ,
+                                    'enemySubKeyName':enemySubKeyName ,
+                                    'rotation':int(rotation) ,
+                                    'patrolRoute':patrolRoute ,
+                                    'lv':lv,
+                                    'assignedObjective':objectiveKey,
+                                    'itemDrop': itemDrop, 
+                                    'spawnMe': spawnMe,
+                                    'numberOfWaves': int(spawn_wave_num), 
+                                    'waveInterval': float(spawn_wave_Interval), 
+                                    'spawnArea': spawn_area, 
+                                    'enemyRange': spawn_range, 
+                                    'spawnAtPeriphery': spawn_periphery=='True', 
+                                    'spawnObjective': spawn_objective
+
+                                    })
 
 
     # Create a new dict with the images scaled

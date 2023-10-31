@@ -21,7 +21,7 @@ class hind(parent):
 
 		self.state             = 'patrol'
 		self.patrolLocations   = [(self.x,self.y),(self.x+400,self.y),(self.x+400,self.y+200),(self.x,self.y+200)] 
-		self.seekStrafe        = False
+		self.seekStrafe        = True
 		self.currentLocIndex   = 0
 		self.defaultHp         = 50
 		self.hp                = 50
@@ -51,9 +51,11 @@ class hind(parent):
 		self.turnPeriod         = 1.5
 		self.turnDirection      = 1
 		self.seekStrafe         = False
+		self.detectionRange     = 0.65*gui.h
 
 	# AI LOGIC
 	def actions(self,gui,game,lv):
+
 
 		if(self.seekStrafe): self.state= 'attackPursue'
 		if(self.state=='patrol'):
@@ -66,7 +68,7 @@ class hind(parent):
 		if(self.state=='alert'):
 			self.alert(gui,lv)
 
-		# ENSURE VECHICLE DOESN'T EXCEED BOUNDARIES
+		# ENSURE vehicle DOESN'T EXCEED BOUNDARIES
 		self.stayOnField(lv)
 
 
@@ -96,7 +98,7 @@ class hind(parent):
 
 		# -----------GET DISTANCE TO ENEMY
 		angleDiffToEnemy, DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, lv.player.x,lv.player.y)
-		if(DistanceToEnemy<0.65*gui.h):
+		if(DistanceToEnemy<self.detectionRange):
 			self.state = 'attackPursue'
 			
 			# WORK OUT WHICH SECTOR IS NEAREST
@@ -109,6 +111,7 @@ class hind(parent):
 	def atackPursue(self,gui,lv,game):
 		
 		# DISTANCE THE ENEMY IS FROM ROUTE COORD
+		# THIS STOPS ENEMY FOLLOWING PLAYER WHEREVER THEY GO
 		angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = angleToTarget(self,lv.player.x,lv.player.y,self.defenceSector[0],self.defenceSector[1])
 		
 		if(self.seekStrafe):
@@ -158,7 +161,7 @@ class hind(parent):
 			if DistanceToEnemy<0.8*gui.h:
 				self.shoot(gui,lv,game)
 
-		else:
+		if(DistanceToEnemy>1.1*self.detectionRange):
 			self.state = 'patrol'
 
 

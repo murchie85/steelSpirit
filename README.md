@@ -29,15 +29,27 @@ QUALITY CONTROL - Does it still have slug throwing SHmup feel?
 
 ## FEATURES UNSORTED 
 
-SORTED - THIS WEEK 
 
-FILTER AND RANK BETTER 
+QUICK WINS:
 
+show LockonMode
+Show search beam
 
-
-CODE: Enemy Respawn
-CODE : PLACE ENEMIES SO THEY SEEK YOU OUT (INCREASE THEIR RANGE) gives more shmup like feel
 Bonus: multiplier to prevent me snipping from a distance.  Use a timer 
+			- kill enemy, timer starts
+			- 1.2 * points for each kill
+			- BONUS COLOUR FLOAT says BONUS 200 PTS
+			- 1.4 at 6 enemies
+			- SCORE TOP LEFT FLASHES
+			- SPAWN POWER UP IF YOU KILL 10
+
+
+- NEW ENEMY & Radar(see fix)
+
+
+
+CONTROL DO-OVER = SEE FIX
+
 
 BURNING ANIMATION: Leave stuff burning (runway, barracks, sam)
 UNITS/ITEMS:
@@ -52,12 +64,13 @@ SETTINGS : DPAD
 ANIMATION: NOT ALL STUFF SHOULD EXPLODE: FIRE AND CRASH DEBRIS LEAVES POT HOLE (L2): slower flipping debris 
 
 HEALTH: HEALTH POWER UP
+
 ART: Improve art https://opengameart.org/art-search-advanced?keys=&field_art_type_tid%5B%5D=14&sort_by=count&sort_order=DESC
 BULLET: bullet flash https://duckduckgo.com/?va=o&t=ha&q=shmup+sprites+powerups&iax=images&ia=images&iai=https%3A%2F%2Fimages.squarespace-cdn.com%2Fcontent%2Fv1%2F551a19f8e4b0e8322a93850a%2F1607969224266-KWX66VFLV66TT276HVRM%2F83-Projectiles_P.gif
 
 
 
-
+scroll = narrw map but long. map --
 
 LOWER 
 
@@ -117,7 +130,6 @@ SHOW:
 - GUI TEXT SCROLL TIMER
 - When flying ships get hit, they crash and leave a crater
 - Big cannons you destroy and black smoke pours out
-- RADAR
 - GROUND AA LASER CANNON builds up
 - Propaganda stations
 - Next ENEMY Arrow/s (red) this will help when vision is down..make it bigger as nearer
@@ -549,6 +561,7 @@ earth is so yesterday.. (make it in game jibes)
 
 ## DONE 
 
+DONE: Enemy Respawn
 DONE: make and render player DONE: Do a simple map DONE: Navigate with aswd DONE: Camera Nav
 DONE - Map maker, Midjourney images, Fix camera, HIT DAMAGE, player explosion animation, allow player to die, Thinner fire, Double fire, radar cone, LOCK ON
 DONE: Finish isonscreen function - test using a viewport, TRISHOT - Like in Underdefeat, Multi-tile edit
@@ -562,6 +575,7 @@ ISOMETRIC MISSILE BASE  - PLACE ME ANYWHERE LAYER
 - Limit sectors until objectives complete
 - pointer times out after 3 seconds, B to show it
  - keep enemies in quandrant
+- DRAW L2 ABOVE GROUND AND ENEMIES BELOW TREES
 
  isometric base (build parts like fence) 
  	- Bomb

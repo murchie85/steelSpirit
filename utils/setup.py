@@ -84,6 +84,10 @@ gui.growingFont = []
 for x in range(19,29):
 	gui.growingFont.append(pygame.font.Font(FONTPATH + 'FORCEDSQUARE.ttf', x))
 
+gui.growingFontLarge = []
+
+for x in range(24,34):
+	gui.growingFontLarge.append(pygame.font.Font(FONTPATH + 'FORCEDSQUARE.ttf', x))
 
 
 gui.titleFont         = pygame.font.Font(FONTPATH + 'squids.ttf', 60)
@@ -158,6 +162,8 @@ gui.bombIcons               = {"nuke": pygame.image.load(IMAGEASSETPATH + 'gui/g
 
 # ----- UNITS AND PLAYER 
 
+
+# OLD STYLE 
 gui.player            = loadImageFiles('fighter1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 gui.playerShooting    = loadImageFiles('fighterShooting1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 gui.playerBoost       = loadImageFiles('fighterBoost1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
@@ -165,6 +171,7 @@ gui.playerShadow      = loadImageFiles('shadow1.png',IMAGEASSETPATH + 'units/fig
 gui.playerHit         = loadImageFiles('playerHit1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 
 
+# G12 OLDISH STYLE 
 gui.player            = loadImageFiles('g12_1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 gui.playerShooting    = loadImageFiles('g12_Shooting1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 gui.playerBoost       = loadImageFiles('g12_boost1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
@@ -172,8 +179,17 @@ gui.playerThustR       = loadImageFiles('g12_ThrustRight1.png',IMAGEASSETPATH + 
 gui.playerThustL       = loadImageFiles('g12_ThrustLeft1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 gui.playerShadow      = loadImageFiles('g12_Shadow1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 gui.playerHit         = loadImageFiles('g12_Hit1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
+gui.playerReverse     = loadImageFiles('g12_1.png',IMAGEASSETPATH + 'units/fighter/',convert=False)
 
-
+# DELTTA
+gui.player            = loadImageFiles('delta_1.png',IMAGEASSETPATH + 'units/fighter/delta/',convert=False)
+gui.playerShooting    = loadImageFiles('delta_shoot1.png',IMAGEASSETPATH + 'units/fighter/delta/',convert=False)
+gui.playerBoost       = loadImageFiles('delta_boost1.png',IMAGEASSETPATH + 'units/fighter/delta/',convert=False)
+gui.playerThustR       = loadImageFiles('delta_thrustRight1.png',IMAGEASSETPATH + 'units/fighter/delta/',convert=False)
+gui.playerThustL       = loadImageFiles('delta_thrustLeft1.png',IMAGEASSETPATH + 'units/fighter/delta/',convert=False)
+gui.playerShadow      = loadImageFiles('delta_shadow1.png',IMAGEASSETPATH + 'units/fighter/delta/',convert=False)
+gui.playerHit         = loadImageFiles('delta_hit1.png',IMAGEASSETPATH + 'units/fighter/delta/',convert=False)
+gui.playerReverse     = loadImageFiles('delta_reverse1.png',IMAGEASSETPATH + 'units/fighter/delta/',convert=False)
 
 
 
@@ -197,30 +213,45 @@ gui.pdAmmo            = { "angleRound": pygame.image.load(IMAGEASSETPATH + 'powe
 						 "angleRound3": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/angle4.png'),
 						 "hotRound": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/hotRound1.png'),
 						 "hotDouble": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/hotRound2.png'),
-						 "hotTripple": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/hotRound3.png'),}
-
-
-gui.hind              = loadImageFiles('hind1.png',IMAGEASSETPATH + 'units/hind/',convert=False)
-gui.hindHit           = loadImageFiles('hindHit1.png',IMAGEASSETPATH + 'units/hind/',convert=False)
-gui.hindShadow        = loadImageFiles('hindShadow1.png',IMAGEASSETPATH + 'units/hind/',convert=False)
+						 "hotTripple": pygame.image.load(IMAGEASSETPATH + 'powerups/powerDroneAmmo/hotRound3.png')}
+gui.Utils             = { "health": pygame.image.load(IMAGEASSETPATH + 'powerups/healthIcon/health.png')}
 
 
 
-gui.tank              = loadImageFiles('sandTank1.png',IMAGEASSETPATH + 'units/tank/sandTank/',convert=False)
-gui.tankHit           = loadImageFiles('sandTankHit1.png',IMAGEASSETPATH + 'units/tank/sandTank/',convert=False)
-gui.turret            = [pygame.image.load(IMAGEASSETPATH + 'units/tank/sandTank/turret.png')]
-gui.turretHit         = loadImageFiles('sandTankTurretHit1.png',IMAGEASSETPATH + 'units/tank/sandTank/',convert=False)
-gui.tankStatic        = pygame.image.load(IMAGEASSETPATH + 'units/tank/sandTank/sandTankStatic.png')
-gui.tankRemains       = loadImageFiles('tankCarcass1.png',IMAGEASSETPATH + 'units/tank/',convert=False)
-gui.tankShadow        = [pygame.image.load(IMAGEASSETPATH + 'units/tank/sandTank/sandTankShadow.png')]
+gui.hind              = loadImageFilesAlpha('hind1.png',IMAGEASSETPATH + 'units/hind/')
+gui.hindHit           = loadImageFilesAlpha('hindHit1.png',IMAGEASSETPATH + 'units/hind/')
+gui.hindShadow        = loadImageFilesAlpha('hindShadow1.png',IMAGEASSETPATH + 'units/hind/')
 
-gui.greenTank              = loadImageFiles('greenTank1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
-gui.greenTankHit           = loadImageFiles('greenTankhit1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
-gui.greenTurret            = [pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTank/greenTurret.png')]
-gui.greenTurretHit         = loadImageFiles('greenTankTurretHit1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
-gui.greenTankStatic        = pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTank/greenTankStatic.png')
-gui.greenTankRemains       = loadImageFiles('greenTankCarcass1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
-gui.greenTankShadow        = [pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTank/greenTankShadow.png')]
+gui.comanche          = loadImageFilesAlpha('comanche1.png',IMAGEASSETPATH + 'units/comanche/')
+gui.comancheHit       = loadImageFilesAlpha('comancheHit1.png',IMAGEASSETPATH + 'units/comanche/')
+gui.comancheDamaged   = loadImageFilesAlpha('comancheDamaged1.png',IMAGEASSETPATH + 'units/comanche/')
+gui.comancheShadow    = loadImageFilesAlpha('comancheShadow1.png',IMAGEASSETPATH + 'units/comanche/')
+
+
+
+gui.tank              = loadImageFilesAlpha('sandTank1.png',IMAGEASSETPATH + 'units/tank/sandTank/')
+gui.tankHit           = loadImageFilesAlpha('sandTankHit1.png',IMAGEASSETPATH + 'units/tank/sandTank/')
+gui.turret            = loadImageFilesAlpha('turret.png',IMAGEASSETPATH + 'units/tank/sandTank/') 
+gui.turretHit         = loadImageFilesAlpha('sandTankTurretHit1.png',IMAGEASSETPATH + 'units/tank/sandTank/')
+gui.tankStatic        = loadImageFilesAlpha('sandTankStatic.png',IMAGEASSETPATH + 'units/tank/sandTank/')[0]
+gui.tankRemains       = loadImageFilesAlpha('tankCarcass1.png',IMAGEASSETPATH + 'units/tank/')
+gui.tankShadow        = loadImageFilesAlpha('sandTankShadow.png',IMAGEASSETPATH + 'units/tank/sandTank/')
+
+gui.greenTank              = loadImageFilesAlpha('greenTank1.png',IMAGEASSETPATH + 'units/tank/greenTank/')
+gui.greenTankHit           = loadImageFilesAlpha('greenTankhit1.png',IMAGEASSETPATH + 'units/tank/greenTank/')
+gui.greenTurret            = loadImageFilesAlpha('greenTurret.png',IMAGEASSETPATH + 'units/tank/greenTank/')
+gui.greenTurretHit         = loadImageFilesAlpha('greenTankTurretHit1.png',IMAGEASSETPATH + 'units/tank/greenTank/')
+gui.greenTankStatic        = loadImageFilesAlpha('greenTankStatic.png',IMAGEASSETPATH + 'units/tank/greenTank/')[0]
+gui.greenTankRemains       = loadImageFilesAlpha('greenTankCarcass1.png',IMAGEASSETPATH + 'units/tank/greenTank/')
+gui.greenTankShadow        = loadImageFilesAlpha('greenTankShadow.png',IMAGEASSETPATH + 'units/tank/greenTank/') 
+
+# gui.greenTank              = loadImageFiles('greenTank1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
+# gui.greenTankHit           = loadImageFiles('greenTankhit1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
+# gui.greenTurret            = [pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTank/greenTurret.png')]
+# gui.greenTurretHit         = loadImageFiles('greenTankTurretHit1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
+# gui.greenTankStatic        = pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTank/greenTankStatic.png')
+# gui.greenTankRemains       = loadImageFiles('greenTankCarcass1.png',IMAGEASSETPATH + 'units/tank/greenTank/',convert=False)
+# gui.greenTankShadow        = [pygame.image.load(IMAGEASSETPATH + 'units/tank/greenTank/greenTankShadow.png')]
 
 
 
@@ -453,6 +484,7 @@ gui.enemyDict          = {'scout':{'image': gui.scoutRed[0]},
 						  'bioLab':{'image': gui.bioLab[0]},
 						  'barrelRed':{'image': gui.barrelGroupRed[0]}, 
 						  'hind':{'image': gui.hind[0]}, 
+						  'comanche':{'image': gui.comanche[0]}, 
 						  'frigate':{'image': gui.frigate[0]}
 
 							}

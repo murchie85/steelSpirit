@@ -10,17 +10,7 @@ import random
 
 
 """
-- actions
-- detectEnemies
-- lockon
-- shoot
-- set invincible
-- classicControls
-- camera
-- drawSelf
-- drawCone
-- animateDestruction
-- damageAnimation
+*********CYCLES LOCKON LEFT/RIGHT******
 """
 
 
@@ -97,16 +87,15 @@ class player():
 		self.lockedOn        = False
 		self.lockOnAvailable = False
 		self.lockonTimer     = stopTimer()
-		self.cycleLockon     = False
-		self.cycling         = True
+		self.cycleRight      = False
+		self.cycleLeft       = False
 		self.lockedEnemy     = None
 		self.lockonIndex     = 0
-		self.cone_length     = 480
-		self.cone_angle      = 80
+		self.cone_length     = 530
+		self.cone_angle      = 100
 		self.firing          = False
 		self.initLockonFacing = False
 		self.switchedLockon  = False
-		self.turnSpeedLockedOn = 8
 
 		self.shake_timer     = 0
 		self.camShakeStarted = False
@@ -127,6 +116,7 @@ class player():
 		self.speed             = 0
 		self.maxSpeedDefault   = 8
 		self.maxSpeed          = self.maxSpeedDefault
+		self.lockTurnSpeed     = 4
 		self.boostSpeed        = 16
 		
 
@@ -209,9 +199,6 @@ class player():
 		self.debris 			 = 0
 		self.score               = 0
 
-		self.LOCKON_MODE 	 	 = 'PRESS_TO_SWITCH'
-		self.lockpressed         = False
-
 	
 	# MANAGE ACCELLERATION 
 	
@@ -228,58 +215,44 @@ class player():
 			self.SPECIAL            = 'L'
 		# LOCKED ON 
 		if(self.lockonActive==True):
-			self.SHOOTKEY           = 'J'
+			self.SHOOTKEY           = 'H'
 			self.BOOST_BUTTON       = 'U' 
-			self.JINK_BUTTON        = 'L' 
-			self.SPECIAL            = 'K'
+			self.JINK_BUTTON        = 'K' 
+			self.SPECIAL            = 'L'
 
 
+		# ---- SIMPLER LOCKON SYSTEM WHERE YOU TAP SHOOT TO CYCLE
+
+		# if('J' in pressedKeys):
+		# 	self.lockonActive = True
+		# else:
+		# 	self.lockonActive = False
+		# 	self.lockedOn = False
+
+		# if(self.lockonActive):
+		# 	if(gui.input.returnedKey.upper()=='H'):
+		# 		self.cycleLockon=True
 
 
-		if(self.LOCKON_MODE == 'NEEDS_LOCKON_PRESSED'):
-			
-			self.cycleLockon = False
-			if('H' in pressedKeys):
-				self.lockonActive = True
-			else:
-				self.lockonActive = False
-				self.lockedOn     = False
-				self.cycling      = True
-			if(gui.input.returnedKey.upper()=='H' and self.lockonActive):
-				self.cycleLockon = True
+		# HOLD BOTH SHOOT AND LOCKON TO SWITCH
+		self.cycleRight,self.cycleLeft = False,False
+		if('H' in pressedKeys and 'J' in pressedKeys):
+			if(gui.input.returnedKey.upper()=='D'):
+				self.cycleRight=True
+			if(gui.input.returnedKey.upper()=='A'):
+				self.cycleLeft=True
 
-		if(self.cycling):
-			# if self.lockonActive changes, the timer resets and counts again.
-			lockonExpired = self.lockonTimer.stopWatch(1,'lockon countdown', str(self.lockonActive),game,silence=True)
-			if(gui.input.returnedKey.upper()=='H'):
-				self.cycleLockon = True
-				self.lockonActive = True
-			
-			if(lockonExpired):
-				self.cycling      = False
 
-		elif(self.LOCKON_MODE =='HOLD_TOGGLE_LOCKON'):
-			
-			self.cycleLockon = False
-			if('H' in pressedKeys and self.lockpressed==False):
-				self.lockonActive = not self.lockonActive
-				self.lockpressed = True
-			if(gui.input.returnedKey.upper()=='H' and self.lockonActive):
-				self.cycleLockon = True
-			if(self.lockonActive==False):
-				self.lockedOn     = False
-			if('H' not in pressedKeys):
-				self.lockpressed = False
-		elif(self.LOCKON_MODE =='PRESS_TO_SWITCH'):
-			self.cycleLockon = False
+			#pressedKeys.remove('H')
 
-			if('J' in pressedKeys and gui.input.returnedKey.upper() =='H'):
-				self.cycleLockon = True
-			elif(gui.input.returnedKey.upper()=='H'):
-				self.lockonActive = not self.lockonActive
-			if(self.lockonActive==False):
-				self.lockedOn     = False
+		
+		elif(gui.input.returnedKey.upper()=='J'):
+			self.lockonActive = not self.lockonActive
 
+		if(self.lockonActive==False):
+			self.lockedOn = False
+
+		
 
 		# ensure animation not stuck
 		self.thrustingL,self.thrustingR = False,False
@@ -295,6 +268,7 @@ class player():
 		# --------BUILD DETECTION CONE
 
 		self.cone_points = detectionCone(self.x,self.y,gui,-self.facing,cone_length=self.cone_length,cone_angle=self.cone_angle)
+		#self.draw_cone(self.x,self.y,gui,self.cone_points,lv)
 
 		# -------LOCK ON
 
@@ -395,13 +369,21 @@ class player():
 					
 					# USER SWITCHES LOCKON TO NEXT ENEMY
 					elif(self.lockedEnemy):
-						if(self.cycleLockon):
+						if(self.cycleRight):
 							self.switchedLockon = True
 							if(self.lockonIndex+1 <len(enemies)):
 								self.lockonIndex += 1
 								self.lockedEnemy  = enemies[self.lockonIndex]
 							else:
 								self.lockonIndex = 0
+								self.lockedEnemy  = enemies[self.lockonIndex]
+						if(self.cycleLeft):
+							self.switchedLockon = True
+							if(self.lockonIndex-1 > 0):
+								self.lockonIndex -= 1
+								self.lockedEnemy  = enemies[self.lockonIndex]
+							else:
+								self.lockonIndex = len(enemies) -1
 								self.lockedEnemy  = enemies[self.lockonIndex]
 
 
@@ -499,7 +481,7 @@ class player():
 				self.thrustingR = True
 			# TURN
 			if('D' in pressedKeys and self.JINK_BUTTON in pressedKeys):
-				self.facing -= self.turnSpeedLockedOn
+				self.facing -= 4
 
 			# MOVE X COMP
 			if('A' in pressedKeys):
@@ -507,7 +489,7 @@ class player():
 				self.thrustingL = True
 			# LEFT     - TURN IF JINK BUTTON HELD
 			if('A' in pressedKeys and self.JINK_BUTTON in pressedKeys):
-				self.facing += self.turnSpeedLockedOn
+				self.facing += 4
 			
 			# UP
 			if('W' in pressedKeys ):
@@ -583,7 +565,9 @@ class player():
 			# RIGHT
 			if('D' in pressedKeys):
 				if('J' in pressedKeys and self.firing):
+					self.facing +=self.facingIncrementFreeRoam
 					self.thrustingR = True
+				else:
 					self.x -= vel_x 
 					self.y -= vel_y 
 					
@@ -591,7 +575,9 @@ class player():
 			# LEFT
 			if('A' in pressedKeys):
 				if('J' in pressedKeys and self.firing):
+					self.facing -=self.facingIncrementFreeRoam
 					self.thrustingL = True
+				else:
 					self.x += vel_x 
 					self.y += vel_y 
 					
@@ -1091,13 +1077,9 @@ class player():
 				currentObjective = lv.objectives[lv.currentObjective]
 				# DONT CONSTRAIN PLAYER IF NOT NEEDED
 				if(currentObjective['constrain']==False):
-					return()
+					return
 				
 				activeQuandrant  = currentObjective['activeQuandrant']
-
-				if(len(activeQuandrant)==0):
-				    return()
-
 				if(gui.camX > activeQuandrant['x'] + activeQuandrant['w'] - gui.camW):
 					gui.camX = activeQuandrant['x'] + activeQuandrant['w'] - gui.camW
 				if(gui.camX < activeQuandrant['x']): 

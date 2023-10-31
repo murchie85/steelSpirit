@@ -68,7 +68,7 @@ class aaSmall(parent):
 	# AI LOGIC
 	def actions(self,gui,game,lv):
 
-		# ENSURE VECHICLE DOESN'T EXCEED BOUNDARIES
+		# ENSURE vehicle DOESN'T EXCEED BOUNDARIES
 		self.stayOnField(lv)
 
 

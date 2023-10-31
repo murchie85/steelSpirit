@@ -22,13 +22,13 @@ import random
 
 
 
-class ruralAssault():
+class sandbox():
 
     def __init__(self,gui,parent):
-        self.name                   = 'ruralAssault'
+        self.name                   = 'sandbox'
         self.player                 = player(gui)
         self.player.maxSpeedDefault = 10
-        self.chosenMapName          = 'rural Assault'
+        self.chosenMapName          = 'sandbox'
         self.chosenMapPath          = None
         """
         GIVES; GAME .activeL1Data, activeL2Data,activeAnimatedData,activeEnemyData,activeSpawnZones
@@ -111,53 +111,21 @@ class ruralAssault():
         # -------SPAWN ZONES
         self.spawnRadiusMasks         = {'none':pygame.Surface((0.01*gui.w, 0.01*gui.h)),'small':pygame.Surface((0.5*gui.w, 0.5*gui.h)), 'medium': pygame.Surface((0.8*gui.w, 0.8*gui.h)),'big':pygame.Surface((1.2*gui.w, 1.2*gui.h))}
         self.spawnList                = []
-        self.playerStartPosition = [4167,10786]
-        self.objectives        = {'firstWave': {'objective':'eliminate',
+        self.playerStartPosition = [0.5*self.mapw,0.95*self.maph]
+        self.objectives        = {'wander': {'objective':'none',
                                                 'targetObjects':[], 
-                                                'constrain': True,
+                                                'constrain': False,
                                                 'status': 'notStarted', 
-                                                'nextObjective':'destroyBase',
+                                                'nextObjective':'complete',
                                                 'holdGame':False, 
-                                                'startMessage':'Rookie, clear a path into the base, good luck!', 
-                                                'audio':gui.cutsceneAudio['ruralAssault']['scene1'],
+                                                'startMessage':'Hi, this is a test map for debugging!', 
                                                 'completionMessage': 'Nicely done!',
-                                                'activeQuandrant': {'x':self.gameMap['quadrants'][0][0],'w':self.gameMap['quadrants'][0][2] ,'y':self.gameMap['quadrants'][0][1],'h':self.gameMap['quadrants'][0][3]},
-                                                },
-                                   'destroyBase': {'objective':'eliminate',
-                                                    'targetObjects':[], 
-                                                    'constrain': True,
-                                                    'status': 'notStarted', 
-                                                    'nextObjective':'secondWave',
-                                                    'holdGame':False,  
-                                                    'startMessage':'Get to the resupply base and take out those siloes.', 
-                                                    'completionMessage': 'Great job! Our forces can carry on unimpeded, make your way to the next objective.',
-                                                    'activeQuandrant': {'x':self.gameMap['quadrants'][0][0],'w':self.gameMap['quadrants'][0][2] ,'y':self.gameMap['quadrants'][0][1],'h':self.gameMap['quadrants'][0][3]}
-                                                    },
-
-                                   'secondWave': {'objective':'eliminate',
-                                                    'targetObjects':[], 
-                                                    'constrain': False,
-                                                    'status': 'notStarted', 
-                                                    'nextObjective':'destroyAirbase',
-                                                    'holdGame':False,  
-                                                    'startMessage':'There is a massive convoy north, stop them before they can get to our lines.', 
-                                                    'completionMessage': 'Whoaa, that was tough!',
-                                                    'activeQuandrant': {}
-                                                    },
-                                   'destroyAirbase': {'objective':'eliminate',
-                                                    'targetObjects':[], 
-                                                    'constrain': False,
-                                                    'status': 'notStarted', 
-                                                    'nextObjective':'complete',
-                                                    'holdGame':False,  
-                                                    'startMessage':'Sorry to dump more work on your lap, but you have an airbase up north that needs dealing with.', 
-                                                    'completionMessage': 'Great job! This is as far as the tutorial goes - you are ready for the next mission!',
-                                                    'activeQuandrant': {}
-                                                    },
+                                                'activeQuandrant': {'x':0,'w':self.mapw ,'y':0,'h':self.maph},
+                                                }
                                   }
         self.objectiveKeyNames       = list(self.objectives.keys())
         
-        self.currentObjective    = 'firstWave'
+        self.currentObjective    = 'wander'
         self.objectiveIntroState = 'notIntroduced'
         self.objectiveTimer      = countUpTimer()
         self.spawnIndex          = 0 # index of the enemy spawn list
@@ -586,23 +554,8 @@ class ruralAssault():
 
         # ----CLAMP PLAYER IN CURRENT QUADRANT
         if(self.currentObjective!= None and self.currentObjective != 'complete'):
-
             currentObjective = self.objectives[self.currentObjective]
-            
-            if(currentObjective['constrain']== False):
-                self.player.rightBoundary  = None
-                self.player.topBoundary    = None
-                self.player.bottomBoundary = None
-
-                return()
             activeQuandrant  = currentObjective['activeQuandrant']
-            if(len(activeQuandrant)==0):
-                self.player.leftBoundary  = None
-                self.player.rightBoundary  = None
-                self.player.topBoundary    = None
-                self.player.bottomBoundary = None
-                return()
-
 
             self.player.leftBoundary  = activeQuandrant['x'] 
             self.player.rightBoundary  = activeQuandrant['x'] + activeQuandrant['w']
@@ -1118,7 +1071,6 @@ def inQuandrant(unit, quandrant):
 
     #print('{} {} {} failed '.format(str(unit.x),str(unit.y),str(unit.name)))
     return(False)
-
 
 
 def generateRandomPatrolRoute(self, ex, ey, maxPerimeter):

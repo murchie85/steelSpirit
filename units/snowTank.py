@@ -9,7 +9,7 @@ class snowTank(parent):
 		# MAIN OVERRIDES 
 		self.id             = _id
 		self.name           = 'tank'
-		self.kind           = 'vechicle'
+		self.kind           = 'vehicle'
 		self.images         = imageAnimateAdvanced(gui.snowTank,0.2)
 		self.turretImage    = imageAnimateAdvanced(gui.snowTurret,0.2)
 		self.shadow         = imageAnimateAdvanced(gui.snowTankShadow,0.2)
@@ -56,11 +56,12 @@ class snowTank(parent):
 		self.bulletTimer        = stopTimer()           # BUFF
 		self.shootDelay         = 0.3                   # BUFF
 		self.bulletsFired       = 0
+		self.detectionRange     = 0.5*gui.h
 
 	# AI LOGIC
 	def actions(self,gui,game,lv):
 
-		# ENSURE VECHICLE DOESN'T EXCEED BOUNDARIES
+		# ENSURE vehicle DOESN'T EXCEED BOUNDARIES
 		self.stayOnField(lv)
 
 
@@ -102,7 +103,7 @@ class snowTank(parent):
 		angleDiffToEnemy, DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, lv.player.x,lv.player.y)
 		
 		self.turretFacing = self.facing
-		if(DistanceToEnemy<0.5*gui.h):
+		if(DistanceToEnemy< self.detectionRange):
 			self.state = 'attackPursue'
 			
 			# WORK OUT WHICH SECTOR IS NEAREST
@@ -126,7 +127,8 @@ class snowTank(parent):
 		# -------SHOOT
 		if DistanceToEnemy<0.5*gui.h:
 			self.shoot(gui,lv,game)
-		else:
+		
+		if DistanceToEnemy<1.1*self.detectionRange:
 			self.state = 'patrol'
 
 		#if(DistanceToEnemy>0.7*gui.h): self.state = 'patrol'

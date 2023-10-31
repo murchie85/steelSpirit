@@ -8,13 +8,15 @@ class powerDrone(parent):
 		super().__init__(gui)
 		self.id             = _id
 		self.name           = 'powerDrone'
+		self.powerType      = 'ammo'
 		self.kind           = 'air'
 		self.collideCollected = False
 		self.images         = imageAnimateAdvanced(gui.powerDrone['ready'],0.2)
+		self.healthImg      = gui.Utils['health']
 		self.countDownImgs  = imageAnimateAdvanced([gui.powerDrone['3'],gui.powerDrone['2'],gui.powerDrone['1'],gui.powerDrone['0'],],1)
 		self.destructionAnimation = imageAnimateAdvanced(gui.powerDrone['destroyed'],0.05)
 		self.shadow         = imageAnimateAdvanced(gui.powerDrone['shadow'],0.2)
-		self.ammoImage      = gui.pdAmmo['angleRound']
+		self.bonusDisplayImage      = gui.pdAmmo['angleRound']
 		self.nextShot       = 'hotRound'
 		self.x,self.y       = 500,500
 		if(x!=None): self.x = x
@@ -32,7 +34,8 @@ class powerDrone(parent):
 		self.hitImage         = gui.powerDrone['hit']
 		self.hitAnimation     = imageAnimateAdvanced(self.hitImage,0.2)
 
-
+		self.growingFontIndex = 0
+		self.fontTimer        = stopTimer()
 
 		# CLASS OVERRIDES
 		self.defaultSpeed    = 1
@@ -56,6 +59,7 @@ class powerDrone(parent):
 		self.terminateSelf       = False
 		self.changeCount         = 0
 		self.swappedWeapon       = False
+		self.typeInitialised     = False
 
 
 
@@ -68,7 +72,15 @@ class powerDrone(parent):
 		# -----COLLECT ME 
 
 		if(self.collideCollected):
-			lv.player.shotType = self.nextShot
+			if(self.powerType== 'HealthUp'):
+				self.bonusNumber  = int(0.33*lv.player.defaultHp)
+				lv.player.hp      += self.bonusNumber
+
+				if(lv.player.hp>lv.player.defaultHp):
+					lv.player.hp = lv.player.defaultHp
+			else:
+				lv.player.shotType = self.nextShot
+			
 			lv.player.flicker  = True
 			killme(self,lv,killMesssage= str(self.name) + ' collected by enemy',printme=True)
 		
@@ -161,39 +173,46 @@ class powerDrone(parent):
 
 	def updateSelf(self,gui,lv,game):
 
-		shotType =lv.player.shotType
+		if(self.powerType== 'ammo'):
 
-		if(self.swappedWeapon==False):
-			if(shotType in lv.player.nextShotDict.keys()):
-				self.nextShot       = lv.player.nextShotDict[lv.player.shotType]
-				self.ammoImage     = gui.pdAmmo[self.nextShot]
-			
-			elif(shotType in lv.player.maxPowerReference):
-				chosenShotImageKey  = shotType
-				self.ammoImage      =  gui.pdAmmo[shotType]
-				self.nextShot       = shotType
-			else:
-				chosenShotImageKey = 'hotRound'
-				self.ammoImage     = gui.pdAmmo[chosenShotImageKey]
-				self.nextShot      = chosenShotImageKey
+			shotType =lv.player.shotType
 
-
-		changeWeapon = self.weaponTimer.stopWatch(3,'changeWeapon', str(self.changeCount), game,silence=True)
-		if(changeWeapon):
-			if(lv.player.shotType in lv.player.swapShotDict.keys()):
+			if(self.swappedWeapon==False):
+				if(shotType in lv.player.nextShotDict.keys()):
+					self.nextShot       = lv.player.nextShotDict[lv.player.shotType]
+					self.bonusDisplayImage     = gui.pdAmmo[self.nextShot]
 				
-				self.nextShot       = lv.player.swapShotDict[lv.player.shotType]
-				self.ammoImage      = gui.pdAmmo[self.nextShot]
-				self.changeCount   +=1
-				print("Changing Weapon to " + str(self.nextShot))
+				elif(shotType in lv.player.maxPowerReference):
+					chosenShotImageKey  = shotType
+					self.bonusDisplayImage      =  gui.pdAmmo[shotType]
+					self.nextShot       = shotType
+				else:
+					chosenShotImageKey = 'hotRound'
+					self.bonusDisplayImage     = gui.pdAmmo[chosenShotImageKey]
+					self.nextShot      = chosenShotImageKey
 
-				
-				if(self.swappedWeapon==True):
-					self.swappedWeapon = False
-					return()
+
+			changeWeapon = self.weaponTimer.stopWatch(3,'changeWeapon', str(self.changeCount), game,silence=True)
+			if(changeWeapon):
+				if(lv.player.shotType in lv.player.swapShotDict.keys()):
+					
+					self.nextShot       = lv.player.swapShotDict[lv.player.shotType]
+					self.bonusDisplayImage      = gui.pdAmmo[self.nextShot]
+					self.changeCount   +=1
+					print("Changing Weapon to " + str(self.nextShot))
+
+					
+					if(self.swappedWeapon==True):
+						self.swappedWeapon = False
+						return()
 
 
-				self.swappedWeapon = True
+					self.swappedWeapon = True
+		if(self.powerType== 'HealthUp'):
+			if(self.typeInitialised==False):
+				self.bonusDisplayImage   = self.healthImg
+				self.showBonusNumber = True
+				self.typeInitialised     = True
 
 
 
@@ -215,22 +234,23 @@ class powerDrone(parent):
 
 		shadow_x = x + 15
 		shadow_y = y + 15
-		self.shadow.animate(gui,'scout shadow',[shadow_x,shadow_y],game,rotation=self.facing-90)
+		self.shadow.animate(gui,'powerdrone shadow',[shadow_x,shadow_y],game,rotation=self.facing-90)
 
 		if(self.hit):
 			self.damageAnimation(gui,lv,game)
 		elif(self.alive==True and onScreen(self.x,self.y,self.w,self.h,gui) ):
-			animate,self.blitPos  = self.images.animate(gui,'scout' + str(self.id),[x,y],game,rotation=self.facing-90)
+			animate,self.blitPos  = self.images.animate(gui,'powerdrone' + str(self.id),[x,y],game,rotation=self.facing-90)
 
 			ammoTimer = self.ammoTimer.stopWatch(0.8,'ammo flicker', str(self.drawAmmo), game,silence=True)
 			
 			if(ammoTimer):
 				self.drawAmmo = not self.drawAmmo
 			
-
+			# DRAW OVERLAPPING IMAGE
 			if(self.terminateSelf == False):
 				if(self.drawAmmo):
-					drawImage(gui.screen,self.ammoImage,(x,y))
+					drawImage(gui.screen,self.bonusDisplayImage,(x,y))
+			
 			else:
 				animateComplete,self.blitPos  = self.countDownImgs.animate(gui,'terminating' + str(self.id),[x,y],game,rotation=self.facing-90,repeat=False)
 				if(animateComplete):
@@ -248,6 +268,12 @@ class powerDrone(parent):
 				y += 0.5*self.centerPoint[1]
 			complete,blitPos = self.destructionAnimation.animate(gui,str(str(self.name) +' destructionAnimation'),[x,y],game)
 
+			if(self.showBonusNumber):
+				drawText(gui,gui.growingFontLarge[self.growingFontIndex],'+' +str(self.bonusNumber) + ' HP' ,x+ 0.4*self.w,y-0.4*self.h + -(self.growingFontIndex/20 * 0.1*gui.h), colour=(0, 200, 0),alpha=(1 - self.growingFontIndex/len(gui.growingFontLarge))*255)
+				incFont = self.fontTimer.stopWatch(0.025,'expanding font', str(self.growingFontIndex), game,silence=True)
+				if(incFont):
+					if(not self.growingFontIndex>=len(gui.growingFontLarge)-1):
+						self.growingFontIndex +=1
 			
 			if(complete):
 				self.destructionComplete = True

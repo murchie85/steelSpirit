@@ -12,7 +12,7 @@ class turret():
 		self.id             = _id
 		self.classification = classification
 		self.name           = 'turret'
-		self.kind           = 'vechicle'
+		self.kind           = 'vehicle'
 		self.turretImage    = turretImg
 		self.x,self.y       = x,y
 		self.w              = int(turretImg.imageFrames[0].get_width())

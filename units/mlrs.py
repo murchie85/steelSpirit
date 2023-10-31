@@ -73,11 +73,12 @@ class mlrs(parent):
 		self.missilesFired      = 0
 		self.missileTimer       = stopTimer()
 		self.missileDelay       = 2
+		self.detectionRange     = 0.7*gui.h
 
 	# AI LOGIC
 	def actions(self,gui,game,lv):
 
-		# ENSURE VECHICLE DOESN'T EXCEED BOUNDARIES
+		# ENSURE vehicle DOESN'T EXCEED BOUNDARIES
 		self.stayOnField(lv)
 
 
@@ -85,7 +86,7 @@ class mlrs(parent):
 		angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = turretAngleToTarget(self,self.x,self.y,lv.player.x,lv.player.y)
 		turretFaceTarget(self,angleDiffToEnemy, turnIcrement=2)
 		
-		if(DistanceToEnemy<0.7*gui.h):
+		if(DistanceToEnemy<self.detectionRange):
 			self.launchMissiles(game,lv,gui)
 
 

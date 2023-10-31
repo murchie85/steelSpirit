@@ -38,6 +38,7 @@ class scout(parent):
 		self.bulletTimer        = stopTimer()           # BUFF
 		self.shootDelay         = 0.5                   # BUFF
 		self.bulletsFired       = 0
+		self.detectionRange     = 0.65*gui.h
 
 	# AI LOGIC
 	def actions(self,gui,game,lv):
@@ -83,7 +84,7 @@ class scout(parent):
 
 		# -----------GET DISTANCE TO ENEMY
 		angleDiffToEnemy, DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, lv.player.x,lv.player.y)
-		if(DistanceToEnemy<0.65*gui.h):
+		if(DistanceToEnemy<self.detectionRange):
 			self.state = 'attackPursue'
 			
 			# WORK OUT WHICH SECTOR IS NEAREST
@@ -98,7 +99,7 @@ class scout(parent):
 		# DISTANCE THE ENEMY IS FROM ROUTE COORD
 		angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = angleToTarget(self,lv.player.x,lv.player.y,self.defenceSector[0],self.defenceSector[1])
 		
-		if(DistanceToEnemy<0.8*gui.h):
+		if(DistanceToEnemy<self.detectionRange):
 
 			# RECALCULATE RELATIVE POS TO ENEMY
 			angleDiffToEnemy,DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y,lv.player.x,lv.player.y)
@@ -117,7 +118,7 @@ class scout(parent):
 			if DistanceToEnemy<0.65*gui.h:
 				self.shoot(gui,lv,game)
 
-		else:
+		if(DistanceToEnemy>1.05*self.detectionRange):
 			self.state = 'patrol'
 
 

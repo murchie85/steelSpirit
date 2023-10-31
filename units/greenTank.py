@@ -9,7 +9,7 @@ class greenTank(parent):
 		# MAIN OVERRIDES 
 		self.id             = _id
 		self.name           = 'greenTank'
-		self.kind           = 'vechicle'
+		self.kind           = 'vehicle'
 		self.images         = imageAnimateAdvanced(gui.greenTank,0.2)
 		self.turretImage    = imageAnimateAdvanced(gui.greenTurret,0.2)
 		self.shadow         = imageAnimateAdvanced(gui.greenTankShadow,0.2)
@@ -56,11 +56,12 @@ class greenTank(parent):
 		self.bulletTimer        = stopTimer()           # BUFF
 		self.shootDelay         = 0.3                   # BUFF
 		self.bulletsFired       = 0
+		self.detectionRange     = 0.5*gui.h
 
 	# AI LOGIC
 	def actions(self,gui,game,lv):
 
-		# ENSURE VECHICLE DOESN'T EXCEED BOUNDARIES
+		# ENSURE vehicle DOESN'T EXCEED BOUNDARIES
 		self.stayOnField(lv)
 
 
@@ -102,7 +103,7 @@ class greenTank(parent):
 		angleDiffToEnemy, DistanceToEnemy,enemyTargetAngle = angleToTarget(self,self.x,self.y, lv.player.x,lv.player.y)
 		
 		self.turretFacing = self.facing
-		if(DistanceToEnemy<0.5*gui.h):
+		if(DistanceToEnemy<self.detectionRange):
 			self.state = 'attackPursue'
 			
 			# WORK OUT WHICH SECTOR IS NEAREST
@@ -122,11 +123,21 @@ class greenTank(parent):
 		
 		turretFaceTarget(self,angleDiffToEnemy, turnIcrement=5)
 
+		# -----------FACE TOWARDS DESTINATION
+		
+		faceTarget(self,angleDiffToEnemy, turnIcrement=5)
+		
+		# -----------MOVE TOWARDS DESTINATION
+		
+		self.speed = 0.7*self.defaultSpeed
+		self.moveForwards()
+
+
 
 		# -------SHOOT
 		if DistanceToEnemy<0.5*gui.h:
 			self.shoot(gui,lv,game)
-		else:
+		if DistanceToEnemy>1.1*self.detectionRange:
 			self.state = 'patrol'
 
 		#if(DistanceToEnemy>0.7*gui.h): self.state = 'patrol'

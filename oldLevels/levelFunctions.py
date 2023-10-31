@@ -207,7 +207,7 @@ def manageCollisions(self,enemy,gui,game):
 			if(collidesWith(otherEnemy,enemy)):
 				if((enemy.kind =='air' and otherEnemy.kind =='air') or 
 					# if bump into me
-				   (enemy.kind in ['structure','vechicle']  and otherEnemy.kind in['vechicle','boat']) or 
+				   (enemy.kind in ['structure','vehicle']  and otherEnemy.kind in['vehicle','boat']) or 
 				   (enemy.kind =='boat' and otherEnemy.kind =='boat') or 
 				   (enemy.kind =='bigBoat' and otherEnemy.kind =='boat')):
 					# MOVE OUT WAY

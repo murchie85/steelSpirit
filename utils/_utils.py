@@ -1138,6 +1138,45 @@ def loadImageFiles(firstFile,path,convert=False,log=False,alphaConvert=False):
 
 
 
+def loadImageFilesAlpha(firstFile, fullPath):
+    imgFiles = []
+    tfile = os.path.join(fullPath, firstFile)
+
+    # Check if the file contains a number at the end, if not load a single file.
+    if not any(char.isdigit() for char in os.path.splitext(firstFile)[0][-1]):
+        if os.path.isfile(tfile):
+            print('Loading ' + str(tfile))  # Assuming you want to always print when loading an image.
+            img = pygame.image.load(tfile).convert_alpha()
+            imgFiles.append(img)
+        else:
+            print("Image file not found: " + str(tfile))
+            exit()
+        return imgFiles
+
+    # If the file name has a number, strip it and prepare for a sequence
+    prefix, num = os.path.splitext(firstFile)[0].rstrip('0123456789'), ''.join(filter(str.isdigit, firstFile))
+    affix = os.path.splitext(firstFile)[-1]
+    index = int(num) if num else 1  # Start from 1 if there is no number
+
+    for i in range(index, index + 98):
+        cf = f"{prefix}{i}"
+        tfile = os.path.join(fullPath, cf + affix)
+        if os.path.isfile(tfile):
+            print('Loading ' + str(tfile))  # Assuming you want to always print when loading an image.
+            img = pygame.image.load(tfile).convert_alpha()
+            imgFiles.append(img)
+        else:
+            break
+
+    if not imgFiles:
+        print("No images loaded for " + str(fullPath))
+        exit()
+
+    return imgFiles
+
+
+
+
 
 
 

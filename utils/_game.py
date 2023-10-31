@@ -114,7 +114,7 @@ class gameObject():
 
     def coordinateGame(self,gui):
 
-        self.newLevels         = ['Rural Assault']
+        self.newLevels         = ['Rural Assault', 'sandbox']
         self.chosenLevels      = self.newLevels + ['osmallWorld', 'olv5','olv4','olv3','olv2','olv1','oiceWorld']
 
 
@@ -166,6 +166,8 @@ class gameObject():
 
                     if(self.selectedLevel=='Rural Assault'):
                         self.activeLevel             = ruralAssault(gui,self)
+                    if(self.selectedLevel=='sandbox'):
+                        self.activeLevel             = sandbox(gui,self)
 
 
                     # OLD LEVELS

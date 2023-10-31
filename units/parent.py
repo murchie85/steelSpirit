@@ -79,6 +79,9 @@ class parent():
 		self.growingFontIndex = 0
 		self.fontTimer        = stopTimer()
 
+		self.showBonusNumber = False
+		self.bonusNumber     = 0
+
 
 
 
@@ -141,7 +144,14 @@ class parent():
 			#---------DRAW SCORE
 
 			if(self.killScore!=0):
-				drawText(gui,gui.growingFont[self.growingFontIndex],str(self.killScore),x+ 0.4*self.w,y-0.4*self.h + -(self.growingFontIndex/20 * 0.1*gui.h), colour=(255, 255, 255),alpha=(1 - self.growingFontIndex/len(gui.growingFont))*255)
+				drawText(gui,gui.growingFontLarge[self.growingFontIndex],str(self.killScore),x+ 0.4*self.w,y-0.4*self.h + -(self.growingFontIndex/20 * 0.1*gui.h), colour=(255, 255, 255),alpha=(1 - self.growingFontIndex/len(gui.growingFontLarge))*255)
+				incFont = self.fontTimer.stopWatch(0.025,'expanding font', str(self.growingFontIndex), game,silence=True)
+				if(incFont):
+					if(not self.growingFontIndex>=len(gui.growingFontLarge)-1):
+						self.growingFontIndex +=1
+
+			if(self.showBonusNumber):
+				drawText(gui,gui.growingFont[self.growingFontIndex],str(self.showBonusNumber),x+ 0.4*self.w,y-0.4*self.h + -(self.growingFontIndex/20 * 0.1*gui.h), colour=(0, 200, 0),alpha=(1 - self.growingFontIndex/len(gui.growingFont))*255)
 				incFont = self.fontTimer.stopWatch(0.025,'expanding font', str(self.growingFontIndex), game,silence=True)
 				if(incFont):
 					if(not self.growingFontIndex>=len(gui.growingFont)-1):
