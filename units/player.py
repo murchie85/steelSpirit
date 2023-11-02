@@ -15,7 +15,7 @@ import random
 - lockon
 - shoot
 - set invincible
-- classicControls
+- controlshierarchy
 - camera
 - drawSelf
 - drawCone
@@ -74,6 +74,7 @@ class player():
 		self.SPECIAL                   = 'J'
 		self.FLARE_BUTTON              = 'F'
 		self.BOMBKEY  				   = 'B'
+		self.LOCK_BUTTON               = 'H'
 		
 
 
@@ -122,7 +123,7 @@ class player():
 
 
 		# ATTRIBUTES 
-		self.defaultHp         = 20
+		self.defaultHp         = 30
 		self.hp                = self.defaultHp
 		self.speed             = 0
 		self.maxSpeedDefault   = 8
@@ -182,7 +183,9 @@ class player():
 		self.availableMissiles   = ['streaker']
 		self.missileAttrs        = { 'streaker':{'speed':6,'damage':150},'nuke':{'speed':12,'damage':1000}, }
 		self.missileTimer        = stopTimer()           # BUFF
-		self.missileDelay        = 1                   # BUFF
+		
+		self.missileDelays       = [1,2,3,4]
+		self.missileDelay        = self.missileDelays[2]
 		self.missilesFired       = 0
 		self.missileFiring       = False
 		self.nukesAvailable      = 3
@@ -225,42 +228,46 @@ class player():
 		# --------BUTTON CONTROLLS
 		# LOCKON OFF 
 		if(self.lockonActive==False):
-			self.SPECIAL            = 'L'
+			self.SPECIAL            = 'J'
 		# LOCKED ON 
 		if(self.lockonActive==True):
 			self.SHOOTKEY           = 'J'
+			self.SPECIAL            = 'J'
 			self.BOOST_BUTTON       = 'U' 
-			self.JINK_BUTTON        = 'L' 
-			self.SPECIAL            = 'K'
-
-
-
-
-		if(self.LOCKON_MODE == 'NEEDS_LOCKON_PRESSED'):
+			self.JINK_BUTTON        = 'L'
+			self.LOCK_BUTTON        = 'H' 
 			
+
+
+
+
+
+		if(self.LOCKON_MODE =='PRESS_TO_SWITCH'):
 			self.cycleLockon = False
-			if('H' in pressedKeys):
-				self.lockonActive = True
-			else:
-				self.lockonActive = False
+
+			if(self.SHOOTKEY  in pressedKeys and gui.input.returnedKey.upper() ==self.LOCK_BUTTON):
+				self.cycleLockon = True
+
+			elif(gui.input.returnedKey.upper()==self.LOCK_BUTTON):
+				self.lockonActive = not self.lockonActive
+
+			# elif(self.lockonActive and self.LOCK_BUTTON in pressedKeys and self.SHOOTKEY  in pressedKeys ):
+			# 	# TIMER RESETS IF ANY OF THESE VALUES CHANGE
+			# 	disengage = self.lockonTimer.stopWatch(1.5,'lockonbtn wait', str(self.LOCK_BUTTON in pressedKeys) + str(self.lockedOn),game,silence=True)
+			# 	if(disengage):
+			# 		print('triggered')
+			# 		self.lockonActive= False
+			# 		self.lockedOn    = False
+
+
+
+			if(self.lockonActive==False):
 				self.lockedOn     = False
-				self.cycling      = True
-			if(gui.input.returnedKey.upper()=='H' and self.lockonActive):
-				self.cycleLockon = True
 
-		if(self.cycling):
-			# if self.lockonActive changes, the timer resets and counts again.
-			lockonExpired = self.lockonTimer.stopWatch(1,'lockon countdown', str(self.lockonActive),game,silence=True)
-			if(gui.input.returnedKey.upper()=='H'):
-				self.cycleLockon = True
-				self.lockonActive = True
-			
-			if(lockonExpired):
-				self.cycling      = False
-
+		# needs work - use timer
 		elif(self.LOCKON_MODE =='HOLD_TOGGLE_LOCKON'):
-			
 			self.cycleLockon = False
+			
 			if('H' in pressedKeys and self.lockpressed==False):
 				self.lockonActive = not self.lockonActive
 				self.lockpressed = True
@@ -270,16 +277,6 @@ class player():
 				self.lockedOn     = False
 			if('H' not in pressedKeys):
 				self.lockpressed = False
-		elif(self.LOCKON_MODE =='PRESS_TO_SWITCH'):
-			self.cycleLockon = False
-
-			if('J' in pressedKeys and gui.input.returnedKey.upper() =='H'):
-				self.cycleLockon = True
-			elif(gui.input.returnedKey.upper()=='H'):
-				self.lockonActive = not self.lockonActive
-			if(self.lockonActive==False):
-				self.lockedOn     = False
-
 
 		# ensure animation not stuck
 		self.thrustingL,self.thrustingR = False,False
@@ -290,7 +287,7 @@ class player():
 
 		# --------MOVEMENT LOGIC
 
-		self.classicControls(gui,pressedKeys,lv,game)
+		self.controlshierarchy(gui,pressedKeys,lv,game)
 
 		# --------BUILD DETECTION CONE
 
@@ -454,7 +451,7 @@ class player():
 
 
 
-	def classicControls(self,gui,pressedKeys,lv,game):
+	def controlshierarchy(self,gui,pressedKeys,lv,game):
 
 		self.accellerating = False # ACCELELRATION FLAG
 		self.vel_x = 0
@@ -611,11 +608,6 @@ class player():
 
 
 	
-
-
-
-	def standardControls(self,gui,pressedKeys,lv,game):	
-
 		# -------STANDARD MOVEMENT
 		if((self.JINK_BUTTON not in pressedKeys) and not self.lockedOn and not self.firing):
 			# GET DIRECTION OF ACCELLERATION
@@ -633,6 +625,11 @@ class player():
 
 
 
+
+	def standardControls(self,gui,pressedKeys,lv,game):	
+
+
+
 		# ------INCREMENT SHOT TYPE 
 
 		if(gui.input.returnedKey.upper()=='E'):
@@ -646,6 +643,9 @@ class player():
 		if(self.BOOST_BUTTON in pressedKeys and not self.JINK_BUTTON in pressedKeys):
 			
 			boostComplete = self.boostTimer.stopWatch(self.boostDuration,'boost', str(self.boostCount),game,silence=True)
+			
+			# negate lockon mode
+			self.lockonActive = False
 			
 			if(not boostComplete):
 				self.boosting = True

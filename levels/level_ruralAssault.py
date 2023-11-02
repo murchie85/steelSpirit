@@ -12,6 +12,8 @@ from units.mlrs import *
 from units.frigate import *
 from units.powerDrone import *
 from buildings.bioLab import *
+from buildings.tankBarracks import *
+from buildings.greenBarracks import *
 from buildings.samSite import *
 from buildings.barrelRed import *
 from buildings.nonInteractable import *
@@ -298,9 +300,12 @@ class ruralAssault():
             
             # DRAW UNITS ABOVE GROUND
             for enemy in self.enemyList:
-                if(enemy.kind!='vehicle'):
+                if(enemy.kind not in ['vehicle','air']):
                     enemy.drawSelf(gui,game,self)
 
+            for enemy in self.enemyList:
+                if(enemy.kind=='air'):
+                    enemy.drawSelf(gui,game,self)
             # ----PLAYER 
 
             self.player.drawSelf(gui,game,self)
@@ -446,6 +451,12 @@ class ruralAssault():
 
             elif(e['enemySubKeyName']=='bioLab'):
                 enemyObject = bioLab(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 500
+            elif(e['enemySubKeyName']=='tankBarracks'):
+                enemyObject = tankBarracks(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 500
+            elif(e['enemySubKeyName']=='greenBarracks'):
+                enemyObject = greenBarracks(createFid(self),gui,x=x,y=y)
                 enemyObject.killScore = 500
             elif(e['enemySubKeyName']=='samSite'):
                 enemyObject = samSite(createFid(self),gui,x=x,y=y)
@@ -976,7 +987,7 @@ def levelGui(self,gui,game):
 
         # -------------DAMAGE PERCENT
 
-        string = str(self.player.hp/self.player.defaultHp*100) + '%'
+        string = str(round(self.player.hp/self.player.defaultHp*100,2)) + '%'
         tw= getTextWidth(gui.squareFontSmall,string)
         drawTextWithBackground(gui.screen,gui.squareFontSmall,string,x + 0.05*self.guiBoxW,y+ 1.1 * shipImage.get_height(),textColour=(255, 255, 255),backColour= (0,0,0),borderColour=(50,50,200))
 
@@ -1004,8 +1015,8 @@ def levelGui(self,gui,game):
             self.healthBar.load(x,y,gui,self.player.hp/self.player.defaultHp,borderThickness=2)
 
 
-        if(gui.mouseCollides(self.guiBoxX,self.guiBoxY,self.guiBoxW, self.guiBoxH)):
-            self.hideGuiBox = True
+        # if(gui.mouseCollides(self.guiBoxX,self.guiBoxY,self.guiBoxW, self.guiBoxH)):
+        #     self.hideGuiBox = True
 
 
 

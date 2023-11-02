@@ -221,6 +221,41 @@ class player():
 			self.SPECIAL            = 'L'
 
 
+		if(self.LOCKON_MODE == 'NEEDS_LOCKON_PRESSED'):
+			
+			self.cycleLockon = False
+			if('H' in pressedKeys):
+				self.lockonActive = True
+			else:
+				self.lockonActive = False
+				self.lockedOn     = False
+				self.cycling      = True
+			if(gui.input.returnedKey.upper()=='H' and self.lockonActive):
+				self.cycleLockon = True
+
+		if(self.cycling):
+			# if self.lockonActive changes, the timer resets and counts again.
+			lockonExpired = self.lockonTimer.stopWatch(1,'lockon countdown', str(self.lockonActive),game,silence=True)
+			if(gui.input.returnedKey.upper()=='H'):
+				self.cycleLockon = True
+				self.lockonActive = True
+			
+			if(lockonExpired):
+				self.cycling      = False
+
+		elif(self.LOCKON_MODE =='HOLD_TOGGLE_LOCKON'):
+			
+			self.cycleLockon = False
+			if('H' in pressedKeys and self.lockpressed==False):
+				self.lockonActive = not self.lockonActive
+				self.lockpressed = True
+			if(gui.input.returnedKey.upper()=='H' and self.lockonActive):
+				self.cycleLockon = True
+			if(self.lockonActive==False):
+				self.lockedOn     = False
+			if('H' not in pressedKeys):
+				self.lockpressed = False
+
 		# ---- SIMPLER LOCKON SYSTEM WHERE YOU TAP SHOOT TO CYCLE
 
 		# if('J' in pressedKeys):

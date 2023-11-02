@@ -541,7 +541,7 @@ class mapCreator():
         # TILE/OBJECT WINDOW
         if(self.toggleWindow and self.currentLayer=='l2'):
             windowItemLen = 30
-            rows = 3
+            rows = 2
             cols = int(windowItemLen/rows)
             startX,startY = 0.2*gui.w,0.8*gui.h
             originX,originY  = startX,startY

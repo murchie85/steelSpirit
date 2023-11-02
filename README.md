@@ -3,9 +3,35 @@
 ![steel spirit cover](scenes/cover.png)  
 
 
-# SCENE MECHANICS 
+
+# JUMP_CONTENTS 
 
 
+- SCENE_MECHANICS
+
+
+- MEDIA_TRACTION
+
+
+- FEATURES_BACKLOG
+
+
+
+- INSPIRATION
+
+
+
+- FEEDBACK_FROM_PEOPLE
+
+
+
+- ACCEPTANCE_CRITERIA
+
+
+
+# SCENE_MECHANICS 
+
+JUMP_CONTENTS
 
 
 It's a FAST DESERT STRIKE like shooter.
@@ -23,19 +49,45 @@ QUALITY CONTROL - Does it still have slug throwing SHmup feel?
 
 
 
+# MEDIA_TRACTION: 
+
+JUMP_CONTENTS
+
+gamedev.net, 
+
+linkedin, 
+
+reddit pygame, 
+
+indiedev, 
+
+fungames, 
+
+twitter, 
+
+tiktok
 
 
-# TRACTION: gamedev.net, linkedin, reddit pygame, indiedev, fungames, twitter, tiktok
-
-## FEATURES UNSORTED 
 
 
-QUICK WINS:
+## FEATURES_BACKLOG 
+JUMP_CONTENTS
 
-show LockonMode
-Show search beam
 
-Bonus: multiplier to prevent me snipping from a distance.  Use a timer 
+
+JINK-DASH IN NEW LOCKON MODE
+
+
+SHOW LOCKON MODE
+
+SHOW SEARCH BEAM
+
+NGUNI ENEMY 
+
+GRASS L2 DARKENED OVERLAY
+
+BONUS MULTIPLIER 
+			to prevent me snipping from a distance.  Use a timer 
 			- kill enemy, timer starts
 			- 1.2 * points for each kill
 			- BONUS COLOUR FLOAT says BONUS 200 PTS
@@ -43,50 +95,45 @@ Bonus: multiplier to prevent me snipping from a distance.  Use a timer
 			- SCORE TOP LEFT FLASHES
 			- SPAWN POWER UP IF YOU KILL 10
 
-
-- NEW ENEMY & Radar(see fix)
-
+			GOLDEN X2 , X3 and score flashes that colour
 
 
-CONTROL DO-OVER = SEE FIX
+MISSILE POWERUPS
 
+BURNING ANIMATION
 
-BURNING ANIMATION: Leave stuff burning (runway, barracks, sam)
-UNITS/ITEMS:
-							RUNWAY
-							Destroyable Barracks
-							SQUARE SAMS
-UNIT: Spider crawler shooter bots
-UNIT: chain gun
+RUNWAY
+
+SPIDER CRAWLER - SHOOTER BOT
+
+CHAIN GUN ENEMY
 
 SETTINGS : DPAD
 
 ANIMATION: NOT ALL STUFF SHOULD EXPLODE: FIRE AND CRASH DEBRIS LEAVES POT HOLE (L2): slower flipping debris 
 
-HEALTH: HEALTH POWER UP
+Frame work for allies and huge fight plus insta shield
 
-ART: Improve art https://opengameart.org/art-search-advanced?keys=&field_art_type_tid%5B%5D=14&sort_by=count&sort_order=DESC
+ANIMATED POND
+
+BETTER L2 - CRATES, CONTAINERS LIKE RAIDEN II
+
+
+
 BULLET: bullet flash https://duckduckgo.com/?va=o&t=ha&q=shmup+sprites+powerups&iax=images&ia=images&iai=https%3A%2F%2Fimages.squarespace-cdn.com%2Fcontent%2Fv1%2F551a19f8e4b0e8322a93850a%2F1607969224266-KWX66VFLV66TT276HVRM%2F83-Projectiles_P.gif
 
+ANIMATED POND
 
 
-scroll = narrw map but long. map --
+ART: Improve art https://opengameart.org/art-search-advanced?keys=&field_art_type_tid%5B%5D=14&sort_by=count&sort_order=DESC
 
 LOWER 
 
-- Animated pond
-Crates/containers like in raiden
-map texture example https://youtu.be/XqinwSr2yD8?si=IRvjGLWmDKA3l6UA&t=664
 
 
+BETTER MAP TEXTURES example https://youtu.be/XqinwSr2yD8?si=IRvjGLWmDKA3l6UA&t=664
 
-DONE: 
 
-WIREFRAME GUI
-MAP OVERHAUL
-ANGLE BULLETS
-POWER UPs [from box, basic gui to show what i'm shooting with
-- Trees (so they cluster as group too)
 
 
 
@@ -265,16 +312,17 @@ https://www.youtube.com/watch?v=-10qqJ_f8ak
 
 
 
-## FEEDBACK FROM PEOPLE 
+## FEEDBACK_FROM_PEOPLE
+JUMP_CONTENTS
 
 
 LEVEL DESIGN TRICK: FOR CONCRETE BASE, BREAK THINGS UP SO ITS NOT CONTINUOUS, HAVE HOLES IN THE FLOOR
 
-```
+
 Looking good! Some improvements if I may: Tile variants in the grass, it would break up the repetition, you can see a grid.
 Shadows for everything.
 The player movement seems a little stiff, could be a little slower to stop when the player stops moving.
-```
+
 
 
 
@@ -297,11 +345,15 @@ In your case, since the map doesn't even change, the chunks can be arbitrarily l
 
 
 
-# ACCEPTANCE CRITERIA 
+# ACCEPTANCE_CRITERIA 
+JUMP_CONTENTS
 
 KEEP: Currently, tank battles feel shmupy, lots of damage, carnage. 
 
-1. Must have, Lots to dodge, lots to shoot, a lot happening.
+LOTS TO DODGE 
+
+LOTS TO SHOOT 
+
 2. Must have MULTIPLE LAYERS
 3. MUST BE differentiable from the 10000 other Shmups (RPG element, Summon attack, Gameplay mechanics???). Joint teams.Shmup/Open pivot
 4. Dodging huge boss like bullet hell stream
@@ -587,8 +639,14 @@ Consider making units smaller
 - snow tank, 
 - Fix frigate
 2. Add blue laser
-
-
+Destroyable Barracks
+SQUARE SAMS
+HEALTH POWER UP DRONE
+WIREFRAME GUI
+MAP OVERHAUL
+ANGLE BULLETS
+POWER UPs [from box, basic gui to show what i'm shooting with
+- Trees (so they cluster as group too)
 Enemy power up spawner
 
 Add option on map selector for unit

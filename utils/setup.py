@@ -307,6 +307,27 @@ gui.bioLab                    = [pygame.image.load(IMAGEASSETPATH + 'buildings/b
 gui.bioLabHit                 = loadImageFiles('bioLabHit1.png',IMAGEASSETPATH + 'buildings/biolab/',convert=False)
 gui.bioLabRemains             = loadImageFiles('bioLabRemains1.png',IMAGEASSETPATH + 'buildings/biolab/',convert=False)
 
+
+gui.tankBarracks               = loadImageFiles('barracks_tank1.png',IMAGEASSETPATH + 'buildings/tankBarracks/',convert=False)
+gui.tankBarracksHit            = loadImageFiles('barracks_tank_hit1.png',IMAGEASSETPATH + 'buildings/tankBarracks/',convert=False)
+gui.tankBarracksDamaged        = loadImageFiles('barracks_damaged1.png',IMAGEASSETPATH + 'buildings/tankBarracks/',convert=False)
+gui.tankBarracksDamagedHit     = loadImageFiles('barracks_damaged_hit1.png',IMAGEASSETPATH + 'buildings/tankBarracks/',convert=False)
+gui.tankBarracksDestroyed      = loadImageFiles('barracks_destroyed1.png',IMAGEASSETPATH + 'buildings/tankBarracks/',convert=False)
+
+
+
+gui.greenBarracks               = loadImageFiles('barracks1.png',IMAGEASSETPATH + 'buildings/barracks/',convert=False)
+gui.greenBarracksHit            = loadImageFiles('barracks_hit1.png',IMAGEASSETPATH + 'buildings/barracks/',convert=False)
+gui.greenBarracksDamaged        = loadImageFiles('barracks_damaged1.png',IMAGEASSETPATH + 'buildings/barracks/',convert=False)
+gui.greenBarracksDamagedHit     = loadImageFiles('barracks_damaged_hit1.png',IMAGEASSETPATH + 'buildings/barracks/',convert=False)
+gui.greenBarracksDestroyed      = loadImageFiles('barracks_destroyed1.png',IMAGEASSETPATH + 'buildings/barracks/',convert=False)
+
+
+
+
+
+
+
 gui.samSite                    = [pygame.image.load(IMAGEASSETPATH + 'buildings/SAM/silo.png')]
 gui.samSiteHit                 = loadImageFiles('silo_hit1.png',IMAGEASSETPATH + 'buildings/SAM/',convert=False)
 gui.samSiteRemains             = loadImageFiles('silo_remains1.png',IMAGEASSETPATH + 'buildings/SAM/',convert=False)
@@ -482,6 +503,7 @@ gui.enemyDict          = {'scout':{'image': gui.scoutRed[0]},
 						  'mlrs':{'image': gui.mlrsStatic},
 						  'aaSmall':{'image': gui.aaSmallStatic}, 
 						  'bioLab':{'image': gui.bioLab[0]},
+						  'tankBarracks':{'image': gui.tankBarracks[0]},
 						  'barrelRed':{'image': gui.barrelGroupRed[0]}, 
 						  'hind':{'image': gui.hind[0]}, 
 						  'comanche':{'image': gui.comanche[0]}, 

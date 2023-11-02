@@ -13,6 +13,8 @@ from units.frigate import *
 from units.powerDrone import *
 from buildings.bioLab import *
 from buildings.samSite import *
+from buildings.tankBarracks import *
+from buildings.greenBarracks import *
 from buildings.barrelRed import *
 from buildings.nonInteractable import *
 from scenes.cutSceneGui import * 
@@ -414,6 +416,12 @@ class sandbox():
 
             elif(e['enemySubKeyName']=='bioLab'):
                 enemyObject = bioLab(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 500
+            elif(e['enemySubKeyName']=='tankBarracks'):
+                enemyObject = tankBarracks(createFid(self),gui,x=x,y=y)
+                enemyObject.killScore = 500
+            elif(e['enemySubKeyName']=='greenBarracks'):
+                enemyObject = greenBarracks(createFid(self),gui,x=x,y=y)
                 enemyObject.killScore = 500
             elif(e['enemySubKeyName']=='samSite'):
                 enemyObject = samSite(createFid(self),gui,x=x,y=y)

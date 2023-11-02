@@ -263,6 +263,8 @@ def loadEnemyRefData(gui,game,debug=True):
     enemyDict['buildings'] = {
                           'bioLab':{'image': gui.bioLab[0]},
                           'samSite':{'image': gui.samSite[0]},
+                          'tankBarracks':{'image':gui.tankBarracks[0]},
+                          'greenBarracks':{'image':gui.greenBarracks[0]},
                           }
     enemyDict['sea'] = {
                           'attackBoat':{'image': gui.attackBoatStatic},
